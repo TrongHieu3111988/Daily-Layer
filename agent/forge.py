@@ -53,7 +53,7 @@ def mesh(fn, lo, hi, step):
     P, origin, s = grid(lo, hi, step)
     vol = fn(P).astype(np.float32)
     vol[0, :, :] = vol[-1, :, :] = vol[:, 0, :] = vol[:, -1, :] = vol[:, :, 0] = vol[:, :, -1] = 1.0
-    v, f, _, _ = marching_cubes(vol, level=0.0, spacing=(s, s, s))
+    v, f, _, _ = marching_cubes(vol, level=1e-4, spacing=(s, s, s))  # tiny offset: exact zeros on grid planes make non-manifold edges
     v = v + origin
     if signed_volume(v, f) < 0: f = f[:, ::-1]
     return v.astype(np.float32), f.astype(np.int64)

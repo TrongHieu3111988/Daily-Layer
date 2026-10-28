@@ -3,6 +3,310 @@
  "started": "2026-10-28",
  "products": [
   {
+   "slug": "xmas-flat-ornaments-4",
+   "title": "Nordic Flat Ornaments (set of 4)",
+   "price": 2.99,
+   "blurb": "Snowflake, star, tree and lattice bauble. Flat prints with built-in hangers, ready for two-tone layer swaps.",
+   "tags": [
+    "christmas",
+    "ornament",
+    "holiday",
+    "gift"
+   ],
+   "line": "decor",
+   "print_hint": "Flat, no supports, 3 mm thick. Swap filament at 2.4 mm for a two-tone face. PLA or silk PLA; hang with ribbon.",
+   "parts": [
+    {
+     "name": "snowflake",
+     "triangles": 217096,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 3.86,
+     "size_mm": [
+      64.1,
+      79.0,
+      3.0
+     ],
+     "min_z": -0.0
+    },
+    {
+     "name": "star",
+     "triangles": 238712,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 4.42,
+     "size_mm": [
+      75.6,
+      78.7,
+      3.0
+     ],
+     "min_z": -0.0
+    },
+    {
+     "name": "tree",
+     "triangles": 227628,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 5.77,
+     "size_mm": [
+      64.0,
+      79.9,
+      3.0
+     ],
+     "min_z": -0.0
+    },
+    {
+     "name": "bauble",
+     "triangles": 372276,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 6.15,
+     "size_mm": [
+      64.0,
+      76.4,
+      3.0
+     ],
+     "min_z": -0.0
+    }
+   ],
+   "watertight": true,
+   "web": [
+    {
+     "file": "products/xmas-flat-ornaments-4/web_snowflake.bin",
+     "color": "#E8EEF2",
+     "name": "snowflake"
+    },
+    {
+     "file": "products/xmas-flat-ornaments-4/web_star.bin",
+     "color": "#E9B949",
+     "name": "star"
+    },
+    {
+     "file": "products/xmas-flat-ornaments-4/web_tree.bin",
+     "color": "#2F7D4F",
+     "name": "tree"
+    },
+    {
+     "file": "products/xmas-flat-ornaments-4/web_bauble.bin",
+     "color": "#C8443A",
+     "name": "bauble"
+    }
+   ],
+   "download": "",
+   "cover": "products/xmas-flat-ornaments-4/cover.jpg",
+   "build_seconds": 63.4,
+   "download_bytes": 8459993,
+   "dropped": "2026-10-28"
+  },
+  {
+   "slug": "flexi-fishbone",
+   "title": "Flexi Fishbone",
+   "price": 1.99,
+   "blurb": "Eight-segment fish skeleton that prints in one piece and wiggles straight off the bed. No supports, no assembly. Great for Halloween.",
+   "tags": [
+    "flexi",
+    "print-in-place",
+    "fidget",
+    "halloween"
+   ],
+   "line": "print-in-place",
+   "print_hint": "Print-in-place, no supports, no assembly. 0.2 mm layer, 0.5 mm joint clearance; flex gently after printing. Looks great in silk orange/white or multi-colour layer swaps.",
+   "parts": [
+    {
+     "name": "fishbone",
+     "triangles": 403808,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 8,
+     "volume_cm3": 10.59,
+     "size_mm": [
+      109.0,
+      40.0,
+      8.0
+     ],
+     "min_z": -0.0
+    }
+   ],
+   "watertight": true,
+   "web": [
+    {
+     "file": "products/flexi-fishbone/web_fishbone.bin",
+     "color": "#E6DFCC",
+     "name": "fishbone"
+    }
+   ],
+   "download": "",
+   "cover": "products/flexi-fishbone/cover.jpg",
+   "build_seconds": 35.1,
+   "download_bytes": 5072551,
+   "dropped": "2026-10-28"
+  },
+  {
+   "slug": "gridfinity-starter-3x3",
+   "title": "Gridfinity Starter Set 3\u00d73",
+   "price": 0.0,
+   "blurb": "Open-bottom 3\u00d73 baseplate plus four bins (1\u00d71, 2\u00d71, 1\u00d72, 2\u00d72). Drops into any Gridfinity drawer system.",
+   "tags": [
+    "gridfinity",
+    "organizer",
+    "storage"
+   ],
+   "line": "functional",
+   "print_hint": "Gridfinity-compatible (42 mm grid, 7 mm units), lite profile without stacking lip. 0.2 mm layer, 2 walls, no supports. Baseplate is open-bottom to save filament.",
+   "parts": [
+    {
+     "name": "baseplate_3x3",
+     "triangles": 197408,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 11.49,
+     "size_mm": [
+      126.0,
+      126.0,
+      4.7
+     ],
+     "min_z": 0.0
+    },
+    {
+     "name": "bin_1x1",
+     "triangles": 103848,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 13.32,
+     "size_mm": [
+      41.5,
+      41.5,
+      21.0
+     ],
+     "min_z": 0.0
+    },
+    {
+     "name": "bin_2x1",
+     "triangles": 181384,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 25.51,
+     "size_mm": [
+      83.5,
+      41.5,
+      21.0
+     ],
+     "min_z": 0.0
+    },
+    {
+     "name": "bin_1x2",
+     "triangles": 181384,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 25.51,
+     "size_mm": [
+      41.5,
+      83.5,
+      21.0
+     ],
+     "min_z": 0.0
+    },
+    {
+     "name": "bin_2x2",
+     "triangles": 307656,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 48.54,
+     "size_mm": [
+      83.5,
+      83.5,
+      21.0
+     ],
+     "min_z": 0.0
+    }
+   ],
+   "watertight": true,
+   "web": [
+    {
+     "file": "products/gridfinity-starter-3x3/web_baseplate_3x3.bin",
+     "color": "#3A4750",
+     "name": "baseplate_3x3"
+    },
+    {
+     "file": "products/gridfinity-starter-3x3/web_bin_1x1.bin",
+     "color": "#F2B705",
+     "name": "bin_1x1"
+    },
+    {
+     "file": "products/gridfinity-starter-3x3/web_bin_2x1.bin",
+     "color": "#0E7C6B",
+     "name": "bin_2x1"
+    },
+    {
+     "file": "products/gridfinity-starter-3x3/web_bin_1x2.bin",
+     "color": "#E07A5F",
+     "name": "bin_1x2"
+    },
+    {
+     "file": "products/gridfinity-starter-3x3/web_bin_2x2.bin",
+     "color": "#E9E4D8",
+     "name": "bin_2x2"
+    }
+   ],
+   "download": "products/gridfinity-starter-3x3/gridfinity-starter-3x3_files.zip",
+   "cover": "products/gridfinity-starter-3x3/cover.jpg",
+   "build_seconds": 35.2,
+   "download_bytes": 6661092,
+   "dropped": "2026-10-28"
+  },
+  {
+   "slug": "airtag-collar-holder",
+   "title": "AirTag Collar Holder",
+   "price": 1.49,
+   "blurb": "Snap-in AirTag case that slides onto pet collars up to 25 mm wide. Print in TPU for a secure, soft fit.",
+   "tags": [
+    "pet",
+    "airtag",
+    "dog",
+    "cat"
+   ],
+   "line": "functional",
+   "print_hint": "Print in TPU 95A so the AirTag snaps in through the front window. Fits collars up to 25 mm wide. 0.2 mm layer, 3 walls, no supports.",
+   "parts": [
+    {
+     "name": "holder",
+     "triangles": 258088,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 6.87,
+     "size_mm": [
+      38.4,
+      38.4,
+      15.0
+     ],
+     "min_z": 0.0
+    }
+   ],
+   "watertight": true,
+   "web": [
+    {
+     "file": "products/airtag-collar-holder/web_holder.bin",
+     "color": "#D9534F",
+     "name": "holder"
+    }
+   ],
+   "download": "",
+   "cover": "products/airtag-collar-holder/cover.jpg",
+   "build_seconds": 12.5,
+   "download_bytes": 1905460,
+   "dropped": "2026-10-28"
+  },
+  {
    "slug": "twist-vase-petal",
    "title": "Petal Twist Vase",
    "price": 2.49,
@@ -418,6 +722,6 @@
   "members": 0,
   "costs_usd": 0.0
  },
- "updated": "2026-10-28 13:38",
- "featured": "chibi-whale-4part"
+ "updated": "2026-10-28 17:45",
+ "featured": "xmas-flat-ornaments-4"
 }

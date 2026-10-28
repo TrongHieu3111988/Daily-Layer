@@ -17,6 +17,8 @@ def write_webmesh(path, v, f):
     open(path, 'wb').write(gzip.compress(raw, 9))
 
 from products import CATALOG
+from products2 import CATALOG2
+CATALOG = {**CATALOG, **CATALOG2}
 
 def hex2rgb(h): return tuple(int(h[i:i + 2], 16) for i in (1, 3, 5))
 
@@ -33,7 +35,8 @@ def build(slug, out):
     write_3mf(os.path.join(d, f"{slug}.3mf"), pp)
     with zipfile.ZipFile(os.path.join(d, f"{slug}_files.zip"), "w", zipfile.ZIP_DEFLATED) as z:
         for name, *_ in pp: z.write(os.path.join(d, f"{slug}_{name}.stl"), f"{slug}_{name}.stl")
-        z.write(os.path.join(d, f"{slug}.3mf"), f"{slug}.3mf")
+        if res["meta"]["line"] == "figure":  # 3MF carries the colour split; elsewhere STL is enough and keeps zips small
+            z.write(os.path.join(d, f"{slug}.3mf"), f"{slug}.3mf")
         z.writestr("README.txt", f"{info['title']}\n\nPrint tips: {res['meta']['print_hint']}\n\nLicense: personal use. Commercial sale of prints requires a Pro membership.\n")
     # lighter preview mesh for the web viewer and render
     if "step" in inspect.signature(fn).parameters:
@@ -47,6 +50,10 @@ def build(slug, out):
         web.append(dict(file=fn_, color=c, name=name))
     render([(v, f, hex2rgb(c)) for _, v, f, c in prev["parts"]], os.path.join(d, "cover.jpg"), size=720, **dict(zip(("elev","azim"), res["meta"].get("view",(28,-55)))))
     allok = all(r["watertight"] for r in reports.values())
+    if "expect_shells" in res:
+        got = sum(r["shells"] for r in reports.values())
+        print(f"  shells: expected {res['expect_shells']}, got {got}")
+        allok = allok and got == res["expect_shells"]
     entry = dict(slug=slug, **info, line=res["meta"]["line"], print_hint=res["meta"]["print_hint"],
                  parts=[dict(name=k, **r) for k, r in reports.items()], watertight=allok,
                  web=web, download=f"{slug}_files.zip", cover="cover.jpg",
