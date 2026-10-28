@@ -105,7 +105,7 @@ a.back{display:grid;place-items:center;text-decoration:none;color:var(--ink)}
 
   <div class="stage" id="stage">
     <div class="badge" id="badge">—</div>
-    <div class="hint" id="hint" data-t="hintSculpt">Vuốt lên tượng để nặn · chọn Xoay để xoay</div>
+    <div class="hint" id="hint" data-t="hintSculpt">Vuốt lên tượng để nặn · vuốt ra ngoài hoặc dùng 2 ngón để xoay</div>
   </div>
 
   <div class="dock">
@@ -573,7 +573,7 @@ const $ = s => document.querySelector(s);
 
 /* ---------- words ---------- */
 const T = {
-  vi: { print:"In tượng", hintSculpt:"Vuốt lên tượng để nặn · chọn Xoay để xoay", hintRotate:"Kéo để xoay · chụm hai ngón để phóng to",
+  vi: { print:"In tượng", hintSculpt:"Vuốt lên tượng để nặn · vuốt ra ngoài hoặc dùng 2 ngón để xoay", hintRotate:"Chế độ chỉ xoay: kéo ở đâu cũng xoay · chụm hai ngón để phóng to",
         rotate:"Xoay", add:"Đắp", carve:"Khoét", smooth:"Vuốt", paint:"Tô màu", eye:"Mắt", size:"Cỡ", mirror:"Đối xứng",
         newTitle:"Bắt đầu tượng mới", newText:"Chọn một cục đất để nặn. Tượng đang làm sẽ được thay thế.", ball:"Bóng", egg:"Trứng", pebble:"Sỏi", block:"Khối", cancel:"Huỷ",
         printTitle:"In tượng của bé", height:"Chiều cao", thicken:"Làm dày chỗ mỏng", sSize:"Kích thước (mm)", sGram:"Nhựa PLA ước tính", sParts:"Màu in",
@@ -583,7 +583,7 @@ const T = {
         preparing:"Đang chuẩn bị file…", saved:"Đã lưu file. Mở bằng Bambu Studio, Orca hoặc PrusaSlicer.", declined:"Đã huỷ tải.",
         noSave:"Trình xem này không lưu được file.", tooSmall:"Tượng dưới 40 mm có thể có chi tiết nhỏ. Nên in to hơn cho bé.",
         colours:["Kem","Trời","Lá","Nắng","San hô","Tím","Trắng","Mực"] },
-  en: { print:"Print it", hintSculpt:"Drag on the sculpture to shape it · pick Rotate to turn it", hintRotate:"Drag to turn · pinch to zoom",
+  en: { print:"Print it", hintSculpt:"Drag on the sculpture to shape it · drag outside it or use two fingers to turn", hintRotate:"Turn-only mode: drag anywhere to turn · pinch to zoom",
         rotate:"Rotate", add:"Add", carve:"Carve", smooth:"Smooth", paint:"Paint", eye:"Eyes", size:"Size", mirror:"Mirror",
         newTitle:"Start a new sculpture", newText:"Pick a lump of clay. Your current sculpture will be replaced.", ball:"Ball", egg:"Egg", pebble:"Pebble", block:"Block", cancel:"Cancel",
         printTitle:"Print your sculpture", height:"Height", thicken:"Thicken thin spots", sSize:"Size (mm)", sGram:"Estimated PLA", sParts:"Print colours",
@@ -662,6 +662,8 @@ disc.position.y = -0.94; scene.add(disc);
 const controls = new OrbitControls(cam, renderer.domElement);
 controls.target.set(0, -0.05, 0); controls.enableDamping = true; controls.enablePan = false;
 controls.minDistance = 1.2; controls.maxDistance = 5;
+controls.touches = { ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_ROTATE };
+controls.rotateSpeed = 0.9;
 let geo = new THREE.BufferGeometry();
 const mat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.62, metalness: 0 });
 const meshObj = new THREE.Mesh(geo, mat); scene.add(meshObj);
@@ -696,7 +698,6 @@ let tool = "add", mirror = true;
 function setTool(name) {
   tool = name;
   document.querySelectorAll(".tool").forEach(b => b.setAttribute("aria-pressed", b.dataset.tool === name));
-  controls.enableRotate = name === "rotate";
   updateHint();
 }
 function updateHint() { $("#hint").textContent = tool === "rotate" ? t("hintRotate") : t("hintSculpt"); }
@@ -731,14 +732,27 @@ function apply(hit, first) {
   dirty = true;
 }
 let drawing = false, lastP = null, pointers = new Set();
-renderer.domElement.addEventListener("pointerdown", ev => {
+// Runs before the orbit controls see the touch (capture phase on the parent):
+// a touch that lands on the sculpture shapes it; a touch on empty space turns the view.
+// A second finger always turns/zooms, and cancels a stroke that the first finger just began.
+let strokeStart = 0;
+stage.addEventListener("pointerdown", ev => {
+  if (ev.target !== renderer.domElement) return;
   pointers.add(ev.pointerId);
-  if (tool === "rotate" || pointers.size > 1) { drawing = false; return; }
-  const hit = hitAt(ev); if (!hit) return;
+  if (pointers.size > 1) {
+    if (drawing) {
+      drawing = false;
+      if (performance.now() - strokeStart < 350 && S.doUndo()) { S.redo.length = 0; dirty = true; updateUndo(); }
+    }
+    controls.enableRotate = true;
+    return;
+  }
+  const hit = tool === "rotate" ? null : hitAt(ev);
+  controls.enableRotate = !hit;
+  if (!hit) { cursor.visible = false; return; }
   S.snapshot(); updateUndo();
-  drawing = true; lastP = hit.point.clone(); apply(hit, true);
-  renderer.domElement.setPointerCapture(ev.pointerId);
-});
+  drawing = true; strokeStart = performance.now(); lastP = hit.point.clone(); apply(hit, true);
+}, true);
 renderer.domElement.addEventListener("pointermove", ev => {
   const hit = tool === "rotate" ? null : hitAt(ev);
   if (hit) { cursor.visible = true; cursor.position.copy(hit.point); cursor.scale.setScalar(tool === "eye" ? Math.max(radius() * 0.7, 0.035) : radius()); }
@@ -747,7 +761,7 @@ renderer.domElement.addEventListener("pointermove", ev => {
   if (hit.point.distanceTo(lastP) < radius() * 0.35) return;
   lastP = hit.point.clone(); apply(hit, false);
 });
-function endStroke(ev) { pointers.delete(ev.pointerId); if (drawing) { drawing = false; scheduleSave(); } }
+function endStroke(ev) { pointers.delete(ev.pointerId); if (drawing) { drawing = false; scheduleSave(); } if (!pointers.size) controls.enableRotate = true; }
 renderer.domElement.addEventListener("pointerup", endStroke);
 renderer.domElement.addEventListener("pointercancel", endStroke);
 renderer.domElement.addEventListener("pointerleave", () => { cursor.visible = false; });
