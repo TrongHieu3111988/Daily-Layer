@@ -11,7 +11,6 @@ for (const t of TH.THEMES) {
   const t0 = Date.now(), score = D.themeMatch(lab, W, W, guide, keep, 10);
   const r = D.buildTheme(lab, new Float32Array(W * W), W, W, { sizeMM: 80, fillLabel: 10, theme: TH.spec(t, W) });
   console.log(t.id, "match", score.toFixed(2), "tris", r.idx.length / 3, r.check.watertight ? "closed" : "OPEN " + r.check.badEdges, "size", r.size.map(v => v.toFixed(1)).join("x"), "base", r.base, "cols", r.used.join(","), (Date.now() - t0) + "ms");
-  const fs = require("fs"), d = "/tmp/claude-0/-home-claude/2d070396-e5c3-5242-8465-43e5b658f845/scratchpad/th_";
-  fs.writeFileSync(d + t.id + ".pos", Buffer.from(r.pos.buffer)); fs.writeFileSync(d + t.id + ".idx", Buffer.from(r.idx.buffer)); fs.writeFileSync(d + t.id + ".lab", Buffer.from(r.faceLab.buffer));
+  if (process.argv[2]) { const fs = require("fs"), d = process.argv[2] + "/th_"; fs.writeFileSync(d + t.id + ".pos", Buffer.from(r.pos.buffer)); fs.writeFileSync(d + t.id + ".idx", Buffer.from(r.idx.buffer)); fs.writeFileSync(d + t.id + ".lab", Buffer.from(r.faceLab.buffer)); }
 }
 
