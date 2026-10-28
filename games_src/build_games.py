@@ -1,12 +1,12 @@
 """Build every game page twice: an artifact copy (games/out/<id>_artifact.html) and the website copy (repo/public/games/<id>/index.html).
 usage: python3 games/build_games.py  (from /home/claude)"""
 import os, sys
-KCSS = open("games/kit.css").read(); KJS = open("games/kit.js").read()
+KCSS = open("games/kit.css").read(); KJS = open("games/kit.js").read(); K3D = open("games/kit3d.js").read()
 SHOP_ART = "https://claude.ai/artifact/NWvKP3j5tXF8mCmxkDrE4A"
 ids = sys.argv[1:] or [f[:-5] for f in sorted(os.listdir("games")) if f.endswith(".html")]
 for gid in ids:
-    src = open(f"games/{gid}.html").read().replace("/*KITCSS*/", KCSS).replace("<script>/*KITJS*/</script>", "<script>\n" + KJS + "\n</script>")
-    art = src.replace("<!--HEAD-->\n", "").replace("<!--TAIL-->\n", "").replace("<script>\n(function () {", f'<script>window.SHOP_URL = "{SHOP_ART}";</script>\n<script>\n(function () {{', 1)
+    src = open(f"games/{gid}.html").read().replace("/*KITCSS*/", KCSS).replace("<script>/*KITJS*/</script>", "<script>\n" + KJS + "\n</script>").replace("/*KIT3D*/", K3D)
+    art = src.replace("<!--HEAD-->\n", "").replace("<!--TAIL-->\n", "").replace("<script>\n(function () {", f'<script>window.SHOP_URL = "{SHOP_ART}"; window.ASSETS = "assets/"; window.HOST = "artifact";</script>\n<script>\n(function () {{', 1)
     open(f"games/out/{gid}_artifact.html", "w").write(art)
     title, rest = src.split("\n", 1)
     rest = rest.replace('<meta name="claude:viewport-fit-sides" content="cover">\n', "")

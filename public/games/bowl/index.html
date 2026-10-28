@@ -1,0 +1,481 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Toy Bowling</title>
+<meta name="theme-color" content="#FFC93C">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/icons/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@500;600;700;800&display=swap">
+<style>
+/* Daily Layer game kit: the same chunky toy-block look as the shop. One-screen apps: bar on top, stage fills the rest. */
+:root{
+  --sky:#DCF0FF; --sky2:#C9E8FF; --paper:#FFFFFF; --ink:#1B2547; --muted:#55608A; --outline:#1B2547;
+  --sun:#FFC93C; --coral:#FF6B57; --grass:#3FBF7F; --grape:#8C6BF2; --bubble:#5DB8FF; --pink:#FF8FB8; --wood:#E9B97A; --wood2:#C98E4F;
+  --good:#1C9A5E; --bad:#E04A3A; --pop:0 5px 0 var(--outline); --pop-sm:0 3px 0 var(--outline);
+  --f-display:"Baloo 2","Nunito",ui-rounded,system-ui,sans-serif;
+  --f-body:"Nunito",ui-rounded,system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --sky:#101A3A; --sky2:#14204A; --paper:#1A2550; --ink:#EEF2FF; --muted:#AAB4DA; --outline:#070B1F;
+  --sun:#FFCF4D; --coral:#FF7A66; --grass:#4FD08F; --grape:#A487FF; --bubble:#6CC2FF; --pink:#FF9DC3; --wood:#B98A55; --wood2:#8E6234;
+  --good:#4FD08F; --bad:#FF7A66; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --sky:#101A3A; --sky2:#14204A; --paper:#1A2550; --ink:#EEF2FF; --muted:#AAB4DA; --outline:#070B1F;
+  --sun:#FFCF4D; --coral:#FF7A66; --grass:#4FD08F; --grape:#A487FF; --bubble:#6CC2FF; --pink:#FF9DC3; --wood:#B98A55; --wood2:#8E6234;
+  --good:#4FD08F; --bad:#FF7A66; color-scheme:dark}
+body{margin:0}[hidden]{display:none!important}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--sky);color:var(--ink);font-family:var(--f-body);font-size:16px;overflow:hidden;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--grape);outline-offset:3px}
+.app{height:100%;display:flex;flex-direction:column}
+.bar{display:flex;align-items:center;gap:8px;padding-block:8px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.bar h1{font-family:var(--f-display);font-weight:800;font-size:22px;margin:0 auto 0 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.ibtn{width:44px;height:44px;flex:none;border-radius:14px;border:2.5px solid var(--outline);background:var(--paper);display:grid;place-items:center;box-shadow:var(--pop-sm);text-decoration:none;color:var(--ink);font-family:var(--f-display);font-weight:800;font-size:14px}
+.ibtn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--outline)}
+.ibtn svg{width:22px;height:22px}
+.score{flex:none;display:flex;align-items:center;gap:6px;background:var(--sun);color:#3A2A00;border:2.5px solid var(--outline);border-radius:14px;padding:4px 12px;font-family:var(--f-display);font-weight:800;font-size:18px;box-shadow:var(--pop-sm);font-variant-numeric:tabular-nums}
+.score svg{width:20px;height:20px}
+.stage{position:relative;flex:1;min-height:0;margin:0 max(16px,env(safe-area-inset-right,0px)) 12px max(16px,env(safe-area-inset-left,0px));border:3px solid var(--outline);border-radius:26px;overflow:hidden;box-shadow:0 6px 0 var(--outline);background:var(--paper)}
+.btn{text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:9px;border:2.5px solid var(--outline);border-radius:18px;padding:12px 22px;font-family:var(--f-display);font-weight:800;font-size:20px;line-height:1;background:var(--paper);color:var(--ink);box-shadow:var(--pop);transition:transform .12s,box-shadow .12s}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 var(--outline)}
+.btn.coral{background:var(--coral);color:#fff}.btn.grass{background:var(--grass);color:#06301B}.btn.sun{background:var(--sun);color:#3A2A00}
+.btn svg{width:24px;height:24px}
+.overlay{position:fixed;inset:0;z-index:30;display:grid;place-items:center;background:rgba(9,14,34,.45);padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.card{background:var(--paper);border:3px solid var(--outline);border-radius:28px;box-shadow:0 8px 0 var(--outline);padding:22px 22px 24px;max-width:420px;width:100%;display:grid;gap:14px;text-align:center;justify-items:center;animation:popin .35s cubic-bezier(.34,1.56,.64,1)}
+.card h2{font-family:var(--f-display);font-weight:800;font-size:32px;line-height:1.05;margin:0}
+.card p{margin:0;color:var(--muted);font-weight:700;line-height:1.45}
+.card canvas.hero{width:200px;height:140px}
+.card .row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.stars{display:flex;gap:6px}
+.stars svg{width:44px;height:44px}
+@keyframes popin{0%{transform:scale(.7);opacity:0}100%{transform:scale(1);opacity:1}}
+.toast{position:absolute;left:50%;top:14px;transform:translateX(-50%);z-index:5;background:var(--paper);border:2.5px solid var(--outline);border-radius:16px;padding:6px 14px;font-family:var(--f-display);font-weight:800;font-size:18px;box-shadow:var(--pop-sm);white-space:nowrap;pointer-events:none;transition:opacity .3s,transform .3s}
+.toast[hidden]{display:block!important;opacity:0;transform:translate(-50%,-10px)}
+canvas#confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:40}
+@media (max-width:420px){.bar h1{font-size:18px}.ibtn{width:40px;height:40px}.score{font-size:16px;padding:3px 10px}}
+@media (prefers-reduced-motion:reduce){.card{animation:none}.btn,.ibtn{transition:none}}
+
+/* Toy Bowling: the shop's real 3D toys stand at the end of a lane as pins. Swipe the ball and knock them over. */
+.stage{background:#CDEBFF}
+#lane{display:block;width:100%;height:100%;touch-action:none}
+.board{position:absolute;left:10px;right:10px;top:10px;z-index:4;display:flex;gap:4px;justify-content:center;pointer-events:none}
+.frame{min-width:44px;background:color-mix(in srgb,var(--paper) 92%,transparent);border:2.5px solid var(--outline);border-radius:12px;padding:2px 4px 3px;text-align:center;font-family:var(--f-display);font-weight:800;line-height:1.05;box-shadow:var(--pop-sm)}
+.frame small{display:block;font-size:12px;color:var(--muted);font-weight:700;letter-spacing:.04em}
+.frame b{font-size:18px;font-variant-numeric:tabular-nums}
+.frame.now{background:var(--sun);color:#3A2A00}
+.frame.now small{color:#5A4500}
+.swipe{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);z-index:3;display:flex;flex-direction:column;align-items:center;gap:2px;pointer-events:none;font-weight:800;font-size:14px;color:var(--ink)}
+.swipe svg{width:40px;height:56px;animation:up 1.4s ease-in-out infinite}
+@keyframes up{0%{transform:translateY(14px);opacity:.2}60%{transform:translateY(-10px);opacity:1}100%{transform:translateY(-14px);opacity:0}}
+.big{position:absolute;left:50%;top:38%;transform:translate(-50%,-50%) rotate(-6deg);z-index:6;font-family:var(--f-display);font-weight:800;font-size:clamp(44px,13vw,84px);color:#fff;-webkit-text-stroke:3px var(--outline);paint-order:stroke fill;text-shadow:0 6px 0 var(--outline);pointer-events:none;white-space:nowrap;animation:slam .5s cubic-bezier(.34,1.56,.64,1)}
+@keyframes slam{0%{transform:translate(-50%,-50%) rotate(-6deg) scale(2.2);opacity:0}100%{transform:translate(-50%,-50%) rotate(-6deg) scale(1);opacity:1}}
+.loading{position:absolute;inset:0;display:grid;place-items:center;z-index:5;font-family:var(--f-display);font-weight:800;font-size:20px;background:#CDEBFF;text-align:center;padding:20px}
+@media (prefers-reduced-motion:reduce){.swipe svg,.big{animation:none}}
+</style>
+
+</head>
+<body>
+<div class="app">
+  <header class="bar">
+    <a class="ibtn" id="back" href="/" data-t-label="back" aria-label="Back"></a>
+    <h1 data-t="title">Toy Bowling</h1>
+    <span class="score" aria-live="polite"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="#8C6BF2" stroke="#1B2547" stroke-width="2"/><circle cx="9.5" cy="9" r="1.3" fill="#1B2547"/><circle cx="13" cy="8" r="1.3" fill="#1B2547"/><circle cx="12" cy="11.5" r="1.3" fill="#1B2547"/></svg><span id="total">0</span></span>
+    <button class="ibtn" id="soundBtn" type="button" data-t-label="sound" aria-label="Sound"></button>
+    <button class="ibtn" id="langBtn" type="button" aria-label="Language">VI</button>
+  </header>
+  <main class="stage" id="stage">
+    <canvas id="lane" aria-label="Bowling lane"></canvas>
+    <div class="board" id="board"></div>
+    <div class="swipe" id="swipe"><svg viewBox="0 0 40 56" aria-hidden="true"><path d="M20 52V12M8 24L20 10l12 14" fill="none" stroke="#1B2547" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-t="swipe">Swipe up to roll!</span></div>
+    <div class="loading" id="loading" data-t="loading">Setting up the pins…</div>
+    <div class="toast" id="toast" hidden></div>
+  </main>
+</div>
+
+<div class="overlay" id="intro">
+  <div class="card">
+    <canvas class="hero" id="introArt" width="400" height="280"></canvas>
+    <h2 data-t="introH">Toy Bowling!</h2>
+    <p data-t="introP">Our toy friends are standing at the end of the lane. Swipe the ball up the lane and knock them all down. Two rolls a turn, five turns a game.</p>
+    <button class="btn coral" type="button" id="startBtn"><span data-t="start">Let's bowl!</span></button>
+  </div>
+</div>
+<div class="overlay" id="over" hidden>
+  <div class="card">
+    <div class="stars" id="stars"></div>
+    <h2 id="overH"></h2>
+    <p id="overP"></p>
+    <div class="row"><button class="btn coral" type="button" id="againBtn"><span data-t="again">Play again</span></button><a class="btn" id="homeBtn" href="/" data-t="home">More games</a></div>
+  </div>
+</div>
+
+<script>
+/* Daily Layer game kit: words, sound, confetti and the "toy friends" every game draws. */
+(function () {
+  "use strict";
+  const K = {};
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+  };
+  K.store = store;
+  K.CALM = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---------- words ---------- */
+  K.lang = store.get("dl-lang", /^vi/i.test(navigator.language || "") ? "vi" : "en");
+  K.words = { en: {}, vi: {} };
+  K.t = (k, ...a) => { const v = K.words[K.lang][k] ?? K.words.en[k] ?? k; return typeof v === "function" ? v(...a) : v; };
+  K.applyWords = () => {
+    document.documentElement.lang = K.lang;
+    document.querySelectorAll("[data-t]").forEach(el => { el.textContent = K.t(el.dataset.t); });
+    document.querySelectorAll("[data-t-label]").forEach(el => { el.setAttribute("aria-label", K.t(el.dataset.tLabel)); });
+    const b = document.getElementById("langBtn"); if (b) b.textContent = K.lang === "vi" ? "EN" : "VI";
+    K.onLang && K.onLang();
+  };
+  K.toggleLang = () => { K.lang = K.lang === "vi" ? "en" : "vi"; store.set("dl-lang", K.lang); K.applyWords(); };
+
+  /* ---------- sound: tiny synth blips, only after the child has touched the screen ---------- */
+  let ac = null; K.muted = store.get("dl-muted", false);
+  function ctx() { if (K.muted) return null; if (!ac) { try { ac = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return null; } } if (ac.state === "suspended") ac.resume(); return ac; }
+  function tone(f0, f1, dur, type = "sine", vol = 0.18, delay = 0) {
+    const a = ctx(); if (!a) return;
+    const t0 = a.currentTime + delay, o = a.createOscillator(), g = a.createGain();
+    o.type = type; o.frequency.setValueAtTime(f0, t0); o.frequency.exponentialRampToValueAtTime(Math.max(30, f1), t0 + dur);
+    g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(vol, t0 + 0.015); g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    o.connect(g).connect(a.destination); o.start(t0); o.stop(t0 + dur + 0.02);
+  }
+  K.sfx = {
+    pop: () => tone(520, 880, 0.12, "triangle", 0.16),
+    thud: () => tone(180, 90, 0.14, "sine", 0.22),
+    boing: () => { tone(300, 120, 0.25, "square", 0.06); tone(150, 260, 0.2, "sine", 0.12, 0.05); },
+    chime: () => { [660, 880, 1320].forEach((f, i) => tone(f, f * 1.01, 0.22, "triangle", 0.12, i * 0.07)); },
+    tada: () => { [523, 659, 784, 1046].forEach((f, i) => tone(f, f, 0.3, "triangle", 0.14, i * 0.09)); },
+    tick: () => tone(1200, 900, 0.04, "square", 0.04)
+  };
+  K.setMuted = m => { K.muted = m; store.set("dl-muted", m); const b = document.getElementById("soundBtn"); if (b) b.innerHTML = m ? K.ICON.mute : K.ICON.sound; };
+
+  /* ---------- confetti ---------- */
+  let cc = null, cg = null, bits = [], craf = 0;
+  const CONF = ["#FF6B57", "#FFC93C", "#3FBF7F", "#5DB8FF", "#8C6BF2", "#FF8FB8"];
+  K.confetti = (x, y, n = 60) => {
+    if (K.CALM) return;
+    if (!cc) { cc = document.createElement("canvas"); cc.id = "confetti"; document.body.appendChild(cc); cg = cc.getContext("2d"); }
+    const d = Math.min(devicePixelRatio || 1, 2); cc.width = innerWidth * d; cc.height = innerHeight * d;
+    x = x ?? innerWidth / 2; y = y ?? innerHeight / 3;
+    for (let i = 0; i < n; i++) { const a = Math.random() * Math.PI * 2, s = 4 + Math.random() * 7;
+      bits.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s - 5, r: Math.random() * 6, vr: (Math.random() - .5) * .4, w: 6 + Math.random() * 6, h: 4 + Math.random() * 4, c: CONF[i % CONF.length], life: 0 }); }
+    if (!craf) craf = requestAnimationFrame(step);
+    function step() {
+      const d = cc.width / innerWidth; cg.clearRect(0, 0, cc.width, cc.height);
+      for (let i = bits.length - 1; i >= 0; i--) { const b = bits[i]; b.life++; b.vy += 0.25; b.vx *= 0.99; b.x += b.vx; b.y += b.vy; b.r += b.vr;
+        if (b.y > innerHeight + 20 || b.life > 240) { bits.splice(i, 1); continue; }
+        cg.save(); cg.translate(b.x * d, b.y * d); cg.rotate(b.r); cg.fillStyle = b.c; cg.fillRect(-b.w * d / 2, -b.h * d / 2, b.w * d, b.h * d); cg.restore(); }
+      craf = bits.length ? requestAnimationFrame(step) : 0;
+    }
+  };
+
+  /* ---------- toy friends: our own little characters, drawn with canvas ---------- */
+  K.COLS = { coral: "#FF6B57", sun: "#FFC93C", grass: "#3FBF7F", sky: "#5DB8FF", grape: "#8C6BF2", pink: "#FF8FB8", orange: "#FF9B3D", mint: "#7FE0C2" };
+  K.INK = "#1B2547";
+  function shapePath(g, shape, w, h) {
+    g.beginPath();
+    const r = Math.min(w, h) * 0.22;
+    if (shape === "ball") { g.ellipse(0, 0, w / 2, h / 2, 0, 0, Math.PI * 2); }
+    else if (shape === "tri") { g.moveTo(0, -h / 2); g.lineTo(w / 2, h / 2); g.lineTo(-w / 2, h / 2); g.closePath(); }
+    else if (shape === "dome") { g.moveTo(-w / 2, h / 2); g.lineTo(-w / 2, 0); g.ellipse(0, 0, w / 2, h / 2, 0, Math.PI, 0); g.lineTo(w / 2, h / 2); g.closePath(); }
+    else if (shape === "star") { for (let k = 0; k < 10; k++) { const a = -Math.PI / 2 + k * Math.PI / 5, rr = k % 2 ? 0.42 : 1; g.lineTo(Math.cos(a) * w / 2 * rr, Math.sin(a) * h / 2 * rr * 1.05 + h * 0.04); } g.closePath(); }
+    else if (shape === "heart") { const s = w / 2; g.moveTo(0, h * 0.42); g.bezierCurveTo(-s * 1.4, -h * 0.05, -s * 0.55, -h * 0.62, 0, -h * 0.2); g.bezierCurveTo(s * 0.55, -h * 0.62, s * 1.4, -h * 0.05, 0, h * 0.42); }
+    else { g.roundRect ? g.roundRect(-w / 2, -h / 2, w, h, r) : g.rect(-w / 2, -h / 2, w, h); }
+  }
+  K.shapePath = shapePath;
+  // draw a friend centred at (0,0); opts: shape, colour, w, h, mood ("happy" | "wow" | "sleepy" | "sad"), lw
+  K.friend = (g, o) => {
+    const { shape = "square", colour = "#FFC93C", w = 60, h = 60, mood = "happy" } = o, lw = o.lw ?? Math.max(2, Math.min(w, h) * 0.07);
+    g.save();
+    shapePath(g, shape, w, h); g.fillStyle = colour; g.fill();
+    // soft highlight
+    g.save(); shapePath(g, shape, w, h); g.clip(); g.fillStyle = "rgba(255,255,255,.28)"; g.beginPath(); g.ellipse(-w * 0.22, -h * 0.28, w * 0.28, h * 0.16, -0.5, 0, Math.PI * 2); g.fill();
+    g.fillStyle = "rgba(0,0,0,.08)"; g.fillRect(-w, h * 0.22, w * 2, h); g.restore();
+    shapePath(g, shape, w, h); g.lineWidth = lw; g.strokeStyle = K.INK; g.lineJoin = "round"; g.stroke();
+    // face
+    const s = Math.min(w, h), fy = shape === "tri" ? h * 0.18 : shape === "dome" ? h * 0.08 : 0, ex = s * 0.17, ey = fy - s * 0.04, er = Math.max(1.6, s * 0.065);
+    g.fillStyle = K.INK; g.strokeStyle = K.INK; g.lineCap = "round"; g.lineWidth = Math.max(1.5, s * 0.05);
+    if (mood === "sleepy") { for (const sx of [-1, 1]) { g.beginPath(); g.arc(sx * ex, ey, er, 0.1 * Math.PI, 0.9 * Math.PI); g.stroke(); } }
+    else for (const sx of [-1, 1]) { g.beginPath(); g.ellipse(sx * ex, ey, er, er * (mood === "wow" ? 1.35 : 1.15), 0, 0, Math.PI * 2); g.fill();
+      g.fillStyle = "#fff"; g.beginPath(); g.arc(sx * ex - er * 0.3, ey - er * 0.35, er * 0.38, 0, Math.PI * 2); g.fill(); g.fillStyle = K.INK; }
+    g.fillStyle = "rgba(255,120,150,.55)";
+    for (const sx of [-1, 1]) { g.beginPath(); g.ellipse(sx * ex * 1.75, ey + s * 0.1, s * 0.07, s * 0.045, 0, 0, Math.PI * 2); g.fill(); }
+    g.beginPath();
+    if (mood === "wow") { g.fillStyle = K.INK; g.ellipse(0, ey + s * 0.15, s * 0.05, s * 0.065, 0, 0, Math.PI * 2); g.fill(); }
+    else if (mood === "sad") { g.arc(0, ey + s * 0.22, s * 0.08, 1.15 * Math.PI, 1.85 * Math.PI); g.stroke(); }
+    else { g.arc(0, ey + s * 0.07, s * 0.09, 0.15 * Math.PI, 0.85 * Math.PI); g.stroke(); }
+    g.restore();
+  };
+  K.star = (g, x, y, r, fill = "#FFC93C") => {
+    g.save(); g.beginPath();
+    for (let k = 0; k < 10; k++) { const a = -Math.PI / 2 + k * Math.PI / 5, rr = k % 2 ? r * 0.45 : r; g.lineTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr); }
+    g.closePath(); g.fillStyle = fill; g.fill(); g.lineWidth = Math.max(2, r * 0.18); g.strokeStyle = K.INK; g.lineJoin = "round"; g.stroke(); g.restore();
+  };
+  K.starSVG = on => `<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M20 3l5 10.3 11.3 1.5-8.3 7.8 2.1 11.2L20 28.3 9.9 33.8 12 22.6 3.7 14.8 15 13.3z" fill="${on ? "#FFC93C" : "rgba(127,140,180,.25)"}" stroke="#1B2547" stroke-width="3" stroke-linejoin="round"/></svg>`;
+
+  /* ---------- canvas helper: crisp at any pixel density ---------- */
+  K.fit = (canvas, onSize) => {
+    const ro = new ResizeObserver(() => { const r = canvas.getBoundingClientRect(), d = Math.min(devicePixelRatio || 1, 2.5);
+      if (!r.width) return; canvas.width = Math.round(r.width * d); canvas.height = Math.round(r.height * d); onSize && onSize(r.width, r.height, d); });
+    ro.observe(canvas);
+  };
+
+  K.ICON = {
+    back: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>',
+    sound: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor" fill-opacity=".2"/><path d="M16.5 9a4 4 0 010 6M19 6.5a7.5 7.5 0 010 11"/></svg>',
+    mute: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor" fill-opacity=".2"/><path d="M17 9l5 6M22 9l-5 6"/></svg>',
+    star: '<svg viewBox="0 0 24 24"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z" fill="#fff" stroke="#1B2547" stroke-width="2" stroke-linejoin="round"/></svg>',
+    replay: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 108-8H8"/><path d="M8 1L5 4l3 3"/></svg>',
+    play: '<svg viewBox="0 0 24 24"><path d="M7 4.5v15l12.5-7.5z" fill="currentColor"/></svg>'
+  };
+  // shared bar wiring: back link, sound, language
+  K.initBar = () => {
+    const back = document.getElementById("back"); if (back) { back.innerHTML = K.ICON.back; back.href = window.SHOP_URL || "/"; }
+    const s = document.getElementById("soundBtn"); if (s) { s.innerHTML = K.muted ? K.ICON.mute : K.ICON.sound; s.onclick = () => { K.setMuted(!K.muted); if (!K.muted) K.sfx.pop(); }; }
+    const l = document.getElementById("langBtn"); if (l) l.onclick = K.toggleLang;
+  };
+  window.K = K;
+})();
+
+</script>
+<script>
+K.words.en = { title: "Toy Bowling", back: "Back", sound: "Sound on or off", swipe: "Swipe up to roll!", loading: "Setting up the pins…", introH: "Toy Bowling!",
+  introP: "Our toy friends are standing at the end of the lane. Swipe the ball up the lane and knock them all down. Two rolls a turn, five turns a game.", start: "Let's bowl!",
+  again: "Play again", home: "More games", turn: n => "T" + n, strike: "STRIKE!", spare: "SPARE!", down: n => n === 0 ? "Missed! Try again" : n + (n === 1 ? " friend down!" : " friends down!"),
+  overH: s => s >= 24 ? "Bowling champion!" : s >= 15 ? "Great bowling!" : "Nice rolling!", overP: (s, best) => "You knocked down " + s + " of 30 friends." + (s >= best ? " New best!" : " Best: " + best + "."),
+  noLoad: "The game couldn't load. Check the connection and try again." };
+K.words.vi = { title: "Bowling Đồ Chơi", back: "Quay lại", sound: "Bật hoặc tắt âm thanh", swipe: "Vuốt lên để lăn bóng!", loading: "Đang xếp các bạn…", introH: "Bowling Đồ Chơi!",
+  introP: "Các bạn đồ chơi đang đứng cuối đường lăn. Bé vuốt quả bóng lên để lăn tới và làm các bạn ngã hết nhé. Mỗi lượt lăn 2 lần, mỗi ván 5 lượt.", start: "Lăn thôi!",
+  again: "Chơi lại", home: "Trò khác", turn: n => "L" + n, strike: "STRIKE!", spare: "SPARE!", down: n => n === 0 ? "Trượt rồi! Thử lại nhé" : n + " bạn ngã rồi!",
+  overH: s => s >= 24 ? "Vô địch bowling!" : s >= 15 ? "Lăn giỏi quá!" : "Lăn hay lắm!", overP: (s, best) => "Bé làm ngã " + s + "/30 bạn." + (s >= best ? " Kỷ lục mới!" : " Kỷ lục: " + best + "."),
+  noLoad: "Chưa tải được trò chơi. Kiểm tra mạng rồi thử lại." };
+K.initBar(); K.applyWords();
+let toastT = 0;
+function toast(m) { const e = document.getElementById("toast"); e.textContent = m; e.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => (e.hidden = true), 1600); }
+</script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/","cannon-es":"https://cdn.jsdelivr.net/npm/cannon-es@0.20.0/dist/cannon-es.js"}}</script>
+<script type="module">
+import * as THREE from "three";
+import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
+import * as CANNON from "cannon-es";
+/* ---------- Daily Layer 3D kit: loads the shop's real figures as light game toys (inlined into module scripts) ---------- */
+const ASSETS = window.ASSETS || "/";
+async function fetchBytes(url) {
+  const res = await fetch(url); if (!res.ok) throw new Error("fetch " + res.status + " " + url);
+  if (!url.endsWith(".txt")) return new Uint8Array(await res.arrayBuffer());
+  const bin = atob((await res.text()).trim()), out = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+  return out;
+}
+async function loadToyList() { const r = await fetch(ASSETS + "toys.json"); if (!r.ok) throw new Error("toys"); return r.json(); }
+const geoCache = new Map();
+// a toy is 1 unit tall, standing on y = 0, centred on x/z, one colour per triangle
+async function toyGeometry(t) {
+  if (geoCache.has(t.slug)) return geoCache.get(t.slug);
+  const p = (async () => {
+    const gz = await fetchBytes(ASSETS + t.game);
+    const buf = await new Response(new Blob([gz]).stream().pipeThrough(new DecompressionStream("gzip"))).arrayBuffer();
+    const dv = new DataView(buf), nv = dv.getUint32(0, true), nf = dv.getUint32(4, true);
+    const lo = [0, 1, 2].map(i => dv.getFloat32(8 + 4 * i, true)), hi = [0, 1, 2].map(i => dv.getFloat32(20 + 4 * i, true));
+    const q = new Uint16Array(buf.slice(32, 32 + nv * 6)), pos = new Float32Array(nv * 3);
+    for (let i = 0; i < nv; i++) for (let k = 0; k < 3; k++) pos[3 * i + k] = lo[k] + q[3 * i + k] / 65535 * (hi[k] - lo[k]);
+    const fo = 32 + nv * 6, idx = new Uint32Array(buf.slice(fo, fo + nf * 12)), rgb = new Uint8Array(buf, fo + nf * 12, nf * 3);
+    const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.BufferAttribute(pos, 3)); g.setIndex(new THREE.BufferAttribute(idx, 1));
+    g.computeVertexNormals();
+    const ng = g.toNonIndexed(), col = new Float32Array(nf * 9), c = new THREE.Color();
+    for (let f = 0; f < nf; f++) { c.setRGB(rgb[3 * f] / 255, rgb[3 * f + 1] / 255, rgb[3 * f + 2] / 255, THREE.SRGBColorSpace); for (let k = 0; k < 3; k++) col.set([c.r, c.g, c.b], 9 * f + 3 * k); }
+    ng.setAttribute("color", new THREE.BufferAttribute(col, 3)); ng.computeBoundingBox(); g.dispose();
+    return ng;
+  })();
+  geoCache.set(t.slug, p); return p;
+}
+const toyMat = () => new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.55, metalness: 0 });
+async function toyMesh(t) { const m = new THREE.Mesh(await toyGeometry(t), toyMat()); m.castShadow = true; m.receiveShadow = true; m.userData.toy = t; return m; }
+// the child's collection is kept on this device only
+const collection = {
+  get() { return K.store.get("dl-collection", {}); },
+  add(slug) { const c = collection.get(); c[slug] = (c[slug] || 0) + 1; K.store.set("dl-collection", c); return c[slug]; }
+};
+const shopLink = slug => (window.SHOP_URL || "/") + "#m-" + slug;
+const assetURL = p => ASSETS + p;
+
+
+/* ---------- scene ---------- */
+const cv = document.getElementById("lane");
+const renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2)); renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+const scene = new THREE.Scene(); scene.background = new THREE.Color("#CDEBFF"); scene.fog = new THREE.Fog("#CDEBFF", 30, 60);
+const cam = new THREE.PerspectiveCamera(50, 1, 0.1, 100);
+scene.add(new THREE.HemisphereLight(0xffffff, 0xC9A27A, 1.6));
+const sun = new THREE.DirectionalLight(0xffffff, 2.2); sun.position.set(5, 14, 6); sun.castShadow = true; sun.shadow.mapSize.set(1024, 1024);
+Object.assign(sun.shadow.camera, { left: -8, right: 8, top: 12, bottom: -22, near: 1, far: 50 }); scene.add(sun);
+const mats = {}; const mat = c => mats[c] || (mats[c] = new THREE.MeshStandardMaterial({ color: c, roughness: 0.7 }));
+function box(w, h, d, c, x, y, z, r = 0.06) { const m = new THREE.Mesh(r ? new RoundedBoxGeometry(w, h, d, 2, r) : new THREE.BoxGeometry(w, h, d), mat(c)); m.position.set(x, y, z); m.receiveShadow = true; m.castShadow = true; scene.add(m); return m; }
+const LANE_W = 4.4, LANE_START = 9, LANE_END = -14, PIN_Z = -8.5;
+box(40, 0.2, 60, "#9ED8B4", 0, -0.12, -5, 0);                                     // grass all around
+box(LANE_W, 0.12, LANE_START - LANE_END, "#E9B97A", 0, 0, (LANE_START + LANE_END) / 2, 0); // the lane
+for (let x = -LANE_W / 2 + 0.55; x < LANE_W / 2; x += 0.55) box(0.03, 0.005, LANE_START - LANE_END, "#D4A266", x, 0.065, (LANE_START + LANE_END) / 2, 0);
+for (const s of [-1, 1]) { box(0.35, 0.55, LANE_START - LANE_END, s < 0 ? "#FF6B57" : "#5DB8FF", s * (LANE_W / 2 + 0.17), 0.28, (LANE_START + LANE_END) / 2, 0.12); }  // bumpers
+for (let i = 0; i < 5; i++) { const c = ["#FF6B57", "#FFC93C", "#3FBF7F", "#5DB8FF", "#8C6BF2"][i]; box(0.3, 0.02, 0.3, c, -1.2 + i * 0.6, 0.07, 3.5, 0.04).rotation.y = Math.PI / 4; }  // aiming arrows
+box(LANE_W + 1.2, 3, 0.4, "#8C6BF2", 0, 1.5, LANE_END - 0.3, 0.15);                // back wall
+// a few clouds and hills
+for (const [x, y, z, s] of [[-12, 9, -35, 3], [10, 11, -38, 4], [0, 13, -45, 3.5]]) { const g = new THREE.Group(); for (let k = 0; k < 3; k++) { const m = new THREE.Mesh(new THREE.SphereGeometry(s * (1 - k * 0.2), 16, 12), mat("#FFFFFF")); m.position.set(k * s * 0.9 - s, (k % 2) * s * 0.3, 0); g.add(m); } g.position.set(x, y, z); scene.add(g); }
+for (const [x, z, r, c] of [[-14, -30, 9, "#7ED69A"], [14, -32, 11, "#6CCB8B"]]) { const m = new THREE.Mesh(new THREE.SphereGeometry(r, 24, 16), mat(c)); m.position.set(x, -r * 0.55, z); scene.add(m); }
+
+/* ---------- physics ---------- */
+const world = new CANNON.World({ gravity: new CANNON.Vec3(0, -20, 0) });
+world.allowSleep = true; world.defaultContactMaterial.friction = 0.35; world.defaultContactMaterial.restitution = 0.15;
+const ground = new CANNON.Body({ mass: 0, shape: new CANNON.Plane() }); ground.quaternion.setFromEuler(-Math.PI / 2, 0, 0); ground.position.y = 0.06; world.addBody(ground);
+for (const s of [-1, 1]) { const b = new CANNON.Body({ mass: 0, shape: new CANNON.Box(new CANNON.Vec3(0.17, 0.6, (LANE_START - LANE_END) / 2)) }); b.position.set(s * (LANE_W / 2 + 0.17), 0.6, (LANE_START + LANE_END) / 2); world.addBody(b); }
+const wall = new CANNON.Body({ mass: 0, shape: new CANNON.Box(new CANNON.Vec3(LANE_W, 2, 0.2)) }); wall.position.set(0, 2, LANE_END - 0.3); world.addBody(wall);
+
+const BALL_R = 0.48;
+const ballMesh = new THREE.Mesh(new THREE.SphereGeometry(BALL_R, 32, 24), new THREE.MeshStandardMaterial({ color: "#8C6BF2", roughness: 0.25 }));
+ballMesh.castShadow = true; scene.add(ballMesh);
+for (const [a, b] of [[0.3, 0.2], [-0.05, 0.38], [0.25, -0.15]]) { const h = new THREE.Mesh(new THREE.SphereGeometry(0.07, 12, 8), mat("#1B2547")); h.position.set(a * BALL_R * 1.9, b * BALL_R * 1.9, BALL_R * 0.92); ballMesh.add(h); }
+const ball = new CANNON.Body({ mass: 7, shape: new CANNON.Sphere(BALL_R), linearDamping: 0.08, angularDamping: 0.1 });
+world.addBody(ball);
+
+/* ---------- pins: real toys on top of simple box colliders ---------- */
+const PIN_H = 1.45, SLOTS = [[0, 0], [-0.62, -1.15], [0.62, -1.15], [-1.24, -2.3], [0, -2.3], [1.24, -2.3]];
+let toys = [], pins = [];
+async function setPins(keep) {
+  for (const p of pins) { if (keep && keep.includes(p)) continue; scene.remove(p.mesh); world.removeBody(p.body); }
+  if (keep) { pins = keep; for (const p of pins) { p.body.velocity.setZero(); p.body.angularVelocity.setZero(); p.body.position.set(p.home.x, p.home.y, p.home.z); p.body.quaternion.set(0, 0, 0, 1); p.body.wakeUp(); } return; }
+  pins = [];
+  const featured = toys.find(t => t.featured), rest = toys.filter(t => t !== featured).sort(() => Math.random() - 0.5);
+  const lineup = (featured ? [featured, ...rest] : rest);
+  for (let i = 0; i < SLOTS.length; i++) {
+    const t = lineup[i % lineup.length], mesh = await toyMesh(t), bb = mesh.geometry.boundingBox;
+    const s = PIN_H / (bb.max.y - bb.min.y); mesh.scale.setScalar(s);
+    const hx = Math.max(0.18, (bb.max.x - bb.min.x) * s * 0.36), hz = Math.max(0.18, (bb.max.z - bb.min.z) * s * 0.36), hy = PIN_H / 2;
+    const cx = (bb.max.x + bb.min.x) / 2 * s, cz = (bb.max.z + bb.min.z) / 2 * s;
+    const body = new CANNON.Body({ mass: 1, shape: new CANNON.Box(new CANNON.Vec3(hx, hy, hz)), linearDamping: 0.2, angularDamping: 0.25, sleepSpeedLimit: 0.15 });
+    const [sx, sz] = SLOTS[i]; body.position.set(sx, 0.06 + hy, PIN_Z + sz);
+    world.addBody(body); scene.add(mesh);
+    pins.push({ t, mesh, body, off: new THREE.Vector3(-cx, -hy, -cz), home: body.position.clone(), down: false });
+  }
+}
+function syncPins() {
+  for (const p of pins) {
+    const q = new THREE.Quaternion(p.body.quaternion.x, p.body.quaternion.y, p.body.quaternion.z, p.body.quaternion.w);
+    p.mesh.quaternion.copy(q); p.mesh.position.set(p.body.position.x, p.body.position.y, p.body.position.z).add(p.off.clone().applyQuaternion(q));
+  }
+}
+const isDown = p => { const up = new CANNON.Vec3(0, 1, 0), v = p.body.quaternion.vmult(up); return v.y < 0.65 || p.body.position.y < 0 || Math.hypot(p.body.position.x - p.home.x, p.body.position.z - p.home.z) > 0.9; };
+
+/* ---------- turns ---------- */
+let frame = 0, roll = 0, scores = [], rolling = false, rollT = 0, standing = 6, firstDown = 0, best = K.store.get("bowl-best", 0);
+function resetBall() { ball.velocity.setZero(); ball.angularVelocity.setZero(); ball.position.set(0, BALL_R + 0.07, 6.2); ball.quaternion.set(0, 0, 0, 1); ball.wakeUp(); }
+function board() {
+  document.getElementById("board").innerHTML = Array.from({ length: 5 }, (_, i) => `<div class="frame${i === frame ? " now" : ""}"><small>${K.t("turn", i + 1)}</small><b>${scores[i] ?? (i === frame && roll ? firstDown : "")}</b></div>`).join("");
+  document.getElementById("total").textContent = scores.reduce((a, b) => a + (b || 0), 0);
+}
+async function newGame() { frame = 0; roll = 0; scores = []; await setPins(); resetBall(); board(); document.getElementById("over").hidden = true; document.getElementById("swipe").hidden = false; }
+function launch(vx, vz) {
+  if (rolling) return; rolling = true; rollT = performance.now();
+  ball.wakeUp(); ball.velocity.set(vx, 0, vz); ball.angularVelocity.set(vz / BALL_R, 0, -vx / BALL_R);   // already rolling, so friction doesn't brake it
+  document.getElementById("swipe").hidden = true; K.sfx.thud();
+}
+let hitSounded = false;
+ball.addEventListener("collide", e => { if (!hitSounded && pins.some(p => p.body === e.body)) { hitSounded = true; K.sfx.boing(); } });
+function settle() {
+  const down = pins.filter(isDown), n = down.length;
+  rolling = false; hitSounded = false;
+  if (roll === 0) {
+    firstDown = n;
+    if (n === pins.length) { scores[frame] = n; big(K.t("strike")); K.sfx.tada(); K.confetti(); return nextFrame(); }
+    toast(K.t("down", n)); if (n) K.sfx.chime();
+    roll = 1; board();
+    for (const p of down) { scene.remove(p.mesh); world.removeBody(p.body); }
+    setPins(pins.filter(p => !down.includes(p))); resetBall();
+  } else {
+    const total = firstDown + n; scores[frame] = total;
+    if (total === 6) { big(K.t("spare")); K.sfx.tada(); K.confetti(); } else { toast(K.t("down", n)); if (n) K.sfx.chime(); }
+    nextFrame();
+  }
+}
+async function nextFrame() {
+  board();
+  await new Promise(r => setTimeout(r, 1400));
+  frame++; roll = 0;
+  if (frame >= 5) return gameOver();
+  await setPins(); resetBall(); board(); document.getElementById("swipe").hidden = false;
+}
+function gameOver() {
+  const s = scores.reduce((a, b) => a + b, 0), newBest = s > best; if (newBest) { best = s; K.store.set("bowl-best", best); }
+  const st = s >= 24 ? 3 : s >= 15 ? 2 : s >= 6 ? 1 : 0;
+  document.getElementById("stars").innerHTML = [0, 1, 2].map(i => K.starSVG(i < st)).join("");
+  document.getElementById("overH").textContent = K.t("overH", s); document.getElementById("overP").textContent = K.t("overP", s, best);
+  document.getElementById("over").hidden = false; if (st) { K.sfx.tada(); K.confetti(); }
+}
+function big(text) { const e = document.createElement("div"); e.className = "big"; e.textContent = text; document.getElementById("stage").appendChild(e); setTimeout(() => e.remove(), 1500); }
+
+/* ---------- swipe to roll ---------- */
+let trail = [];
+cv.addEventListener("pointerdown", e => { if (rolling) return; trail = [[e.clientX, e.clientY, performance.now()]]; cv.setPointerCapture(e.pointerId); });
+cv.addEventListener("pointermove", e => { if (!trail.length) return; trail.push([e.clientX, e.clientY, performance.now()]); if (trail.length > 12) trail.shift();
+  const r = cv.getBoundingClientRect(), dx = (e.clientX - trail[0][0]) / r.width; if (!rolling) ball.position.x = Math.max(-1.6, Math.min(1.6, dx * 3)); });
+cv.addEventListener("pointerup", e => {
+  if (!trail.length || rolling) { trail = []; return; }
+  const a = trail[0], b = [e.clientX, e.clientY, performance.now()], r = cv.getBoundingClientRect();
+  const dy = (a[1] - b[1]) / r.height, dx = (b[0] - a[0]) / r.width, dt = Math.max(60, b[2] - a[2]) / 1000;
+  trail = [];
+  if (dy < 0.06) { resetBall(); return; }                                       // too short: not a roll
+  const speed = Math.min(26, Math.max(9, dy / dt * 9)), side = Math.max(-0.22, Math.min(0.22, dx / Math.max(dy, 0.1) * 0.6));
+  launch(side * speed, -speed);
+});
+addEventListener("keydown", e => { if ((e.key === " " || e.key === "ArrowUp") && !rolling && document.getElementById("intro").hidden) { e.preventDefault(); launch((Math.random() - 0.5) * 2, -18); } });
+
+/* ---------- loop ---------- */
+function resize() { const r = cv.getBoundingClientRect(); if (!r.width) return; renderer.setSize(r.width, r.height, false); cam.aspect = r.width / r.height; cam.fov = cam.aspect < 0.8 ? 62 : 50; cam.updateProjectionMatrix(); }
+new ResizeObserver(resize).observe(cv); resize();
+let last = performance.now();
+(function loop(now) {
+  requestAnimationFrame(loop);
+  const dt = Math.min(0.05, (now - last) / 1000); last = now;
+  world.step(1 / 60, dt, 4);
+  ballMesh.position.copy(ball.position); ballMesh.quaternion.copy(ball.quaternion);
+  syncPins();
+  // camera rides behind the ball, then waits by the pins
+  const tz = rolling ? Math.max(PIN_Z + 6, ball.position.z + 5.5) : 10, ty = rolling ? 3 : 3.4;
+  cam.position.lerp(new THREE.Vector3(0, ty, tz), Math.min(1, dt * 3)); cam.lookAt(0, 0.6, Math.min(cam.position.z - 8, PIN_Z + 1));
+  if (rolling) {
+    const t = (now - rollT) / 1000, slow = ball.velocity.length() < 0.6 && t > 1.2, quiet = pins.every(p => p.body.sleepState === CANNON.Body.SLEEPING || p.body.velocity.length() < 0.15);
+    if ((ball.position.z < PIN_Z - 3.5 && quiet && t > 2) || t > 7 || (slow && quiet)) settle();
+  }
+  renderer.render(scene, cam);
+})(performance.now());
+
+/* ---------- boot ---------- */
+document.getElementById("homeBtn").href = window.SHOP_URL ? window.SHOP_URL : "/#play";
+document.getElementById("back").href = window.SHOP_URL || "/";
+(async () => {
+  try { toys = (await loadToyList()).toys; await Promise.all(toys.map(toyGeometry)); }
+  catch (e) { document.getElementById("loading").textContent = K.t("noLoad"); return; }
+  document.getElementById("loading").hidden = true;
+  await newGame();
+  const c = document.getElementById("introArt"), x = c.getContext("2d");
+  const imgs = await Promise.all(toys.slice(0, 3).map(t => new Promise(r => { const im = new Image(); im.onload = () => r(im); im.onerror = () => r(null); im.src = assetURL(`products/${t.slug}/cover.jpg`); })));
+  [[200, 70], [140, 150], [260, 150]].forEach(([px, py], i) => { const im = imgs[i]; if (!im) return; x.save(); x.beginPath(); x.arc(px, py, 50, 0, 7); x.clip(); x.drawImage(im, px - 50, py - 50, 100, 100); x.restore(); x.lineWidth = 5; x.strokeStyle = "#1B2547"; x.beginPath(); x.arc(px, py, 50, 0, 7); x.stroke(); });
+  x.fillStyle = "#8C6BF2"; x.strokeStyle = "#1B2547"; x.lineWidth = 5; x.beginPath(); x.arc(60, 220, 40, 0, 7); x.fill(); x.stroke();
+})();
+document.getElementById("startBtn").onclick = () => { K.sfx.pop(); document.getElementById("intro").hidden = true; };
+document.getElementById("againBtn").onclick = () => { K.sfx.pop(); newGame(); };
+window.__game = { launch, pins: () => pins, scores: () => scores, frame: () => frame };   // used by automated play tests
+</script>
+</body>
+</html>

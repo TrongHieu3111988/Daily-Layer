@@ -1,0 +1,96 @@
+{
+ "updated": "2026-10-29 01:27",
+ "featured": "sculpt-axolotl",
+ "toys": [
+  {
+   "slug": "sculpt-penguin",
+   "title": "Little Penguin",
+   "price": 2.49,
+   "dropped": "2026-10-28",
+   "height_mm": 70.6,
+   "game": "products/sculpt-penguin/game.bin",
+   "cover": "products/sculpt-penguin/cover.jpg",
+   "featured": false
+  },
+  {
+   "slug": "sculpt-kitten",
+   "title": "Tabby Kitten",
+   "price": 2.99,
+   "dropped": "2026-10-28",
+   "height_mm": 70.4,
+   "game": "products/sculpt-kitten/game.bin",
+   "cover": "products/sculpt-kitten/cover.jpg",
+   "featured": false
+  },
+  {
+   "slug": "sculpt-frog",
+   "title": "Grinning Frog",
+   "price": 2.49,
+   "dropped": "2026-10-28",
+   "height_mm": 70.7,
+   "game": "products/sculpt-frog/game.bin",
+   "cover": "products/sculpt-frog/cover.jpg",
+   "featured": false
+  },
+  {
+   "slug": "sculpt-fox",
+   "title": "Fox Cub",
+   "price": 2.99,
+   "dropped": "2026-10-28",
+   "height_mm": 70.6,
+   "game": "products/sculpt-fox/game.bin",
+   "cover": "products/sculpt-fox/cover.jpg",
+   "featured": false
+  },
+  {
+   "slug": "sculpt-chick",
+   "title": "Chubby Chick",
+   "price": 2.49,
+   "dropped": "2026-10-28",
+   "height_mm": 70.4,
+   "game": "products/sculpt-chick/game.bin",
+   "cover": "products/sculpt-chick/cover.jpg",
+   "featured": false
+  },
+  {
+   "slug": "sculpt-bunny",
+   "title": "Round Bunny",
+   "price": 2.49,
+   "dropped": "2026-10-28",
+   "height_mm": 70.6,
+   "game": "products/sculpt-bunny/game.bin",
+   "cover": "products/sculpt-bunny/cover.jpg",
+   "featured": false
+  },
+  {
+   "slug": "sculpt-bear",
+   "title": "Bear Cub",
+   "price": 2.49,
+   "dropped": "2026-10-28",
+   "height_mm": 70.6,
+   "game": "products/sculpt-bear/game.bin",
+   "cover": "products/sculpt-bear/cover.jpg",
+   "featured": false
+  },
+  {
+   "slug": "sculpt-axolotl",
+   "title": "Smiley Axolotl",
+   "price": 2.99,
+   "dropped": "2026-10-28",
+   "height_mm": 70.4,
+   "game": "products/sculpt-axolotl/game.bin",
+   "cover": "products/sculpt-axolotl/cover.jpg",
+   "featured": true
+  },
+  {
+   "slug": "chibi-whale-4part",
+   "title": "Chibi Whale (multi-colour)",
+   "price": 3.99,
+   "dropped": "2026-10-28",
+   "height_mm": 36.0,
+   "game": "products/chibi-whale-4part/game.bin",
+   "cover": "products/chibi-whale-4part/cover.jpg",
+   "featured": false
+  }
+ ]
+}

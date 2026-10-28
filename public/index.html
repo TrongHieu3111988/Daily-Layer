@@ -384,7 +384,7 @@ window.T = {
     more: "Show older entries", less: "Show fewer", ledgerNote: "Payments are not connected yet, so revenue stays at zero until checkout goes live.",
     foot: "Made for curious kids and the grown-ups who print with them. Files are for personal use unless you hold a Pro Seller licence.",
     day: n => "Day " + n, bubble: t => "Today's toy: " + t + "!", play: "Play now", soon: "Coming soon", newTag: "New",
-    games: { doodle: ["Doodle Puff", "Draw anything and watch it puff up into a squishy 3D toy."], sculpt: ["Sculpt Studio", "Squish, pinch and paint clay, then print your own figure."],
+    games: { hide: ["Hide and Seek", "Our real 3D toys are hiding in a bedroom. Spin the room and find them all!"], bowl: ["Toy Bowling", "Our 3D toys stand in as pins. Swipe the ball and knock them down!"], doodle: ["Doodle Puff", "Draw anything and watch it puff up into a squishy 3D toy."], sculpt: ["Sculpt Studio", "Squish, pinch and paint clay, then print your own figure."],
       stack: ["Stack the Drop", "Pile today's toys into a tower before it wobbles over."], spot: ["Spot the Oops", "Find what went wrong with each print, as fast as you can."],
       shelf: ["Shelf Life", "Spot the pattern on the toy shelf and find who comes next."], kits: ["Little Hands Kits", "Sorting, stacking and counting sets to print and play with."] },
     lines: { all: "All", figure: "Cute figures", "print-in-place": "Moving toys", functional: "Handy things", decor: "Decor" },
@@ -417,7 +417,7 @@ window.T = {
     more: "Xem nhật ký cũ hơn", less: "Thu gọn", ledgerNote: "Chưa kết nối thanh toán nên doanh thu vẫn bằng 0 cho đến khi mở bán.",
     foot: "Làm cho những bé tò mò và bố mẹ cùng in với bé. File dùng cho cá nhân, trừ khi bạn có giấy phép Pro Seller.",
     day: n => "Ngày " + n, bubble: t => "Đồ chơi hôm nay: " + t + "!", play: "Chơi ngay", soon: "Sắp ra mắt", newTag: "Mới",
-    games: { doodle: ["Tranh Phồng", "Vẽ gì cũng được, tranh sẽ phồng lên thành đồ chơi 3D mềm mại."], sculpt: ["Xưởng Nặn", "Nặn, vuốt, tô màu đất sét rồi in ra tượng của riêng bé."],
+    games: { hide: ["Trốn Tìm", "Các bạn đồ chơi 3D thật đang trốn trong phòng ngủ. Xoay phòng và tìm hết nhé!"], bowl: ["Bowling Đồ Chơi", "Các bạn đồ chơi 3D đứng làm ky. Vuốt bóng cho các bạn ngã hết nào!"], doodle: ["Tranh Phồng", "Vẽ gì cũng được, tranh sẽ phồng lên thành đồ chơi 3D mềm mại."], sculpt: ["Xưởng Nặn", "Nặn, vuốt, tô màu đất sét rồi in ra tượng của riêng bé."],
       stack: ["Xếp Tháp", "Chồng đồ chơi hôm nay thành tháp trước khi nó lắc lư đổ."], spot: ["Tìm Lỗi In", "Tìm xem bản in nào bị lỗi gì, càng nhanh càng giỏi."],
       shelf: ["Kệ Đồ Chơi", "Tìm quy luật trên kệ và chọn bạn đồ chơi tiếp theo."], kits: ["Bộ Đồ Chơi Montessori", "Bộ phân loại, xếp chồng, tập đếm để in về chơi cùng bé."] },
     lines: { all: "Tất cả", figure: "Thú dễ thương", "print-in-place": "Đồ chơi cử động", functional: "Đồ tiện ích", decor: "Trang trí" },
@@ -436,7 +436,7 @@ window.T = {
 <script type="module">
 const $ = (s, el = document) => el.querySelector(s);
 const HOST = window.HOST || "artifact";
-const TOOLS = window.TOOLS || { doodle: "/doodle/", sculpt: "/sculpt/", stack: "/games/stack/", spot: "/games/spot/", shelf: "/games/shelf/" };
+const TOOLS = window.TOOLS || { doodle: "/doodle/", sculpt: "/sculpt/", stack: "/games/stack/", spot: "/games/spot/", shelf: "/games/shelf/", hide: "/games/hide/", bowl: "/games/bowl/" };
 let LANG = "en";
 try { LANG = localStorage.getItem("dl-lang") || (/^vi/i.test(navigator.language || "") ? "vi" : "en"); } catch (e) { LANG = /^vi/i.test(navigator.language || "") ? "vi" : "en"; }
 const t = k => T[LANG][k];
@@ -453,11 +453,14 @@ const ART = {
   stack: `<svg viewBox="0 0 200 125" aria-hidden="true"><rect x="62" y="92" width="76" height="22" rx="7" fill="#5DB8FF" stroke="#1B2547" stroke-width="4.5"/><rect x="74" y="66" width="56" height="24" rx="7" fill="#FFC93C" stroke="#1B2547" stroke-width="4.5" transform="rotate(4 102 78)"/><rect x="82" y="40" width="40" height="24" rx="7" fill="#FF6B57" stroke="#1B2547" stroke-width="4.5" transform="rotate(-6 102 52)"/><circle cx="104" cy="22" r="14" fill="#3FBF7F" stroke="#1B2547" stroke-width="4.5"/><path d="M146 40q8 6 0 12M154 34q14 12 0 24" fill="none" stroke="#1B2547" stroke-width="4" stroke-linecap="round"/></svg>`,
   spot: `<svg viewBox="0 0 200 125" aria-hidden="true"><rect x="40" y="30" width="70" height="70" rx="14" fill="#fff" stroke="#1B2547" stroke-width="4.5"/><path d="M52 84h46M56 72h38M60 60h30M64 48h22" stroke="#8C6BF2" stroke-width="5" stroke-linecap="round"/><path d="M84 60h8" stroke="#FF6B57" stroke-width="6" stroke-linecap="round"/><circle cx="130" cy="62" r="26" fill="#DCF0FF" stroke="#1B2547" stroke-width="5"/><path d="M149 81l22 22" stroke="#1B2547" stroke-width="9" stroke-linecap="round"/></svg>`,
   shelf: `<svg viewBox="0 0 200 125" aria-hidden="true"><rect x="30" y="20" width="140" height="92" rx="10" fill="#FFE0A8" stroke="#1B2547" stroke-width="4.5"/><path d="M30 66h140" stroke="#1B2547" stroke-width="4.5"/><circle cx="60" cy="50" r="12" fill="#FF8FB8" stroke="#1B2547" stroke-width="4"/><rect x="88" y="38" width="24" height="24" rx="5" fill="#5DB8FF" stroke="#1B2547" stroke-width="4"/><path d="M134 62l12-24 12 24z" fill="#3FBF7F" stroke="#1B2547" stroke-width="4" stroke-linejoin="round"/><rect x="50" y="80" width="30" height="28" rx="8" fill="#FFC93C" stroke="#1B2547" stroke-width="4"/><circle cx="125" cy="94" r="13" fill="none" stroke="#1B2547" stroke-width="4" stroke-dasharray="6 6"/></svg>`,
+  hide: `<svg viewBox="0 0 200 125" aria-hidden="true"><rect x="28" y="64" width="110" height="46" rx="14" fill="#3FBF7F" stroke="#1B2547" stroke-width="4.5"/><rect x="28" y="40" width="110" height="34" rx="14" fill="#62D394" stroke="#1B2547" stroke-width="4.5"/><path d="M110 40c0-22 8-30 18-30s18 8 18 30" fill="#FF8FB8" stroke="#1B2547" stroke-width="4.5"/><circle cx="122" cy="26" r="3.5" fill="#1B2547"/><circle cx="136" cy="26" r="3.5" fill="#1B2547"/><path d="M114 12l-6-8M142 12l6-8" stroke="#1B2547" stroke-width="4" stroke-linecap="round"/><circle cx="172" cy="50" r="12" fill="none" stroke="#1B2547" stroke-width="5"/><path d="M180 59l10 10" stroke="#1B2547" stroke-width="6" stroke-linecap="round"/></svg>`,
+  bowl: `<svg viewBox="0 0 200 125" aria-hidden="true"><path d="M30 118l40-80h60l40 80z" fill="#E9B97A" stroke="#1B2547" stroke-width="4.5" stroke-linejoin="round"/><circle cx="100" cy="96" r="18" fill="#8C6BF2" stroke="#1B2547" stroke-width="4.5"/><circle cx="94" cy="90" r="2.6" fill="#1B2547"/><circle cx="103" cy="88" r="2.6" fill="#1B2547"/><circle cx="99" cy="97" r="2.6" fill="#1B2547"/>${[[100, 34, "#FF8FB8"], [86, 30, "#FFC93C"], [114, 30, "#5DB8FF"]].map(([x, y, c]) => `<rect x="${x - 8}" y="${y - 22}" width="16" height="24" rx="8" fill="${c}" stroke="#1B2547" stroke-width="3.5"/><circle cx="${x - 3}" cy="${y - 13}" r="1.8" fill="#1B2547"/><circle cx="${x + 3}" cy="${y - 13}" r="1.8" fill="#1B2547"/>`).join("")}<path d="M100 76l0-30" stroke="#1B2547" stroke-width="3" stroke-dasharray="5 5"/></svg>`,
   kits: `<svg viewBox="0 0 200 125" aria-hidden="true"><rect x="96" y="20" width="8" height="90" rx="4" fill="#A86B45" stroke="#1B2547" stroke-width="4"/><ellipse cx="100" cy="100" rx="46" ry="11" fill="#FF6B57" stroke="#1B2547" stroke-width="4.5"/><ellipse cx="100" cy="82" rx="38" ry="10" fill="#FFC93C" stroke="#1B2547" stroke-width="4.5"/><ellipse cx="100" cy="64" rx="30" ry="9" fill="#3FBF7F" stroke="#1B2547" stroke-width="4.5"/><ellipse cx="100" cy="47" rx="22" ry="8" fill="#5DB8FF" stroke="#1B2547" stroke-width="4.5"/><circle cx="100" cy="24" r="9" fill="#8C6BF2" stroke="#1B2547" stroke-width="4"/></svg>`
 };
 const GAMES = [
+  { id: "hide", ready: true, bg: "#FFE6F0", isNew: true }, { id: "bowl", ready: true, bg: "#DDF7EA", isNew: true },
   { id: "doodle", ready: true, bg: "#FFE3DE" }, { id: "sculpt", ready: true, bg: "#DDF7EA" },
-  { id: "stack", ready: true, bg: "#DCF0FF", isNew: true }, { id: "spot", ready: true, bg: "#ECE5FF", isNew: true }, { id: "shelf", ready: true, bg: "#FFF1C9", isNew: true }, { id: "kits", bg: "#FFE6F0" }
+  { id: "stack", ready: true, bg: "#DCF0FF" }, { id: "spot", ready: true, bg: "#ECE5FF" }, { id: "shelf", ready: true, bg: "#FFF1C9" }, { id: "kits", bg: "#FFE6F0" }
 ];
 function toolLink(el, id) { el.href = TOOLS[id]; if (HOST === "artifact") { el.target = "_blank"; el.rel = "noopener"; } }
 function renderGames() {

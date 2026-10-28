@@ -26,6 +26,12 @@ for p in cat["products"]:
         open(os.path.join(deliv, os.path.basename(zname)), "wb").write(data); p["download"] = ""
     else:
         open(os.path.join(repo, zname), "wb").write(data); p["download"] = zname
+# light game copies of the figures (gen/game_assets.py) and their list, used by the 3D games
+for p in cat["products"]:
+    gsrc = os.path.join(site, "products", p["slug"], "game.bin.txt")
+    if os.path.exists(gsrc):
+        open(os.path.join(repo, "products", p["slug"], "game.bin"), "wb").write(base64.b64decode(open(gsrc).read()))
+if os.path.exists(os.path.join(site, "toys.json")): shutil.copy2(os.path.join(site, "toys.json"), os.path.join(repo, "toys.json"))
 json.dump(cat, open(os.path.join(repo, "catalog.json"), "w"), indent=1)
 shutil.copy2(os.path.join(site, "journal.json"), os.path.join(repo, "journal.json"))
 if os.path.exists(zip_out): os.remove(zip_out)

@@ -1,0 +1,554 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Hide and Seek</title>
+<meta name="theme-color" content="#FFC93C">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/icons/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@500;600;700;800&display=swap">
+<style>
+/* Daily Layer game kit: the same chunky toy-block look as the shop. One-screen apps: bar on top, stage fills the rest. */
+:root{
+  --sky:#DCF0FF; --sky2:#C9E8FF; --paper:#FFFFFF; --ink:#1B2547; --muted:#55608A; --outline:#1B2547;
+  --sun:#FFC93C; --coral:#FF6B57; --grass:#3FBF7F; --grape:#8C6BF2; --bubble:#5DB8FF; --pink:#FF8FB8; --wood:#E9B97A; --wood2:#C98E4F;
+  --good:#1C9A5E; --bad:#E04A3A; --pop:0 5px 0 var(--outline); --pop-sm:0 3px 0 var(--outline);
+  --f-display:"Baloo 2","Nunito",ui-rounded,system-ui,sans-serif;
+  --f-body:"Nunito",ui-rounded,system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --sky:#101A3A; --sky2:#14204A; --paper:#1A2550; --ink:#EEF2FF; --muted:#AAB4DA; --outline:#070B1F;
+  --sun:#FFCF4D; --coral:#FF7A66; --grass:#4FD08F; --grape:#A487FF; --bubble:#6CC2FF; --pink:#FF9DC3; --wood:#B98A55; --wood2:#8E6234;
+  --good:#4FD08F; --bad:#FF7A66; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --sky:#101A3A; --sky2:#14204A; --paper:#1A2550; --ink:#EEF2FF; --muted:#AAB4DA; --outline:#070B1F;
+  --sun:#FFCF4D; --coral:#FF7A66; --grass:#4FD08F; --grape:#A487FF; --bubble:#6CC2FF; --pink:#FF9DC3; --wood:#B98A55; --wood2:#8E6234;
+  --good:#4FD08F; --bad:#FF7A66; color-scheme:dark}
+body{margin:0}[hidden]{display:none!important}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--sky);color:var(--ink);font-family:var(--f-body);font-size:16px;overflow:hidden;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--grape);outline-offset:3px}
+.app{height:100%;display:flex;flex-direction:column}
+.bar{display:flex;align-items:center;gap:8px;padding-block:8px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.bar h1{font-family:var(--f-display);font-weight:800;font-size:22px;margin:0 auto 0 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.ibtn{width:44px;height:44px;flex:none;border-radius:14px;border:2.5px solid var(--outline);background:var(--paper);display:grid;place-items:center;box-shadow:var(--pop-sm);text-decoration:none;color:var(--ink);font-family:var(--f-display);font-weight:800;font-size:14px}
+.ibtn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--outline)}
+.ibtn svg{width:22px;height:22px}
+.score{flex:none;display:flex;align-items:center;gap:6px;background:var(--sun);color:#3A2A00;border:2.5px solid var(--outline);border-radius:14px;padding:4px 12px;font-family:var(--f-display);font-weight:800;font-size:18px;box-shadow:var(--pop-sm);font-variant-numeric:tabular-nums}
+.score svg{width:20px;height:20px}
+.stage{position:relative;flex:1;min-height:0;margin:0 max(16px,env(safe-area-inset-right,0px)) 12px max(16px,env(safe-area-inset-left,0px));border:3px solid var(--outline);border-radius:26px;overflow:hidden;box-shadow:0 6px 0 var(--outline);background:var(--paper)}
+.btn{text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:9px;border:2.5px solid var(--outline);border-radius:18px;padding:12px 22px;font-family:var(--f-display);font-weight:800;font-size:20px;line-height:1;background:var(--paper);color:var(--ink);box-shadow:var(--pop);transition:transform .12s,box-shadow .12s}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 var(--outline)}
+.btn.coral{background:var(--coral);color:#fff}.btn.grass{background:var(--grass);color:#06301B}.btn.sun{background:var(--sun);color:#3A2A00}
+.btn svg{width:24px;height:24px}
+.overlay{position:fixed;inset:0;z-index:30;display:grid;place-items:center;background:rgba(9,14,34,.45);padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.card{background:var(--paper);border:3px solid var(--outline);border-radius:28px;box-shadow:0 8px 0 var(--outline);padding:22px 22px 24px;max-width:420px;width:100%;display:grid;gap:14px;text-align:center;justify-items:center;animation:popin .35s cubic-bezier(.34,1.56,.64,1)}
+.card h2{font-family:var(--f-display);font-weight:800;font-size:32px;line-height:1.05;margin:0}
+.card p{margin:0;color:var(--muted);font-weight:700;line-height:1.45}
+.card canvas.hero{width:200px;height:140px}
+.card .row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.stars{display:flex;gap:6px}
+.stars svg{width:44px;height:44px}
+@keyframes popin{0%{transform:scale(.7);opacity:0}100%{transform:scale(1);opacity:1}}
+.toast{position:absolute;left:50%;top:14px;transform:translateX(-50%);z-index:5;background:var(--paper);border:2.5px solid var(--outline);border-radius:16px;padding:6px 14px;font-family:var(--f-display);font-weight:800;font-size:18px;box-shadow:var(--pop-sm);white-space:nowrap;pointer-events:none;transition:opacity .3s,transform .3s}
+.toast[hidden]{display:block!important;opacity:0;transform:translate(-50%,-10px)}
+canvas#confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:40}
+@media (max-width:420px){.bar h1{font-size:18px}.ibtn{width:40px;height:40px}.score{font-size:16px;padding:3px 10px}}
+@media (prefers-reduced-motion:reduce){.card{animation:none}.btn,.ibtn{transition:none}}
+
+/* Hide and Seek: the shop's real 3D toys hide around a little bedroom. Spin the room, tap a friend you spot, collect them all. */
+.stage{background:#F4E7D3}
+#room{display:block;width:100%;height:100%;touch-action:none}
+.hud{position:absolute;left:10px;right:10px;top:10px;z-index:4;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;pointer-events:none}
+.goal{background:color-mix(in srgb,var(--paper) 92%,transparent);border:2.5px solid var(--outline);border-radius:18px;box-shadow:var(--pop-sm);padding:6px 10px 8px;pointer-events:auto}
+.goal b{display:block;font-family:var(--f-display);font-weight:800;font-size:16px;line-height:1.1;margin-bottom:5px}
+.found{display:flex;gap:6px}
+.found i{width:38px;height:38px;border-radius:50%;border:2.5px solid var(--outline);background:#E9EEF7 center/cover no-repeat;display:grid;place-items:center;font-style:normal;font-family:var(--f-display);font-weight:800;color:var(--muted);font-size:18px}
+.found i.got{animation:pop .5s cubic-bezier(.34,1.56,.64,1)}
+@keyframes pop{0%{transform:scale(.3)}100%{transform:scale(1)}}
+.tools{position:absolute;right:10px;bottom:12px;z-index:4;display:flex;flex-direction:column;gap:10px}
+.round{width:58px;height:58px;border-radius:50%;border:3px solid var(--outline);background:var(--sun);box-shadow:var(--pop);display:grid;place-items:center;padding:0}
+.round svg{width:30px;height:30px}
+.round.col{background:var(--paper)}
+.round:active{transform:translateY(3px);box-shadow:0 2px 0 var(--outline)}
+.round[disabled]{opacity:.45}
+.spin{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);z-index:3;background:color-mix(in srgb,var(--paper) 88%,transparent);border-radius:999px;padding:5px 14px;font-weight:800;font-size:13.5px;color:var(--muted);pointer-events:none;white-space:nowrap}
+.loading{position:absolute;inset:0;display:grid;place-items:center;z-index:5;font-family:var(--f-display);font-weight:800;font-size:20px;background:#F4E7D3}
+.colgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;width:100%;max-height:52vh;overflow:auto;padding:4px}
+.colgrid button{border:2.5px solid var(--outline);border-radius:16px;background:#F3F6FB;padding:6px 4px 8px;display:grid;gap:2px;justify-items:center;box-shadow:var(--pop-sm);font-weight:800;font-size:12.5px;line-height:1.2}
+.colgrid img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;mix-blend-mode:multiply}
+.colgrid .no img{filter:brightness(0) opacity(.18);mix-blend-mode:normal}
+.colgrid small{color:var(--muted);font-weight:700}
+.card.wide{max-width:520px}
+.viewer{width:100%;aspect-ratio:4/3;border-radius:18px;border:2.5px solid var(--outline);background:radial-gradient(90% 80% at 50% 30%,#fff,#DCF0FF)}
+.viewer canvas{display:block;width:100%;height:100%}
+</style>
+
+</head>
+<body>
+<div class="app">
+  <header class="bar">
+    <a class="ibtn" id="back" href="/" data-t-label="back" aria-label="Back"></a>
+    <h1 data-t="title">Hide and Seek</h1>
+    <span class="score" aria-live="polite"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z" fill="#fff" stroke="#1B2547" stroke-width="2" stroke-linejoin="round"/></svg><span id="starCount">0</span></span>
+    <button class="ibtn" id="soundBtn" type="button" data-t-label="sound" aria-label="Sound"></button>
+    <button class="ibtn" id="langBtn" type="button" aria-label="Language">VI</button>
+  </header>
+  <main class="stage" id="stage">
+    <canvas id="room" aria-label="Toy room"></canvas>
+    <div class="hud"><div class="goal"><b id="goal">Find 4 friends</b><div class="found" id="found"></div></div></div>
+    <div class="tools">
+      <button class="round" id="hintBtn" type="button" data-t-label="hint" aria-label="Hint"><svg viewBox="0 0 24 24" fill="none" stroke="#1B2547" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4" /><path d="M12 3a6 6 0 00-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0012 3z" fill="#fff"/></svg></button>
+      <button class="round col" id="colBtn" type="button" data-t-label="collection" aria-label="Collection"><svg viewBox="0 0 24 24" fill="none" stroke="#1B2547" stroke-width="2.2" stroke-linejoin="round"><rect x="3.5" y="3.5" width="7" height="7" rx="2" fill="#FF8FB8"/><rect x="13.5" y="3.5" width="7" height="7" rx="2" fill="#5DB8FF"/><rect x="3.5" y="13.5" width="7" height="7" rx="2" fill="#FFC93C"/><rect x="13.5" y="13.5" width="7" height="7" rx="2" fill="#3FBF7F"/></svg></button>
+    </div>
+    <div class="spin" id="spinHint" data-t="spin">Drag to look around · tap a friend you spot</div>
+    <div class="loading" id="loading" data-t="loading">Tidying the room…</div>
+    <div class="toast" id="toast" hidden></div>
+  </main>
+</div>
+
+<div class="overlay" id="intro">
+  <div class="card">
+    <canvas class="hero" id="introArt" width="400" height="280"></canvas>
+    <h2 data-t="introH">Who's hiding?</h2>
+    <p data-t="introP">The toy friends from our shop are hiding in this room. Turn the room around, peek behind the sofa and under the bed, and tap every friend you find!</p>
+    <button class="btn coral" type="button" id="startBtn"><span data-t="start">Ready or not!</span></button>
+  </div>
+</div>
+<div class="overlay" id="done" hidden>
+  <div class="card">
+    <div class="stars" id="stars"></div>
+    <h2 data-t="doneH">You found everyone!</h2>
+    <p id="doneP"></p>
+    <div class="row"><button class="btn coral" type="button" id="againBtn"><span data-t="again">New room</span></button><button class="btn" type="button" id="doneColBtn"><span data-t="collection">Collection</span></button></div>
+  </div>
+</div>
+<div class="overlay" id="colSheet" hidden>
+  <div class="card wide">
+    <h2 data-t="colH">My toy collection</h2>
+    <p id="colP"></p>
+    <div class="viewer" id="viewer" hidden></div>
+    <div class="row" id="viewerRow" hidden><a class="btn coral" id="printLink" href="/" target="_blank" rel="noopener"><span data-t="print">Print this one</span></a><button class="btn" type="button" id="viewerBack"><span data-t="allToys">All toys</span></button></div>
+    <div class="colgrid" id="colGrid"></div>
+    <button class="btn" type="button" id="colClose"><span data-t="close">Close</span></button>
+  </div>
+</div>
+
+<script>
+/* Daily Layer game kit: words, sound, confetti and the "toy friends" every game draws. */
+(function () {
+  "use strict";
+  const K = {};
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+  };
+  K.store = store;
+  K.CALM = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---------- words ---------- */
+  K.lang = store.get("dl-lang", /^vi/i.test(navigator.language || "") ? "vi" : "en");
+  K.words = { en: {}, vi: {} };
+  K.t = (k, ...a) => { const v = K.words[K.lang][k] ?? K.words.en[k] ?? k; return typeof v === "function" ? v(...a) : v; };
+  K.applyWords = () => {
+    document.documentElement.lang = K.lang;
+    document.querySelectorAll("[data-t]").forEach(el => { el.textContent = K.t(el.dataset.t); });
+    document.querySelectorAll("[data-t-label]").forEach(el => { el.setAttribute("aria-label", K.t(el.dataset.tLabel)); });
+    const b = document.getElementById("langBtn"); if (b) b.textContent = K.lang === "vi" ? "EN" : "VI";
+    K.onLang && K.onLang();
+  };
+  K.toggleLang = () => { K.lang = K.lang === "vi" ? "en" : "vi"; store.set("dl-lang", K.lang); K.applyWords(); };
+
+  /* ---------- sound: tiny synth blips, only after the child has touched the screen ---------- */
+  let ac = null; K.muted = store.get("dl-muted", false);
+  function ctx() { if (K.muted) return null; if (!ac) { try { ac = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return null; } } if (ac.state === "suspended") ac.resume(); return ac; }
+  function tone(f0, f1, dur, type = "sine", vol = 0.18, delay = 0) {
+    const a = ctx(); if (!a) return;
+    const t0 = a.currentTime + delay, o = a.createOscillator(), g = a.createGain();
+    o.type = type; o.frequency.setValueAtTime(f0, t0); o.frequency.exponentialRampToValueAtTime(Math.max(30, f1), t0 + dur);
+    g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(vol, t0 + 0.015); g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    o.connect(g).connect(a.destination); o.start(t0); o.stop(t0 + dur + 0.02);
+  }
+  K.sfx = {
+    pop: () => tone(520, 880, 0.12, "triangle", 0.16),
+    thud: () => tone(180, 90, 0.14, "sine", 0.22),
+    boing: () => { tone(300, 120, 0.25, "square", 0.06); tone(150, 260, 0.2, "sine", 0.12, 0.05); },
+    chime: () => { [660, 880, 1320].forEach((f, i) => tone(f, f * 1.01, 0.22, "triangle", 0.12, i * 0.07)); },
+    tada: () => { [523, 659, 784, 1046].forEach((f, i) => tone(f, f, 0.3, "triangle", 0.14, i * 0.09)); },
+    tick: () => tone(1200, 900, 0.04, "square", 0.04)
+  };
+  K.setMuted = m => { K.muted = m; store.set("dl-muted", m); const b = document.getElementById("soundBtn"); if (b) b.innerHTML = m ? K.ICON.mute : K.ICON.sound; };
+
+  /* ---------- confetti ---------- */
+  let cc = null, cg = null, bits = [], craf = 0;
+  const CONF = ["#FF6B57", "#FFC93C", "#3FBF7F", "#5DB8FF", "#8C6BF2", "#FF8FB8"];
+  K.confetti = (x, y, n = 60) => {
+    if (K.CALM) return;
+    if (!cc) { cc = document.createElement("canvas"); cc.id = "confetti"; document.body.appendChild(cc); cg = cc.getContext("2d"); }
+    const d = Math.min(devicePixelRatio || 1, 2); cc.width = innerWidth * d; cc.height = innerHeight * d;
+    x = x ?? innerWidth / 2; y = y ?? innerHeight / 3;
+    for (let i = 0; i < n; i++) { const a = Math.random() * Math.PI * 2, s = 4 + Math.random() * 7;
+      bits.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s - 5, r: Math.random() * 6, vr: (Math.random() - .5) * .4, w: 6 + Math.random() * 6, h: 4 + Math.random() * 4, c: CONF[i % CONF.length], life: 0 }); }
+    if (!craf) craf = requestAnimationFrame(step);
+    function step() {
+      const d = cc.width / innerWidth; cg.clearRect(0, 0, cc.width, cc.height);
+      for (let i = bits.length - 1; i >= 0; i--) { const b = bits[i]; b.life++; b.vy += 0.25; b.vx *= 0.99; b.x += b.vx; b.y += b.vy; b.r += b.vr;
+        if (b.y > innerHeight + 20 || b.life > 240) { bits.splice(i, 1); continue; }
+        cg.save(); cg.translate(b.x * d, b.y * d); cg.rotate(b.r); cg.fillStyle = b.c; cg.fillRect(-b.w * d / 2, -b.h * d / 2, b.w * d, b.h * d); cg.restore(); }
+      craf = bits.length ? requestAnimationFrame(step) : 0;
+    }
+  };
+
+  /* ---------- toy friends: our own little characters, drawn with canvas ---------- */
+  K.COLS = { coral: "#FF6B57", sun: "#FFC93C", grass: "#3FBF7F", sky: "#5DB8FF", grape: "#8C6BF2", pink: "#FF8FB8", orange: "#FF9B3D", mint: "#7FE0C2" };
+  K.INK = "#1B2547";
+  function shapePath(g, shape, w, h) {
+    g.beginPath();
+    const r = Math.min(w, h) * 0.22;
+    if (shape === "ball") { g.ellipse(0, 0, w / 2, h / 2, 0, 0, Math.PI * 2); }
+    else if (shape === "tri") { g.moveTo(0, -h / 2); g.lineTo(w / 2, h / 2); g.lineTo(-w / 2, h / 2); g.closePath(); }
+    else if (shape === "dome") { g.moveTo(-w / 2, h / 2); g.lineTo(-w / 2, 0); g.ellipse(0, 0, w / 2, h / 2, 0, Math.PI, 0); g.lineTo(w / 2, h / 2); g.closePath(); }
+    else if (shape === "star") { for (let k = 0; k < 10; k++) { const a = -Math.PI / 2 + k * Math.PI / 5, rr = k % 2 ? 0.42 : 1; g.lineTo(Math.cos(a) * w / 2 * rr, Math.sin(a) * h / 2 * rr * 1.05 + h * 0.04); } g.closePath(); }
+    else if (shape === "heart") { const s = w / 2; g.moveTo(0, h * 0.42); g.bezierCurveTo(-s * 1.4, -h * 0.05, -s * 0.55, -h * 0.62, 0, -h * 0.2); g.bezierCurveTo(s * 0.55, -h * 0.62, s * 1.4, -h * 0.05, 0, h * 0.42); }
+    else { g.roundRect ? g.roundRect(-w / 2, -h / 2, w, h, r) : g.rect(-w / 2, -h / 2, w, h); }
+  }
+  K.shapePath = shapePath;
+  // draw a friend centred at (0,0); opts: shape, colour, w, h, mood ("happy" | "wow" | "sleepy" | "sad"), lw
+  K.friend = (g, o) => {
+    const { shape = "square", colour = "#FFC93C", w = 60, h = 60, mood = "happy" } = o, lw = o.lw ?? Math.max(2, Math.min(w, h) * 0.07);
+    g.save();
+    shapePath(g, shape, w, h); g.fillStyle = colour; g.fill();
+    // soft highlight
+    g.save(); shapePath(g, shape, w, h); g.clip(); g.fillStyle = "rgba(255,255,255,.28)"; g.beginPath(); g.ellipse(-w * 0.22, -h * 0.28, w * 0.28, h * 0.16, -0.5, 0, Math.PI * 2); g.fill();
+    g.fillStyle = "rgba(0,0,0,.08)"; g.fillRect(-w, h * 0.22, w * 2, h); g.restore();
+    shapePath(g, shape, w, h); g.lineWidth = lw; g.strokeStyle = K.INK; g.lineJoin = "round"; g.stroke();
+    // face
+    const s = Math.min(w, h), fy = shape === "tri" ? h * 0.18 : shape === "dome" ? h * 0.08 : 0, ex = s * 0.17, ey = fy - s * 0.04, er = Math.max(1.6, s * 0.065);
+    g.fillStyle = K.INK; g.strokeStyle = K.INK; g.lineCap = "round"; g.lineWidth = Math.max(1.5, s * 0.05);
+    if (mood === "sleepy") { for (const sx of [-1, 1]) { g.beginPath(); g.arc(sx * ex, ey, er, 0.1 * Math.PI, 0.9 * Math.PI); g.stroke(); } }
+    else for (const sx of [-1, 1]) { g.beginPath(); g.ellipse(sx * ex, ey, er, er * (mood === "wow" ? 1.35 : 1.15), 0, 0, Math.PI * 2); g.fill();
+      g.fillStyle = "#fff"; g.beginPath(); g.arc(sx * ex - er * 0.3, ey - er * 0.35, er * 0.38, 0, Math.PI * 2); g.fill(); g.fillStyle = K.INK; }
+    g.fillStyle = "rgba(255,120,150,.55)";
+    for (const sx of [-1, 1]) { g.beginPath(); g.ellipse(sx * ex * 1.75, ey + s * 0.1, s * 0.07, s * 0.045, 0, 0, Math.PI * 2); g.fill(); }
+    g.beginPath();
+    if (mood === "wow") { g.fillStyle = K.INK; g.ellipse(0, ey + s * 0.15, s * 0.05, s * 0.065, 0, 0, Math.PI * 2); g.fill(); }
+    else if (mood === "sad") { g.arc(0, ey + s * 0.22, s * 0.08, 1.15 * Math.PI, 1.85 * Math.PI); g.stroke(); }
+    else { g.arc(0, ey + s * 0.07, s * 0.09, 0.15 * Math.PI, 0.85 * Math.PI); g.stroke(); }
+    g.restore();
+  };
+  K.star = (g, x, y, r, fill = "#FFC93C") => {
+    g.save(); g.beginPath();
+    for (let k = 0; k < 10; k++) { const a = -Math.PI / 2 + k * Math.PI / 5, rr = k % 2 ? r * 0.45 : r; g.lineTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr); }
+    g.closePath(); g.fillStyle = fill; g.fill(); g.lineWidth = Math.max(2, r * 0.18); g.strokeStyle = K.INK; g.lineJoin = "round"; g.stroke(); g.restore();
+  };
+  K.starSVG = on => `<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M20 3l5 10.3 11.3 1.5-8.3 7.8 2.1 11.2L20 28.3 9.9 33.8 12 22.6 3.7 14.8 15 13.3z" fill="${on ? "#FFC93C" : "rgba(127,140,180,.25)"}" stroke="#1B2547" stroke-width="3" stroke-linejoin="round"/></svg>`;
+
+  /* ---------- canvas helper: crisp at any pixel density ---------- */
+  K.fit = (canvas, onSize) => {
+    const ro = new ResizeObserver(() => { const r = canvas.getBoundingClientRect(), d = Math.min(devicePixelRatio || 1, 2.5);
+      if (!r.width) return; canvas.width = Math.round(r.width * d); canvas.height = Math.round(r.height * d); onSize && onSize(r.width, r.height, d); });
+    ro.observe(canvas);
+  };
+
+  K.ICON = {
+    back: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>',
+    sound: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor" fill-opacity=".2"/><path d="M16.5 9a4 4 0 010 6M19 6.5a7.5 7.5 0 010 11"/></svg>',
+    mute: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor" fill-opacity=".2"/><path d="M17 9l5 6M22 9l-5 6"/></svg>',
+    star: '<svg viewBox="0 0 24 24"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z" fill="#fff" stroke="#1B2547" stroke-width="2" stroke-linejoin="round"/></svg>',
+    replay: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 108-8H8"/><path d="M8 1L5 4l3 3"/></svg>',
+    play: '<svg viewBox="0 0 24 24"><path d="M7 4.5v15l12.5-7.5z" fill="currentColor"/></svg>'
+  };
+  // shared bar wiring: back link, sound, language
+  K.initBar = () => {
+    const back = document.getElementById("back"); if (back) { back.innerHTML = K.ICON.back; back.href = window.SHOP_URL || "/"; }
+    const s = document.getElementById("soundBtn"); if (s) { s.innerHTML = K.muted ? K.ICON.mute : K.ICON.sound; s.onclick = () => { K.setMuted(!K.muted); if (!K.muted) K.sfx.pop(); }; }
+    const l = document.getElementById("langBtn"); if (l) l.onclick = K.toggleLang;
+  };
+  window.K = K;
+})();
+
+</script>
+<script>
+K.words.en = { title: "Hide and Seek", back: "Back", sound: "Sound on or off", hint: "Hint", collection: "Collection", spin: "Drag to look around · tap a friend you spot", loading: "Tidying the room…",
+  introH: "Who's hiding?", introP: "The toy friends from our shop are hiding in this room. Turn the room around, peek behind the sofa and under the bed, and tap every friend you find!",
+  start: "Ready or not!", goal: (n, f) => f >= n ? "Everyone found!" : "Find " + (n - f) + " more " + (n - f === 1 ? "friend" : "friends"), found: t => "Found " + t + "!", today: "Today's new toy!",
+  doneH: "You found everyone!", doneP: (h) => h === 0 ? "No hints needed. Super seeker!" : "You used " + h + (h === 1 ? " hint." : " hints."), again: "New room",
+  colH: "My toy collection", colP: (a, b) => a + " of " + b + " friends found. Find the rest in new rooms!", times: n => "found " + n + "×", print: "Print this one", allToys: "All toys", close: "Close",
+  hintMsg: "Look where it's sparkling!", noLoad: "The toys couldn't load. Check the connection and try again." };
+K.words.vi = { title: "Trốn Tìm", back: "Quay lại", sound: "Bật hoặc tắt âm thanh", hint: "Gợi ý", collection: "Bộ sưu tập", spin: "Kéo để nhìn quanh · chạm vào bạn bé thấy", loading: "Đang dọn phòng…",
+  introH: "Ai đang trốn nào?", introP: "Các bạn đồ chơi của shop đang trốn trong căn phòng này. Bé xoay phòng, ngó sau ghế sofa, dưới gầm giường và chạm vào từng bạn bé tìm thấy nhé!",
+  start: "Đi tìm thôi!", goal: (n, f) => f >= n ? "Tìm thấy hết rồi!" : "Còn " + (n - f) + " bạn đang trốn", found: t => "Tìm thấy " + t + "!", today: "Đồ chơi mới hôm nay!",
+  doneH: "Bé tìm thấy tất cả!", doneP: (h) => h === 0 ? "Không cần gợi ý. Bé tìm siêu giỏi!" : "Bé đã dùng " + h + " gợi ý.", again: "Phòng mới",
+  colH: "Bộ sưu tập của bé", colP: (a, b) => "Đã tìm " + a + "/" + b + " bạn. Chơi phòng mới để tìm các bạn còn lại!", times: n => "tìm " + n + " lần", print: "In bạn này", allToys: "Tất cả", close: "Đóng",
+  hintMsg: "Nhìn chỗ đang lấp lánh kìa!", noLoad: "Chưa tải được đồ chơi. Kiểm tra mạng rồi thử lại." };
+K.initBar(); K.applyWords();
+let toastT = 0;
+function toast(m) { const e = document.getElementById("toast"); e.textContent = m; e.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => (e.hidden = true), 1700); }
+</script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
+/* ---------- Daily Layer 3D kit: loads the shop's real figures as light game toys (inlined into module scripts) ---------- */
+const ASSETS = window.ASSETS || "/";
+async function fetchBytes(url) {
+  const res = await fetch(url); if (!res.ok) throw new Error("fetch " + res.status + " " + url);
+  if (!url.endsWith(".txt")) return new Uint8Array(await res.arrayBuffer());
+  const bin = atob((await res.text()).trim()), out = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+  return out;
+}
+async function loadToyList() { const r = await fetch(ASSETS + "toys.json"); if (!r.ok) throw new Error("toys"); return r.json(); }
+const geoCache = new Map();
+// a toy is 1 unit tall, standing on y = 0, centred on x/z, one colour per triangle
+async function toyGeometry(t) {
+  if (geoCache.has(t.slug)) return geoCache.get(t.slug);
+  const p = (async () => {
+    const gz = await fetchBytes(ASSETS + t.game);
+    const buf = await new Response(new Blob([gz]).stream().pipeThrough(new DecompressionStream("gzip"))).arrayBuffer();
+    const dv = new DataView(buf), nv = dv.getUint32(0, true), nf = dv.getUint32(4, true);
+    const lo = [0, 1, 2].map(i => dv.getFloat32(8 + 4 * i, true)), hi = [0, 1, 2].map(i => dv.getFloat32(20 + 4 * i, true));
+    const q = new Uint16Array(buf.slice(32, 32 + nv * 6)), pos = new Float32Array(nv * 3);
+    for (let i = 0; i < nv; i++) for (let k = 0; k < 3; k++) pos[3 * i + k] = lo[k] + q[3 * i + k] / 65535 * (hi[k] - lo[k]);
+    const fo = 32 + nv * 6, idx = new Uint32Array(buf.slice(fo, fo + nf * 12)), rgb = new Uint8Array(buf, fo + nf * 12, nf * 3);
+    const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.BufferAttribute(pos, 3)); g.setIndex(new THREE.BufferAttribute(idx, 1));
+    g.computeVertexNormals();
+    const ng = g.toNonIndexed(), col = new Float32Array(nf * 9), c = new THREE.Color();
+    for (let f = 0; f < nf; f++) { c.setRGB(rgb[3 * f] / 255, rgb[3 * f + 1] / 255, rgb[3 * f + 2] / 255, THREE.SRGBColorSpace); for (let k = 0; k < 3; k++) col.set([c.r, c.g, c.b], 9 * f + 3 * k); }
+    ng.setAttribute("color", new THREE.BufferAttribute(col, 3)); ng.computeBoundingBox(); g.dispose();
+    return ng;
+  })();
+  geoCache.set(t.slug, p); return p;
+}
+const toyMat = () => new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.55, metalness: 0 });
+async function toyMesh(t) { const m = new THREE.Mesh(await toyGeometry(t), toyMat()); m.castShadow = true; m.receiveShadow = true; m.userData.toy = t; return m; }
+// the child's collection is kept on this device only
+const collection = {
+  get() { return K.store.get("dl-collection", {}); },
+  add(slug) { const c = collection.get(); c[slug] = (c[slug] || 0) + 1; K.store.set("dl-collection", c); return c[slug]; }
+};
+const shopLink = slug => (window.SHOP_URL || "/") + "#m-" + slug;
+const assetURL = p => ASSETS + p;
+
+
+/* ---------- the room ---------- */
+const cv = document.getElementById("room");
+const renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2)); renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+const scene = new THREE.Scene(); scene.background = new THREE.Color("#F4E7D3");
+const cam = new THREE.PerspectiveCamera(45, 1, 0.1, 100); cam.position.set(9.5, 7.5, 11);
+const controls = new OrbitControls(cam, cv);
+controls.target.set(-1, 1.2, -2); controls.enableDamping = true; controls.enablePan = false;
+controls.minDistance = 5; controls.maxDistance = 21; controls.minPolarAngle = 0.35; controls.maxPolarAngle = 1.5;
+controls.minAzimuthAngle = -0.15; controls.maxAzimuthAngle = 1.75;
+scene.add(new THREE.HemisphereLight(0xffffff, 0xC9A27A, 1.6));
+const sun = new THREE.DirectionalLight(0xffffff, 2.2); sun.position.set(6, 12, 8); sun.castShadow = true;
+sun.shadow.mapSize.set(1024, 1024); Object.assign(sun.shadow.camera, { left: -10, right: 10, top: 10, bottom: -10, near: 1, far: 40 }); scene.add(sun);
+const mats = {};
+const mat = c => mats[c] || (mats[c] = new THREE.MeshStandardMaterial({ color: c, roughness: 0.8 }));
+function box(w, h, d, c, x, y, z, r = 0.08, ry = 0) {
+  const m = new THREE.Mesh(r ? new RoundedBoxGeometry(w, h, d, 3, Math.min(r, w / 2, h / 2, d / 2)) : new THREE.BoxGeometry(w, h, d), mat(c));
+  m.position.set(x, y, z); m.rotation.y = ry; m.castShadow = true; m.receiveShadow = true; scene.add(m); return m;
+}
+function cyl(r0, r1, h, c, x, y, z, seg = 24) { const m = new THREE.Mesh(new THREE.CylinderGeometry(r0, r1, h, seg), mat(c)); m.position.set(x, y, z); m.castShadow = m.receiveShadow = true; scene.add(m); return m; }
+function ball(r, c, x, y, z) { const m = new THREE.Mesh(new THREE.SphereGeometry(r, 24, 16), mat(c)); m.position.set(x, y, z); m.castShadow = m.receiveShadow = true; scene.add(m); return m; }
+// floor, walls, rug
+box(16, 0.2, 16, "#E2B88A", 0, -0.1, 0, 0);
+for (let i = -7; i <= 7; i += 2) box(0.04, 0.01, 16, "#CFA373", i, 0.005, 0, 0);
+box(16, 9, 0.3, "#BFE3F7", 0, 4.5, -8.15, 0); box(0.3, 9, 16, "#FFD9C9", -8.15, 4.5, 0, 0);
+box(16, 0.5, 0.35, "#FFFFFF", 0, 0.25, -7.95, 0); box(0.35, 0.5, 16, "#FFFFFF", -7.95, 0.25, 0, 0);
+const rug = new THREE.Mesh(new THREE.CylinderGeometry(3.6, 3.6, 0.05, 48), mat("#FFB3C7")); rug.position.set(0.5, 0.03, -0.5); rug.receiveShadow = true; scene.add(rug);
+cyl(2.6, 2.6, 0.06, "#FFD4E0", 0.5, 0.04, -0.5, 48);
+// window and curtain on the left wall
+box(0.15, 2.6, 3.2, "#FFFFFF", -7.9, 3.6, 3.4, 0.05); box(0.1, 2.2, 2.8, "#9ED8FF", -7.85, 3.6, 3.4, 0);
+box(0.12, 0.12, 2.8, "#FFFFFF", -7.8, 3.6, 3.4, 0); box(0.6, 0.2, 3.4, "#FFFFFF", -7.6, 2.2, 3.4, 0.04);
+box(0.3, 4.2, 1.1, "#8C6BF2", -7.55, 3.2, 1.45, 0.12); box(0.3, 4.2, 1.1, "#8C6BF2", -7.55, 3.2, 5.35, 0.12);
+// picture on the back wall
+box(2.2, 1.6, 0.1, "#FFFFFF", 4.6, 4.8, -7.95, 0.05); box(1.8, 1.2, 0.1, "#FFE08A", 4.6, 4.8, -7.9, 0.02); ball(0.35, "#FF6B57", 4.6, 4.9, -7.85);
+// bed on legs (a gap underneath to peek into)
+for (const [x, z] of [[-6.9, -7.2], [-2.3, -7.2], [-6.9, -3.9], [-2.3, -3.9]]) box(0.3, 0.6, 0.3, "#C98E4F", x, 0.3, z, 0.04);
+box(5, 0.4, 3.6, "#C98E4F", -4.6, 0.75, -5.6); box(4.8, 0.45, 3.4, "#FFFFFF", -4.6, 1.15, -5.6, 0.18);
+box(5.2, 2.7, 0.3, "#C98E4F", -4.6, 1.35, -7.5, 0.12); box(4.9, 0.2, 2.3, "#5DB8FF", -4.6, 1.42, -4.95, 0.08);
+box(2, 0.45, 0.9, "#FFFFFF", -4.0, 1.58, -6.7, 0.2);
+// toy chest
+box(2.6, 0.18, 1.9, "#FF9B3D", -5.4, 0.09, 1.6, 0.04);
+box(2.6, 1.3, 0.16, "#FF9B3D", -5.4, 0.65, 2.48, 0.04); box(2.6, 1.3, 0.16, "#FF9B3D", -5.4, 0.65, 0.72, 0.04);
+box(0.16, 1.3, 1.9, "#FF9B3D", -6.62, 0.65, 1.6, 0.04); box(0.16, 1.3, 1.9, "#FF9B3D", -4.18, 0.65, 1.6, 0.04);
+const lid = box(2.7, 0.16, 2, "#FF7B2D", -5.4, 1.95, 0.55, 0.04); lid.rotation.x = -1.2;
+// sofa against the back wall
+box(4.6, 0.85, 2.1, "#3FBF7F", 2.6, 0.43, -5.6, 0.2); box(4.6, 1.5, 0.6, "#3FBF7F", 2.6, 1.3, -6.5, 0.25);
+box(0.55, 1.2, 2.1, "#33A86C", 0.55, 0.85, -5.6, 0.22); box(0.55, 1.2, 2.1, "#33A86C", 4.65, 0.85, -5.6, 0.22);
+box(1.8, 0.3, 1.7, "#62D394", 1.7, 0.98, -5.45, 0.14); box(1.8, 0.3, 1.7, "#62D394", 3.5, 0.98, -5.45, 0.14);
+box(1.2, 0.9, 0.35, "#FFC93C", 1.6, 1.6, -6.05, 0.16, 0.2);
+box(1.4, 1.0, 0.8, "#A86B45", 2.4, 0.5, -7.45, 0.06);                          // book stack hidden behind the sofa
+// bookshelf
+box(3.2, 3.7, 0.12, "#E9B97A", -0.5, 1.85, -7.86, 0.03); box(0.14, 3.7, 0.9, "#E9B97A", -2.07, 1.85, -7.45, 0.04); box(0.14, 3.7, 0.9, "#E9B97A", 1.07, 1.85, -7.45, 0.04);
+for (const y of [0.1, 0.95, 1.85, 2.75, 3.62]) box(3, 0.1, 0.8, "#C98E4F", -0.5, y, -7.4, 0);
+const BOOKS = ["#FF6B57", "#5DB8FF", "#FFC93C", "#8C6BF2", "#3FBF7F", "#FF8FB8"];
+[[0.15, 0.36], [1.0, 0.8], [1.9, 0.0], [2.8, 0.55]].forEach(([y, start], s) => { let x = -1.9 + start; for (let k = 0; k < 6 - s % 2; k++) { const w = 0.18 + (k * 37 % 7) / 40, h = 0.6 + (k * 13 % 5) / 20; if (x + w > 0.95) break; box(w, h, 0.6, BOOKS[(k + s) % 6], x + w / 2, y + h / 2, -7.4, 0.02); x += w + 0.04; if (s === 1 && k === 2) x += 0.75; } });
+// plant
+cyl(0.7, 0.55, 1.2, "#FF6B57", 6.6, 0.6, -6.8); for (const [x, y, z, r] of [[6.6, 2.0, -6.8, 0.9], [6.1, 2.6, -6.6, 0.6], [7.0, 2.7, -6.9, 0.65], [6.6, 3.2, -7.0, 0.5]]) ball(r, "#3FBF7F", x, y, z);
+// little table and chairs
+box(2.8, 0.18, 1.9, "#FFFFFF", 1.8, 1.25, 0.6, 0.06); for (const [x, z] of [[0.6, -0.2], [3.0, -0.2], [0.6, 1.4], [3.0, 1.4]]) box(0.16, 1.2, 0.16, "#5DB8FF", x, 0.6, z, 0.04);
+box(1.1, 0.14, 1.1, "#FF8FB8", 1.8, 0.75, 2.3, 0.05); box(1.1, 1.0, 0.14, "#FF8FB8", 1.8, 1.25, 2.85, 0.05); for (const [x, z] of [[1.35, 1.85], [2.25, 1.85], [1.35, 2.75], [2.25, 2.75]]) box(0.1, 0.7, 0.1, "#FF8FB8", x, 0.35, z, 0.03);
+// block pile and a big ball
+[["#FF6B57", -2.0, 0.4, -2.4], ["#FFC93C", -1.2, 0.4, -2.5], ["#5DB8FF", -1.6, 1.2, -2.45], ["#3FBF7F", -2.8, 0.4, -2.6], ["#8C6BF2", -2.4, 1.2, -2.5]].forEach(([c, x, y, z], i) => box(0.8, 0.8, 0.8, c, x, y, z, 0.08, i * 0.3));
+const bigBall = ball(0.9, "#FFC93C", 5.2, 0.9, 2.4); const stripe = new THREE.Mesh(new THREE.TorusGeometry(0.9, 0.12, 8, 32), mat("#FF6B57")); stripe.position.copy(bigBall.position); stripe.rotation.y = 0.6; scene.add(stripe);
+
+/* hiding spots: each is behind, under or inside something, with a bit of the toy showing from some angle */
+const SPOTS = [
+  { p: [-3.3, 1.38, -7.15], s: 0.98 },   // behind the pillow
+  { p: [-3.4, 0, -4.4], s: 0.48 },      // under the bed
+  { p: [-5.9, 0, -6.0], s: 0.45 },    // under the bed, far side
+  { p: [-5.3, 0.25, 1.6], s: 1.47 },    // inside the toy chest
+  { p: [2.4, 1.0, -7.45], s: 1.33 },    // behind the sofa, on the books
+  { p: [4.2, 1.13, -5.6], s: 0.87 },    // between the sofa cushions
+  { p: [-1.45, 1.94, -7.35], s: 0.84 },  // in the bookshelf gap
+  { p: [0.6, 3.68, -7.3], s: 0.98 },     // on top of the bookshelf
+  { p: [6.9, 0, -7.6], s: 1.33 },       // behind the plant
+  { p: [1.7, 0, 0.6], s: 1.01 },        // under the table
+  { p: [-2.5, 0, -3.35], s: 1.12 },      // behind the blocks
+  { p: [-7.5, 2.3, 2.4], s: 0.87, face: 1.57 }, // on the window sill by the curtain
+  { p: [5.9, 0, 3.3], s: 1.05 }          // behind the big ball
+];
+
+/* ---------- sparkles (sprites) ---------- */
+const starTex = (() => { const c = document.createElement("canvas"); c.width = c.height = 64; const g = c.getContext("2d"); g.translate(32, 32); g.fillStyle = "#FFE066";
+  g.beginPath(); for (let k = 0; k < 8; k++) { const a = k * Math.PI / 4, r = k % 2 ? 9 : 30; g.lineTo(Math.cos(a) * r, Math.sin(a) * r); } g.closePath(); g.fill(); return new THREE.CanvasTexture(c); })();
+const fx = [];
+function sparkleAt(v, n = 8, spread = 0.8) { for (let i = 0; i < n; i++) { const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: starTex, transparent: true, depthWrite: false }));
+  s.position.copy(v).add(new THREE.Vector3((Math.random() - .5) * spread, Math.random() * spread, (Math.random() - .5) * spread)); s.scale.setScalar(0.01); s.userData = { life: 0, max: 40 + Math.random() * 30, vy: 0.01 + Math.random() * 0.02 }; scene.add(s); fx.push(s); } }
+
+/* ---------- play ---------- */
+let list = [], hidden = [], foundN = 0, hints = 0, playing = false, lastFind = performance.now(), hintTarget = null;
+const raycaster = new THREE.Raycaster(), ptr = new THREE.Vector2();
+const solids = scene.children.filter(o => o.isMesh);
+async function newRoom() {
+  for (const h of hidden) scene.remove(h.mesh);
+  hidden = []; foundN = 0; hints = 0; hintTarget = null;
+  const n = Math.min(list.length, 4);
+  const featured = list.find(t => t.featured);
+  const pool = list.filter(t => t !== featured).sort(() => Math.random() - 0.5);
+  const chosen = (featured ? [featured, ...pool] : pool).slice(0, n);
+  const spots = SPOTS.slice().sort(() => Math.random() - 0.5).slice(0, n);
+  for (let i = 0; i < n; i++) {
+    const t = chosen[i], sp = spots[i], m = await toyMesh(t);
+    m.scale.setScalar(sp.s); m.position.set(...sp.p);
+    m.rotation.y = sp.face ?? Math.atan2(cam.position.x - sp.p[0], cam.position.z - sp.p[2]) + (Math.random() - 0.5) * 0.6;
+    scene.add(m); hidden.push({ t, mesh: m, found: false, base: m.position.clone() });
+  }
+  renderFound(); playing = true; lastFind = performance.now();
+  document.getElementById("hintBtn").disabled = false;
+}
+function renderFound() {
+  document.getElementById("goal").textContent = K.t("goal", hidden.length, foundN);
+  document.getElementById("found").innerHTML = hidden.map(h => h.found ? `<i class="got" style="background-image:url('${assetURL("products/" + h.t.slug + "/cover.jpg")}')"></i>` : `<i>?</i>`).join("");
+}
+function tap(e) {
+  if (!playing) return;
+  const r = cv.getBoundingClientRect(); ptr.set((e.clientX - r.left) / r.width * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+  raycaster.setFromCamera(ptr, cam);
+  const hits = raycaster.intersectObjects([...solids, ...hidden.filter(h => !h.found).map(h => h.mesh)], false);
+  if (!hits.length) return;
+  const h = hidden.find(x => x.mesh === hits[0].object && !x.found);
+  if (!h) return;
+  h.found = true; h.t0 = performance.now(); foundN++; lastFind = performance.now();
+  const times = collection.add(h.t.slug);
+  K.sfx.chime(); K.confetti(e.clientX, e.clientY, 36); sparkleAt(h.mesh.position.clone().add(new THREE.Vector3(0, h.mesh.scale.x * 0.6, 0)), 12, 1.2);
+  toast(h.t.featured ? K.t("today") : K.t("found", h.t.title)); renderFound();
+  if (hintTarget === h) hintTarget = null;
+  if (foundN === hidden.length) { playing = false; setTimeout(finish, 1300); }
+}
+// tell a tap from a drag: only short, still presses count as taps
+let down = null;
+cv.addEventListener("pointerdown", e => { down = { x: e.clientX, y: e.clientY, t: performance.now() }; });
+cv.addEventListener("pointerup", e => { if (down && Math.hypot(e.clientX - down.x, e.clientY - down.y) < 10 && performance.now() - down.t < 500) tap(e); down = null; });
+document.getElementById("hintBtn").onclick = () => {
+  const left = hidden.filter(h => !h.found); if (!left.length) return;
+  hintTarget = left[(Math.random() * left.length) | 0]; hints++; hintTarget.hintAt = performance.now();
+  K.sfx.tick(); toast(K.t("hintMsg"));
+  document.getElementById("hintBtn").disabled = true; setTimeout(() => (document.getElementById("hintBtn").disabled = !playing), 6000);
+};
+function finish() {
+  const s = hints === 0 ? 3 : hints <= 2 ? 2 : 1, total = K.store.get("hide-stars", 0) + s; K.store.set("hide-stars", total);
+  document.getElementById("starCount").textContent = total;
+  document.getElementById("stars").innerHTML = [0, 1, 2].map(i => K.starSVG(i < s)).join("");
+  document.getElementById("doneP").textContent = K.t("doneP", hints);
+  document.getElementById("done").hidden = false; K.sfx.tada(); K.confetti();
+}
+
+/* ---------- collection ---------- */
+let mini = null;
+function openCollection() {
+  const c = collection.get(), got = list.filter(t => c[t.slug]).length;
+  document.getElementById("colP").textContent = K.t("colP", got, list.length);
+  document.getElementById("colGrid").innerHTML = list.map(t => { const n = c[t.slug] || 0, img = assetURL(`products/${t.slug}/cover.jpg`);
+    return `<button type="button" class="${n ? "" : "no"}" data-slug="${t.slug}" ${n ? "" : "disabled"}><img src="${img}" alt="">${n ? t.title.replace(/</g, "") : "?"}<small>${n ? K.t("times", n) : ""}</small></button>`; }).join("");
+  showGrid(true); document.getElementById("colSheet").hidden = false;
+}
+function showGrid(on) { document.getElementById("colGrid").hidden = !on; document.getElementById("viewer").hidden = on; document.getElementById("viewerRow").hidden = on; if (on && mini) { mini.stop(); mini = null; } }
+document.getElementById("colGrid").addEventListener("click", async e => {
+  const b = e.target.closest("button[data-slug]"); if (!b || b.disabled) return;
+  const t = list.find(x => x.slug === b.dataset.slug); showGrid(false); K.sfx.pop();
+  document.getElementById("printLink").href = shopLink(t.slug);
+  if (window.HOST !== "artifact") document.getElementById("printLink").removeAttribute("target");
+  const host = document.getElementById("viewer"); host.innerHTML = "";
+  const r2 = new THREE.WebGLRenderer({ antialias: true, alpha: true }); r2.setPixelRatio(Math.min(devicePixelRatio, 2)); r2.outputColorSpace = THREE.SRGBColorSpace; host.appendChild(r2.domElement);
+  const s2 = new THREE.Scene(), c2 = new THREE.PerspectiveCamera(35, 4 / 3, 0.1, 50); c2.position.set(0, 0.8, 2.6); c2.lookAt(0, 0.5, 0);
+  s2.add(new THREE.HemisphereLight(0xffffff, 0x9aa6c4, 1.8)); const l2 = new THREE.DirectionalLight(0xffffff, 2); l2.position.set(-1, 2, 2); s2.add(l2);
+  const m = await toyMesh(t); s2.add(m);
+  let alive = true, raf = 0; const size = () => { const w = host.clientWidth, h = host.clientHeight; r2.setSize(w, h, false); c2.aspect = w / h; c2.updateProjectionMatrix(); }; size();
+  (function loop() { if (!alive) return; m.rotation.y += 0.012; r2.render(s2, c2); raf = requestAnimationFrame(loop); })();
+  mini = { stop() { alive = false; cancelAnimationFrame(raf); r2.dispose(); host.innerHTML = ""; } };
+});
+document.getElementById("viewerBack").onclick = () => showGrid(true);
+document.getElementById("colBtn").onclick = () => { K.sfx.pop(); openCollection(); };
+document.getElementById("doneColBtn").onclick = () => { document.getElementById("done").hidden = true; openCollection(); };
+document.getElementById("colClose").onclick = () => { showGrid(true); document.getElementById("colSheet").hidden = true; if (!playing && foundN === hidden.length && hidden.length) document.getElementById("done").hidden = false; };
+document.getElementById("againBtn").onclick = () => { K.sfx.pop(); document.getElementById("done").hidden = true; newRoom(); };
+document.getElementById("startBtn").onclick = () => { K.sfx.pop(); document.getElementById("intro").hidden = true; };
+
+/* ---------- loop ---------- */
+let placed = false;
+function resize() { const r = cv.getBoundingClientRect(); if (!r.width) return; renderer.setSize(r.width, r.height, false); cam.aspect = r.width / r.height; cam.fov = cam.aspect < 0.8 ? 62 : 45; cam.updateProjectionMatrix();
+  if (!placed) { placed = true; if (innerWidth / innerHeight < 0.8) { cam.position.set(8.2, 7.2, 9.6); controls.target.set(-1.4, 1.3, -2.6); } } }
+new ResizeObserver(resize).observe(cv); resize();
+(function loop(now) {
+  requestAnimationFrame(loop); controls.update();
+  for (const h of hidden) {
+    const m = h.mesh;
+    if (h.found) { const k = Math.min(1, (now - h.t0) / 900); m.position.y = h.base.y + Math.sin(k * Math.PI) * 1.4; m.rotation.y += 0.25 * (1 - k); if (k >= 1 && !h.gone) { h.gone = true; m.visible = false; } }
+    else if (hintTarget === h && now - h.hintAt < 4000) { m.rotation.z = Math.sin(now / 70) * 0.12; if (Math.random() < 0.25) sparkleAt(m.position.clone().add(new THREE.Vector3(0, m.scale.x, 0)), 1, 0.9); }
+    else m.rotation.z = Math.sin(now / 600 + m.position.x) * 0.03;    // a tiny breathing wobble
+  }
+  for (let i = fx.length - 1; i >= 0; i--) { const s = fx[i], u = s.userData; u.life++; const k = u.life / u.max; s.position.y += u.vy; s.scale.setScalar(0.35 * Math.sin(k * Math.PI)); if (k >= 1) { scene.remove(s); s.material.dispose(); fx.splice(i, 1); } }
+  renderer.render(scene, cam);
+})(performance.now());
+document.getElementById("starCount").textContent = K.store.get("hide-stars", 0);
+window.__game = { hidden: () => hidden, cam, THREE };   // used by automated play tests
+
+/* ---------- boot ---------- */
+(async () => {
+  try { list = (await loadToyList()).toys; await Promise.all(list.map(toyGeometry)); }
+  catch (e) { document.getElementById("loading").textContent = K.t("noLoad"); return; }
+  document.getElementById("loading").hidden = true;
+  await newRoom();
+  // intro art: the first friends standing in a row
+  const c = document.getElementById("introArt"), x = c.getContext("2d");
+  const imgs = list.slice(0, 3).map(t => new Promise(r => { const im = new Image(); im.onload = () => r(im); im.onerror = () => r(null); im.src = assetURL(`products/${t.slug}/cover.jpg`); }));
+  (await Promise.all(imgs)).forEach((im, i) => { if (!im) return; x.save(); x.beginPath(); x.arc(80 + i * 120, 140, 58, 0, Math.PI * 2); x.clip(); x.drawImage(im, 22 + i * 120, 82, 116, 116); x.restore();
+    x.lineWidth = 5; x.strokeStyle = "#1B2547"; x.beginPath(); x.arc(80 + i * 120, 140, 58, 0, Math.PI * 2); x.stroke(); });
+  x.fillStyle = "#1B2547"; x.font = "800 64px 'Baloo 2', sans-serif"; x.textAlign = "center"; x.fillText("?", 340, 90);
+})();
+document.getElementById("back").href = window.SHOP_URL || "/";
+</script>
+</body>
+</html>
