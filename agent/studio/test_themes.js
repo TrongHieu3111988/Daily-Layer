@@ -1,5 +1,5 @@
 // builds every theme from a fake "child drawing": traced outline in ink, filled body, some stripes and dots
-const D = require("/home/claude/studio/doodle_core.js"), TH = require("/home/claude/studio/doodle_themes.js");
+const D = require(__dirname + "/doodle_core.js"), TH = require(__dirname + "/doodle_themes.js");
 const W = 512, out = {};
 for (const t of TH.THEMES) {
   const { guide, keep } = TH.masks(t, W), lab = new Uint8Array(W * W);
