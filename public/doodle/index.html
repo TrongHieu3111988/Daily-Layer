@@ -104,6 +104,51 @@ details.safe ul{margin:4px 0 0;padding-left:18px}
 .tpl{border:1px solid var(--line);background:var(--bg);border-radius:16px;padding:8px;display:grid;gap:4px;justify-items:center;font-weight:800;font-size:13px}
 .tpl canvas{width:100%;aspect-ratio:1;max-width:100%;border-radius:10px;background:var(--paper)}
 .cardrow{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+
+/* ---------- crayon box ---------- */
+.paper canvas#fx{pointer-events:none}
+.paper.wobble{animation:wobble .45s ease}
+@keyframes wobble{20%{transform:rotate(-1.6deg)}45%{transform:rotate(1.3deg)}70%{transform:rotate(-.7deg)}}
+.hint.warn{color:var(--warn)}
+.toolbar{display:flex;gap:7px;align-items:flex-end;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.toolbar .tool{flex:1 1 0;min-width:0;max-width:86px;border:0;background:var(--panel);border-radius:18px;padding:6px 2px 6px;display:flex;flex-direction:column;align-items:center;gap:2px;font-weight:800;font-size:12px;
+  box-shadow:0 3px 0 var(--line);transition:transform .18s cubic-bezier(.34,1.56,.64,1),box-shadow .18s}
+.toolbar .tool .ic{width:38px;height:38px;border-radius:13px;display:grid;place-items:center;background:var(--bg)}
+.toolbar .tool svg{width:28px;height:28px}
+.toolbar .tool .tl{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;line-height:1.15}
+.toolbar .tool[aria-pressed="true"]{transform:translateY(-4px);box-shadow:0 4px 0 var(--accent);background:var(--panel);color:var(--ink)}
+.toolbar .tool[aria-pressed="true"] .ic{background:color-mix(in srgb,var(--accent) 20%,var(--panel))}
+.toolbar .tool.small{flex:0 0 auto;width:44px;padding:4px 0}
+.toolbar .tool.small .ic{background:transparent}
+.toolbar .tool:active{transform:scale(.93)}
+
+.toolbar.rainbow #tool-pen .ic,.toolbar.rainbow #tool-fill .ic{background:conic-gradient(from 200deg,#E8483B,#FF9B3D,#FFD24C,#5CBF6A,#4FA8E8,#4A55C9,#9B6BD6,#E8483B)}
+.toolbar.rainbow #tool-pen .ic svg,.toolbar.rainbow #tool-fill .ic svg{background:var(--panel);border-radius:10px;padding:2px}
+.toolbar .sizes{display:flex;flex-direction:column;gap:4px;flex:none}
+.toolbar .size{width:30px;height:22px;border-radius:9px;border:0;background:var(--panel);display:grid;place-items:center;box-shadow:0 2px 0 var(--line);padding:0}
+.toolbar .size i{display:block;border-radius:50%;background:currentColor;max-width:18px;max-height:18px}
+.toolbar .size[aria-pressed="true"]{background:var(--sel);color:var(--sel-ink)}
+.pop{animation:pop .35s cubic-bezier(.34,1.56,.64,1)}
+@keyframes pop{0%{scale:1}40%{scale:1.14}100%{scale:1}}
+/* the box: crayons stand in a cardboard tray; the picked one rises out of it */
+.dock{grid-template-columns:minmax(0,1fr)}
+.box{position:relative;margin-left:max(16px,env(safe-area-inset-left,0px));margin-right:max(16px,env(safe-area-inset-right,0px));height:104px;border-radius:16px 16px 20px 20px;
+  background:linear-gradient(#F2B33D,#E79A22);box-shadow:inset 0 3px 0 rgba(255,255,255,.35),var(--shadow);overflow:hidden}
+.crayons{position:absolute;inset:0 10px;display:flex;justify-content:space-between;gap:2px}
+/* each crayon is a window the height of the box; the drawing inside slides up when picked */
+.crayon{position:relative;flex:1 1 0;min-width:0;max-width:38px;height:100%;border:0;padding:0;background:none;overflow:visible;-webkit-tap-highlight-color:transparent}
+.crayon svg{position:absolute;left:0;top:0;width:100%;height:auto;transform:translateY(28px);transition:transform .32s cubic-bezier(.34,1.56,.64,1);filter:drop-shadow(0 2px 1px rgba(0,0,0,.18))}
+.crayon:hover svg{transform:translateY(21px)}
+.crayon[aria-pressed="true"] svg{transform:translateY(4px);animation:wiggle .6s .3s ease-in-out}
+.crayon:focus-visible{outline:none}.crayon:focus-visible svg{outline:3px solid var(--accent);outline-offset:1px;border-radius:6px}
+@keyframes wiggle{25%{rotate:-5deg}55%{rotate:4deg}80%{rotate:-2deg}}
+.lip{position:absolute;left:0;right:0;bottom:0;height:32px;border-radius:0 0 20px 20px;background:linear-gradient(#3F8F5B,#2F7449);box-shadow:0 -3px 0 rgba(0,0,0,.12);display:grid;place-items:center;pointer-events:none;z-index:2}
+.lip span{font-family:var(--f-display);font-weight:800;font-size:14px;letter-spacing:.06em;color:#FFE7A8;text-shadow:0 2px 0 rgba(0,0,0,.2)}
+.pickfx{position:fixed;inset:0;pointer-events:none;z-index:30}
+.pickfx i{position:absolute;width:10px;height:10px;margin:-5px 0 0 -5px;clip-path:polygon(50% 0,62% 38%,100% 50%,62% 62%,50% 100%,38% 62%,0 50%,38% 38%);animation:fly .8s ease-out forwards}
+@keyframes fly{0%{transform:translate(0,0) scale(.3);opacity:1}70%{opacity:1}100%{transform:translate(var(--dx),var(--dy)) scale(1.2) rotate(90deg);opacity:0}}
+@media (prefers-reduced-motion:reduce){.crayon svg,.toolbar .tool{transition:none}.crayon[aria-pressed="true"] svg,.pop,.paper.wobble{animation:none}}
+@media (max-height:700px){.box{height:90px}.lip{height:34px}.crayon svg{transform:translateY(30px)}.crayon[aria-pressed="true"] svg{transform:translateY(4px)}}
 </style>
 
 </head>
@@ -120,6 +165,7 @@ details.safe ul{margin:4px 0 0;padding-left:18px}
   <main class="stage" id="stage">
     <div class="paper" id="paper">
       <canvas id="draw" width="512" height="512" aria-label="Drawing paper"></canvas>
+      <canvas id="fx" aria-hidden="true"></canvas>
     </div>
     <div class="view3d" id="view3d" hidden><canvas id="c3d"></canvas></div>
     <div class="hint" id="hint"></div>
@@ -127,8 +173,8 @@ details.safe ul{margin:4px 0 0;padding-left:18px}
   </main>
 
   <section class="dock" id="drawDock">
-    <div class="row" id="tools"></div>
-    <div class="row" id="swatches"></div>
+    <div class="toolbar" id="tools"></div>
+    <div class="box"><div class="crayons" id="crayons" role="group" aria-label="Crayons"></div><div class="lip" aria-hidden="true"><span>Doodle Puff</span></div></div>
   </section>
 
   <section class="dock" id="printDock" hidden>
@@ -151,6 +197,7 @@ details.safe ul{margin:4px 0 0;padding-left:18px}
   </section>
 </div>
 
+<div class="pickfx" id="pickfx" aria-hidden="true"></div>
 <div class="sheet" id="tplSheet" hidden role="dialog" aria-modal="true" aria-labelledby="tplTitle">
   <div class="card">
     <h2 id="tplTitle">Pick a picture to colour</h2>
@@ -471,12 +518,16 @@ details.safe ul{margin:4px 0 0;padding-left:18px}
     return { obj: enc(out.join("")), mtl: enc(mtl) };
   }
   // 3MF: one solid object, colour per triangle (3MF core basematerials)
+  // 3MF: one solid object, colour per triangle.
+  // m:colorgroup + pid/p1 is what Bambu Studio / Orca read as triangle colours (checked in BambuStudio bbs_3mf.cpp);
+  // slic3rpe:mmu_segmentation carries the same colours as PrusaSlicer multi-material painting (filament 1..n).
+  const paintCode = s => (s < 3 ? (s << 2).toString(16).toUpperCase() : (s - 3).toString(16).toUpperCase() + "C");
   function model3mf(pos, idx, faceLab, palette, names, title) {
     const used = [...new Set(faceLab)].sort((a, b) => a - b), slot = new Map(used.map((l, i) => [l, i]));
-    const mats = used.map(l => `<base name="${names[l]}" displaycolor="${palette[l].toUpperCase()}FF"/>`).join("");
+    const cols = used.map(l => `<m:color color="${palette[l].toUpperCase()}FF"/>`).join("");
     const vs = []; for (let q = 0; q < pos.length; q += 3) vs.push(`<vertex x="${pos[q].toFixed(3)}" y="${pos[q + 1].toFixed(3)}" z="${pos[q + 2].toFixed(3)}"/>`);
-    const ts = []; for (let t = 0; t < faceLab.length; t++) ts.push(`<triangle v1="${idx[3 * t]}" v2="${idx[3 * t + 1]}" v3="${idx[3 * t + 2]}" pid="1" p1="${slot.get(faceLab[t])}"/>`);
-    return `<?xml version="1.0" encoding="UTF-8"?><model unit="millimeter" xml:lang="en-US" xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02"><resources><basematerials id="1">${mats}</basematerials><object id="2" name="${title}" type="model" pid="1" pindex="0"><mesh><vertices>${vs.join("")}</vertices><triangles>${ts.join("")}</triangles></mesh></object></resources><build><item objectid="2"/></build></model>`;
+    const ts = []; for (let t = 0; t < faceLab.length; t++) { const k = slot.get(faceLab[t]); ts.push(`<triangle v1="${idx[3 * t]}" v2="${idx[3 * t + 1]}" v3="${idx[3 * t + 2]}" pid="1" p1="${k}" slic3rpe:mmu_segmentation="${paintCode(k + 1)}"/>`); }
+    return `<?xml version="1.0" encoding="UTF-8"?><model unit="millimeter" xml:lang="en-US" xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02" xmlns:m="http://schemas.microsoft.com/3dmanufacturing/material/2015/02" xmlns:slic3rpe="http://schemas.slic3r.org/3mf/2017/06"><metadata name="Title">${title}</metadata><resources><m:colorgroup id="1">${cols}</m:colorgroup><object id="2" name="${title}" type="model" pid="1" pindex="0"><mesh><vertices>${vs.join("")}</vertices><triangles>${ts.join("")}</triangles></mesh></object></resources><build><item objectid="2"/></build></model>`;
   }
 
   const Doodle = { build, shape, edt, stl, obj, model3mf, check };
@@ -493,9 +544,9 @@ const T = {
   vi: { go: "Thành 3D", busy: "Đang thổi phồng tranh…", redraw: "Vẽ tiếp", dl: "Tải file in", puff: "Độ phồng", size: "Kích thước", body: "Màu phần trống",
         loop: "Móc khoá", fine: "Mịn hơn", safeTitle: "An toàn cho bé",
         safe: ["Dành cho bé từ 3 tuổi, có người lớn giám sát.", "Tranh in thành một miếng liền, không có chi tiết rời.", "Không gắn nam châm nhỏ: bé có thể nuốt.", "Không cho bé ngậm hay cắn. Chà nhẹ chỗ sắc sau khi in."],
-        tools: { pen: "Bút sáp", fill: "Tô màu", eye: "Mắt", eraser: "Tẩy", tpl: "Tranh mẫu", clear: "Giấy mới" },
+        tools: { pen: "Bút sáp", fill: "Xô màu", eye: "Mắt", eraser: "Tẩy", tpl: "Tranh mẫu", clear: "Giấy mới" },
         hints: { pen: "Vẽ con vật hoặc hình bé thích · nét vẽ sẽ nổi lên", fill: "Chạm vào bên trong hình để tô màu", eye: "Chạm để dán mắt tròn xoe",
-                 eraser: "Kéo để tẩy", view: "Kéo để xoay · chụm 2 ngón để phóng to" },
+                 eraser: "Kéo để tẩy", rainbow: "Bút cầu vồng: vẽ một nét là ra đủ 7 màu! Thử vẽ một vòng cung nhé", view: "Kéo để xoay · chụm 2 ngón để phóng to" },
         leak: "Hình còn hở nên màu sẽ tràn ra ngoài. Nối kín nét vẽ rồi tô lại nhé!", empty: "Giấy còn trống. Bé vẽ gì đó trước đã!",
         statSize: "Kích thước", statPla: "Nhựa PLA", statCols: "Màu", ok: "Đã kiểm tra: khối kín, in được ngay.", notOk: "Còn chỗ hở. Thử đổi Độ phồng hoặc vẽ nét dày hơn.",
         dropped: n => `${n} hình rời không dính vào hình chính nên sẽ không được in. Hãy vẽ nối chúng lại.`,
@@ -504,13 +555,13 @@ const T = {
         no3d: "Không tải được trình xem 3D, nhưng vẫn tải được file in.",
         tplTitle: "Chọn tranh để tô", tplText: "Tranh mẫu sẽ thay cho giấy hiện tại. Có thể hoàn tác.", close: "Đóng",
         clearTitle: "Bắt đầu tranh mới?", clearText: "Giấy sẽ được xoá sạch. Có thể hoàn tác.", cancel: "Huỷ", wipe: "Xoá giấy",
-        tpls: ["Cá", "Ngôi sao", "Mèo"], cols: ["Mực", "Đỏ", "Cam", "Vàng", "Lá", "Trời", "Tím", "Hồng", "Nâu", "Trắng"] },
+        tpls: ["Cá", "Ngôi sao", "Mèo"], cols: ["Mực", "Đỏ", "Cam", "Vàng", "Lá", "Trời", "Tím", "Hồng", "Nâu", "Trắng", "Chàm"], rainbow: "Bút cầu vồng", sizeLbl: "Cỡ nét", sizeNames: ["Nét nhỏ", "Nét vừa", "Nét to"] },
   en: { go: "Make it 3D", busy: "Puffing up the drawing…", redraw: "Keep drawing", dl: "Download print files", puff: "Puffiness", size: "Size", body: "Empty areas",
         loop: "Keyring loop", fine: "Extra smooth", safeTitle: "Safety for kids",
         safe: ["For ages 3 and up, with an adult nearby.", "The drawing prints as one solid piece with no loose parts.", "Don't glue small magnets on: children can swallow them.", "Not for mouthing or chewing. Sand any sharp spots after printing."],
-        tools: { pen: "Crayon", fill: "Fill", eye: "Eyes", eraser: "Eraser", tpl: "Pictures", clear: "New paper" },
+        tools: { pen: "Crayon", fill: "Paint pot", eye: "Eyes", eraser: "Eraser", tpl: "Pictures", clear: "New paper" },
         hints: { pen: "Draw an animal or any shape · crayon lines come out raised", fill: "Tap inside a shape to colour it", eye: "Tap to stick on googly eyes",
-                 eraser: "Drag to erase", view: "Drag to turn · pinch to zoom" },
+                 eraser: "Drag to erase", rainbow: "Rainbow crayon: one line, all seven colours! Try drawing an arch", view: "Drag to turn · pinch to zoom" },
         leak: "The shape has a gap, so the colour would spill out. Close the line and try again!", empty: "The paper is empty. Draw something first!",
         statSize: "Size", statPla: "PLA", statCols: "Colours", ok: "Checked: closed solid, ready to print.", notOk: "Some gaps remain. Try another puffiness or thicker lines.",
         dropped: n => `${n} separate shape${n > 1 ? "s" : ""} not touching the main drawing won't be printed. Join them with a line.`,
@@ -519,14 +570,14 @@ const T = {
         no3d: "The 3D viewer didn't load, but the print files still download.",
         tplTitle: "Pick a picture to colour", tplText: "It replaces what is on the paper. You can undo.", close: "Close",
         clearTitle: "Start a new drawing?", clearText: "The paper will be wiped clean. You can undo.", cancel: "Cancel", wipe: "Wipe the paper",
-        tpls: ["Fish", "Star", "Cat"], cols: ["Ink", "Red", "Orange", "Sun", "Leaf", "Sky", "Lilac", "Pink", "Brown", "White"] }
+        tpls: ["Fish", "Star", "Cat"], cols: ["Ink", "Red", "Orange", "Sun", "Leaf", "Sky", "Lilac", "Pink", "Brown", "White", "Indigo"], rainbow: "Rainbow crayon", sizeLbl: "Line size", sizeNames: ["Thin", "Medium", "Thick"] }
 };
 const LANG = /^vi/i.test(navigator.language || "") || /lang=vi/.test(location.hash) ? "vi" : "en";
 const t = k => T[LANG][k];
 
 /* ---------- palette (label 0 = paper) ---------- */
-const PAL = [null, "#24283A", "#E8483B", "#FF9B3D", "#FFD24C", "#5CBF6A", "#4FA8E8", "#9B6BD6", "#F7A1B5", "#A86B45", "#FFFFFF"];
-const NAMES = [null, "ink", "red", "orange", "sun", "leaf", "sky", "lilac", "pink", "brown", "white"];
+const PAL = [null, "#24283A", "#E8483B", "#FF9B3D", "#FFD24C", "#5CBF6A", "#4FA8E8", "#9B6BD6", "#F7A1B5", "#A86B45", "#FFFFFF", "#4A55C9"];
+const NAMES = [null, "ink", "red", "orange", "sun", "leaf", "sky", "lilac", "pink", "brown", "white", "indigo"];
 const RGB = PAL.map(h => h ? [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)] : null);
 
 /* ---------- drawing state ---------- */
@@ -569,13 +620,56 @@ function loadDraft() {
         for (let i = 0; i < W * H; i++) { lab[i] = r.charCodeAt(i); bump[i] = r.charCodeAt(W * H + i) / 100; } return lab.some(v => v); } catch (e) { return false; }
 }
 
+/* ---------- sparkles: little twinkling stars that follow the crayon and burst when colouring ---------- */
+const fx = $("#fx"), fctx = fx.getContext("2d"), parts = [];
+const CALM = matchMedia("(prefers-reduced-motion: reduce)").matches;
+let fxOn = true, fxRaf = 0;
+const SPARK = ["#FFD24C", "#FF9B3D", "#F7A1B5", "#4FA8E8", "#9B6BD6", "#5CBF6A", "#FFFFFF"];
+function fxSize() { const r = fx.getBoundingClientRect(), d = Math.min(devicePixelRatio || 1, 2); if (!r.width) return; fx.width = Math.round(r.width * d); fx.height = Math.round(r.height * d); }
+new ResizeObserver(fxSize).observe(fx);
+function sparkle(x, y, n, opt = {}) {           // x, y in paper pixels (0..512)
+  if (!fxOn || CALM) return;
+  for (let i = 0; i < n; i++) {
+    const a = Math.random() * Math.PI * 2, sp = (opt.speed ?? 1.6) * (0.4 + Math.random());
+    parts.push({ x: x + (opt.jitter ? (Math.random() - 0.5) * opt.jitter : 0), y: y + (opt.jitter ? (Math.random() - 0.5) * opt.jitter : 0),
+      vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - (opt.lift ?? 0.4), life: 0, max: 26 + Math.random() * 22,
+      r: (opt.size ?? 7) * (0.6 + Math.random() * 0.7), c: opt.colour || SPARK[(Math.random() * SPARK.length) | 0], spin: (Math.random() - 0.5) * 0.3, rot: Math.random() * 3 });
+  }
+  if (parts.length > 500) parts.splice(0, parts.length - 500);
+  if (!fxRaf) fxRaf = requestAnimationFrame(fxLoop);
+}
+function star(g, x, y, r, rot) {                 // four-point twinkle
+  g.beginPath();
+  for (let k = 0; k < 8; k++) { const a = rot + k * Math.PI / 4, rr = k % 2 ? r * 0.32 : r; g.lineTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr); }
+  g.closePath(); g.fill();
+}
+function fxLoop() {
+  const s = fx.width / W; fctx.clearRect(0, 0, fx.width, fx.height);
+  for (let i = parts.length - 1; i >= 0; i--) {
+    const p = parts[i]; p.life++; p.x += p.vx; p.y += p.vy; p.vx *= 0.94; p.vy = p.vy * 0.94 + 0.03; p.rot += p.spin;
+    const k = p.life / p.max; if (k >= 1) { parts.splice(i, 1); continue; }
+    const tw = Math.sin(k * Math.PI) * (0.75 + 0.25 * Math.sin(p.life * 0.9));    // grow, twinkle, fade
+    fctx.globalAlpha = Math.min(1, tw * 1.2); fctx.fillStyle = p.c;
+    fctx.shadowColor = p.c; fctx.shadowBlur = 6 * s;
+    star(fctx, p.x * s, p.y * s, p.r * s * tw, p.rot);
+  }
+  fctx.globalAlpha = 1; fctx.shadowBlur = 0;
+  fxRaf = parts.length ? requestAnimationFrame(fxLoop) : 0;
+}
+
 /* ---------- brushes ---------- */
+const RAINBOW = [2, 3, 4, 5, 6, 11, 7];           // red, orange, yellow, green, blue, indigo, violet
+const RSIZES = [12, 18, 26];                      // rainbow crayon is wider so all seven stripes show
+let normal = [0, 1];                              // rainbow stripes run across the stroke direction
 function dab(x, y, r, l, relief) {
   for (let j = Math.floor(y - r); j <= y + r; j++) for (let i = Math.floor(x - r); i <= x + r; i++) {
     if (i < 0 || j < 0 || i >= W || j >= H) continue;
-    if ((i - x) * (i - x) + (j - y) * (j - y) > r * r) continue;
+    const dx = i - x, dy = j - y; if (dx * dx + dy * dy > r * r) continue;
     const p = i + W * j;
-    if (l === 0) { lab[p] = 0; bump[p] = 0; } else { lab[p] = l; bump[p] = Math.max(bump[p], relief); }
+    if (l === 0) { lab[p] = 0; bump[p] = 0; continue; }
+    if (l === "R") { const s = (dx * normal[0] + dy * normal[1]) / r; lab[p] = RAINBOW[Math.min(6, Math.max(0, Math.floor((s + 1) / 2 * 7)))]; }
+    else lab[p] = l;
+    bump[p] = Math.max(bump[p], relief);
   }
 }
 function eye(x, y) {
@@ -589,76 +683,127 @@ function eye(x, y) {
     if (Math.hypot(i - (px - r2 * 0.35), j - (py - r2 * 0.4)) < r2 * 0.28) lab[p] = 10;   // tiny shine
   }
   paint(x - R - 1, y - R - 1, x + R + 1, y + R + 1);
+  sparkle(x, y, 10, { size: 6, speed: 2.2, colour: "#FFD24C" });
 }
+/* fill: the colour spreads out from the finger like a ripple, with sparkles riding the wave */
+let filling = null;
 function fill(x, y) {
+  if (filling) return;
   const s = (x | 0) + W * (y | 0), from = lab[s];
-  if (from === colour) return;
-  const seen = new Uint8Array(W * H), st = [s]; seen[s] = 1; const reg = [];
-  let touchesEdge = false;
-  while (st.length) {
-    const p = st.pop(); reg.push(p); const px = p % W, py = (p - px) / W;
+  if (from === colour && colour !== "R") return;
+  const seen = new Uint8Array(W * H), order = new Int32Array(W * H); let h = 0, n = 0; order[n++] = s; seen[s] = 1;
+  let touchesEdge = false, y0 = H, y1 = 0;
+  while (h < n) {                                   // breadth-first: the order is the ripple
+    const p = order[h++], px = p % W, py = (p - px) / W;
+    if (py < y0) y0 = py; if (py > y1) y1 = py;
     if (px === 0 || py === 0 || px === W - 1 || py === H - 1) touchesEdge = true;
-    for (const q of [px > 0 ? p - 1 : -1, px < W - 1 ? p + 1 : -1, py > 0 ? p - W : -1, py < H - 1 ? p + W : -1])
-      if (q >= 0 && !seen[q] && lab[q] === from) { seen[q] = 1; st.push(q); }
+    if (px > 0 && !seen[p - 1] && lab[p - 1] === from) { seen[p - 1] = 1; order[n++] = p - 1; }
+    if (px < W - 1 && !seen[p + 1] && lab[p + 1] === from) { seen[p + 1] = 1; order[n++] = p + 1; }
+    if (py > 0 && !seen[p - W] && lab[p - W] === from) { seen[p - W] = 1; order[n++] = p - W; }
+    if (py < H - 1 && !seen[p + W] && lab[p + W] === from) { seen[p + W] = 1; order[n++] = p + W; }
   }
-  if (from === 0 && touchesEdge) { flash(t("leak")); return; }
+  if (from === 0 && touchesEdge) { flash(t("leak")); wobble(); return; }
   pushUndo();
-  for (const p of reg) lab[p] = colour;
-  paintAll(); saveDraft();
+  const col = colour, span = Math.max(1, y1 - y0 + 1);
+  const put = p => { lab[p] = col === "R" ? RAINBOW[Math.min(6, Math.floor(((p / W | 0) - y0) / span * 7))] : col; };
+  if (CALM) { for (let i = 0; i < n; i++) put(order[i]); paintAll(); saveDraft(); return; }
+  const frames = Math.min(22, Math.max(8, Math.round(Math.sqrt(n) / 9))), per = Math.ceil(n / frames);
+  let i = 0; filling = true;
+  sparkle(x, y, 14, { size: 9, speed: 2.6 });
+  (function step() {
+    const end = Math.min(n, i + per);
+    for (let k = i; k < end; k++) put(order[k]);
+    for (let k = 0; k < 4 && end > i; k++) { const p = order[i + ((Math.random() * (end - i)) | 0)]; sparkle(p % W, p / W | 0, 1, { size: 6, speed: 0.6, colour: col === "R" ? undefined : "#FFFFFF" }); }
+    i = end; paintAll();
+    if (i < n) requestAnimationFrame(step);
+    else { filling = null; saveDraft(); const c = order[(n * 0.6) | 0]; sparkle(c % W, c / W | 0, 18, { size: 10, speed: 3, jitter: 40 }); }
+  })();
 }
 let flashTimer = 0;
-function flash(m) { const h = $("#hint"); h.textContent = m; h.style.color = "var(--warn)"; clearTimeout(flashTimer); flashTimer = setTimeout(() => { h.style.color = ""; setHint(); }, 3200); }
-function setHint() { $("#hint").textContent = $("#view3d").hidden ? T[LANG].hints[tool] || "" : T[LANG].hints.view; }
+function flash(m) { const h = $("#hint"); h.textContent = m; h.classList.add("warn"); clearTimeout(flashTimer); flashTimer = setTimeout(() => { h.classList.remove("warn"); setHint(); }, 3200); }
+function wobble() { const p = $("#paper"); p.classList.remove("wobble"); void p.offsetWidth; p.classList.add("wobble"); }
+function setHint() { $("#hint").textContent = $("#view3d").hidden ? (tool === "pen" && colour === "R" ? T[LANG].hints.rainbow : T[LANG].hints[tool]) || "" : T[LANG].hints.view; }
 
 /* pointer drawing */
-let drawing = false, last = null;
+let drawing = false, last = null, travelled = 0;
 function toPaper(e) { const r = cv.getBoundingClientRect(); return [(e.clientX - r.left) / r.width * W, (e.clientY - r.top) / r.height * H]; }
 cv.addEventListener("pointerdown", e => {
   e.preventDefault(); const [x, y] = toPaper(e);
   if (tool === "fill") return fill(x, y);
   if (tool === "eye") { pushUndo(); eye(x, y); saveDraft(); return; }
-  cv.setPointerCapture(e.pointerId); drawing = true; pushUndo(); last = [x, y]; stroke([x, y]);
+  cv.setPointerCapture(e.pointerId); drawing = true; pushUndo(); last = null; travelled = 0; normal = [0, 1]; stroke([x, y]);
 });
 cv.addEventListener("pointermove", e => {
   if (!drawing) return;
-  const evs = e.getCoalescedEvents ? e.getCoalescedEvents() : [e];
+  const evs = e.getCoalescedEvents ? e.getCoalescedEvents() : [];
   for (const ev of evs.length ? evs : [e]) stroke(toPaper(ev));
 });
 const end = () => { if (drawing) { drawing = false; last = null; saveDraft(); } };
 cv.addEventListener("pointerup", end); cv.addEventListener("pointercancel", end);
 function stroke(p) {
-  const r = tool === "eraser" ? SIZES[sizeIx] * 1.6 : SIZES[sizeIx], l = tool === "eraser" ? 0 : colour;
-  const [ax, ay] = last || p, [bx, by] = p, n = Math.max(1, Math.ceil(Math.hypot(bx - ax, by - ay) / (r * 0.35)));
+  const rainbow = tool === "pen" && colour === "R";
+  const r = tool === "eraser" ? SIZES[sizeIx] * 1.6 : rainbow ? RSIZES[sizeIx] : SIZES[sizeIx], l = tool === "eraser" ? 0 : colour;
+  const [ax, ay] = last || p, [bx, by] = p, len = Math.hypot(bx - ax, by - ay);
+  if (rainbow && len > 0.5) { const nx = -(by - ay) / len, ny = (bx - ax) / len; normal = [normal[0] * 0.6 + nx * 0.4, normal[1] * 0.6 + ny * 0.4]; const m = Math.hypot(...normal) || 1; normal = [normal[0] / m, normal[1] / m]; }
+  const n = Math.max(1, Math.ceil(len / (r * 0.3)));
   for (let i = last ? 1 : 0; i <= n; i++) { const k = i / n; dab(ax + (bx - ax) * k, ay + (by - ay) * k, r, l, 0.7); }
   paint(Math.min(ax, bx) - r - 1, Math.min(ay, by) - r - 1, Math.max(ax, bx) + r + 1, Math.max(ay, by) + r + 1);
+  travelled += len;
+  const every = rainbow ? 9 : 22;
+  while (tool !== "eraser" && travelled > every) { travelled -= every; sparkle(bx + normal[0] * r * (Math.random() * 2 - 1), by + normal[1] * r * (Math.random() * 2 - 1), 1, { size: rainbow ? 8 : 6, speed: 0.9, colour: rainbow ? undefined : (colour === 10 ? "#FFD24C" : "#FFFFFF") }); }
   last = p;
 }
 
-/* ---------- tray ---------- */
+/* ---------- toolbar and crayon box ---------- */
 const ICON = {
-  pen: '<path d="M4 20l3.5-1L19 7.5 16.5 5 5 16.5z"/><path d="M14.5 7l2.5 2.5"/>',
-  fill: '<path d="M5 11l7-7 7 7-7 7z"/><path d="M19 15c0 1.5 1 2.5 1 3.5a1 1 0 01-2 0c0-1 1-2 1-3.5z"/>',
-  eye: '<circle cx="12" cy="12" r="7.5"/><circle cx="13.5" cy="13" r="3.2" fill="currentColor"/>',
-  eraser: '<path d="M8 20h11"/><path d="M4.5 15.5l9-9 5 5-6.5 6.5H8z"/>',
+  pen: '<path d="M5 19l2.6-.7L18.5 7.4 16.6 5.5 5.7 16.4z" style="fill:var(--cur)" stroke="currentColor"/><path d="M15.2 6.9l1.9 1.9"/>',
+  fill: '<path d="M4.5 11.5l7-7 7 7-7 7z"/><path d="M6.5 13.2h10.2l-5.2 5.3z" style="fill:var(--cur)" stroke="none"/><path d="M19.5 14.5c0 1.6 1.2 2.6 1.2 3.7a1.2 1.2 0 01-2.4 0c0-1.1 1.2-2.1 1.2-3.7z" style="fill:var(--cur)"/>',
+  eye: '<circle cx="12" cy="12" r="8" fill="#FFFFFF"/><circle cx="13.5" cy="13" r="3.6" fill="#24283A" stroke="none"/><circle cx="12.4" cy="11.6" r="1.1" fill="#FFFFFF" stroke="none"/>',
+  eraser: '<path d="M4.5 15.5l8.6-8.6 5.5 5.5-6.1 6.1H8.2z" fill="#F7A1B5"/><path d="M8.6 11.4l5.5 5.5"/><path d="M8 20h12"/>',
   tpl: '<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 15c2-4 6-4 8 0"/><circle cx="9.5" cy="9.5" r="1.2" fill="currentColor"/>',
-  clear: '<path d="M6 4h9l4 4v12H6z"/><path d="M15 4v4h4"/>'
+  clear: '<path d="M6 4h9l4 4v12H6z" fill="#FFFDF6"/><path d="M15 4v4h4"/>'
 };
+// the box, left to right: rainbow first, then warm to cool, then the neutrals
+const CRAYONS = ["R", 2, 3, 4, 5, 6, 11, 7, 8, 9, 1, 10];
+function crayonSVG(l) {
+  const id = "rb" + Math.random().toString(36).slice(2, 7);
+  if (l === "R") {
+    const stripes = RAINBOW.map((c, i) => `<rect x="${4 + i * (22 / 7)}" y="0" width="${22 / 7 + 0.2}" height="140" fill="${PAL[c]}"/>`).join("");
+    return `<svg viewBox="0 0 30 140" aria-hidden="true"><defs><clipPath id="${id}"><path d="M9 34 L13.5 6 Q15 3 16.5 6 L21 34 L26 34 L26 136 Q26 139 23 139 L7 139 Q4 139 4 136 L4 34 Z"/></clipPath></defs>
+      <g clip-path="url(#${id})">${stripes}</g><rect x="4" y="52" width="22" height="3" fill="rgba(0,0,0,.25)"/><rect x="4" y="112" width="22" height="3" fill="rgba(0,0,0,.25)"/>
+      <rect x="7" y="38" width="3" height="96" rx="1.5" fill="rgba(255,255,255,.45)"/></svg>`;
+  }
+  const c = PAL[l], edge = l === 10 ? ' stroke="rgba(31,42,34,.25)" stroke-width="1"' : "";
+  return `<svg viewBox="0 0 30 140" aria-hidden="true"><path d="M9 34 L13.5 6 Q15 3 16.5 6 L21 34 Z" fill="${c}"${edge}/><path d="M9 34 L13.5 6 Q15 3 16.5 6 L21 34 Z" fill="rgba(0,0,0,.12)"/>
+    <path d="M4 34 H26 V136 Q26 139 23 139 H7 Q4 139 4 136 Z" fill="${c}"${edge}/>
+    <rect x="4" y="48" width="22" height="70" fill="rgba(0,0,0,.10)"/><rect x="4" y="52" width="22" height="3" fill="rgba(0,0,0,.22)"/><rect x="4" y="111" width="22" height="3" fill="rgba(0,0,0,.22)"/>
+    <path d="M8 74c3-4 11-4 14 0M8 86c3 4 11 4 14 0" stroke="rgba(255,255,255,.55)" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+    <rect x="7" y="38" width="3" height="96" rx="1.5" fill="rgba(255,255,255,.45)"/></svg>`;
+}
 function buildTray() {
   const tools = $("#tools"); tools.innerHTML = "";
   for (const k of ["pen", "fill", "eye", "eraser", "tpl", "clear"]) {
-    const b = document.createElement("button"); b.className = "tool"; b.id = "tool-" + k;
-    b.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICON[k]}</svg>${T[LANG].tools[k]}`;
-    if (["pen", "fill", "eye", "eraser"].includes(k)) { b.setAttribute("aria-pressed", k === tool); b.onclick = () => { tool = k; syncTools(); }; }
-    else b.onclick = () => (k === "tpl" ? openTpl() : ($("#clearSheet").hidden = false));
+    const b = document.createElement("button"); b.className = "tool" + (["tpl", "clear"].includes(k) ? " small" : ""); b.id = "tool-" + k;
+    b.innerHTML = `<span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICON[k]}</svg></span>${["tpl", "clear"].includes(k) ? "" : `<span class="tl">${T[LANG].tools[k]}</span>`}`; if (["tpl", "clear"].includes(k)) b.setAttribute("aria-label", T[LANG].tools[k]);
+    if (["pen", "fill", "eye", "eraser"].includes(k)) { b.setAttribute("aria-pressed", k === tool); b.onclick = () => { tool = k; syncTools(); bounce(b); }; }
+    else b.onclick = () => { bounce(b); k === "tpl" ? openTpl() : ($("#clearSheet").hidden = false); };
     tools.appendChild(b);
   }
-  const sz = document.createElement("div"); sz.className = "sizes";
-  SIZES.forEach((s, i) => { const b = document.createElement("button"); b.className = "size"; b.id = "size-" + i; b.setAttribute("aria-label", ["Small", "Medium", "Large"][i]);
-    b.innerHTML = `<i style="width:${6 + i * 6}px;height:${6 + i * 6}px"></i>`; b.setAttribute("aria-pressed", i === sizeIx); b.onclick = () => { sizeIx = i; syncTools(); }; sz.appendChild(b); });
-  const sw = $("#swatches"); sw.innerHTML = ""; sw.appendChild(sz);
-  for (let l = 1; l < PAL.length; l++) {
-    const b = document.createElement("button"); b.className = "sw"; b.id = "sw-" + l; b.style.background = PAL[l]; b.setAttribute("aria-label", T[LANG].cols[l - 1]);
-    b.setAttribute("aria-pressed", l === colour); b.onclick = () => { colour = l; if (tool === "eraser" || tool === "eye") tool = "pen"; syncTools(); }; sw.appendChild(b);
+  const sz = document.createElement("div"); sz.className = "sizes"; sz.setAttribute("role", "group"); sz.setAttribute("aria-label", T[LANG].sizeLbl);
+  SIZES.forEach((s, i) => { const b = document.createElement("button"); b.className = "size"; b.id = "size-" + i; b.setAttribute("aria-label", T[LANG].sizeNames[i]);
+    b.innerHTML = `<i style="width:${7 + i * 6}px;height:${7 + i * 6}px"></i>`; b.setAttribute("aria-pressed", i === sizeIx); b.onclick = () => { sizeIx = i; syncTools(); bounce(b); }; sz.appendChild(b); });
+  tools.appendChild(sz);
+  const box = $("#crayons"); box.innerHTML = "";
+  for (const l of CRAYONS) {
+    const b = document.createElement("button"); b.className = "crayon"; b.id = "cr-" + l;
+    b.setAttribute("aria-label", l === "R" ? T[LANG].rainbow : T[LANG].cols[l - 1]);
+    b.innerHTML = crayonSVG(l);
+    b.onclick = () => {
+      colour = l; if (tool === "eraser" || tool === "eye") tool = "pen"; syncTools();
+      const r = b.getBoundingClientRect(), pr = cv.getBoundingClientRect();
+      if (!CALM) burstAt(r.left + r.width / 2, r.top + 6, l);
+    };
+    box.appendChild(b);
   }
   const bc = $("#bodycol"); bc.querySelectorAll(".sw").forEach(n => n.remove());
   for (const l of [10, 4, 8, 6, 5, 3]) {
@@ -666,14 +811,27 @@ function buildTray() {
     b.setAttribute("aria-pressed", l === bodyLabel); b.onclick = () => { bodyLabel = l; bc.querySelectorAll(".sw").forEach(n => n.setAttribute("aria-pressed", n === b)); rebuild(); }; bc.appendChild(b);
   }
 }
+function bounce(el) { if (CALM) return; el.classList.remove("pop"); void el.offsetWidth; el.classList.add("pop"); }
+/* a small twinkle above the crayon that was picked (page-level layer, outside the paper) */
+function burstAt(cx, cy, l) {
+  const layer = $("#pickfx");
+  for (let i = 0; i < 7; i++) {
+    const s = document.createElement("i"), a = -Math.PI / 2 + (Math.random() - 0.5) * 2.2, d = 22 + Math.random() * 22;
+    s.style.left = cx + "px"; s.style.top = cy + "px"; s.style.setProperty("--dx", Math.cos(a) * d + "px"); s.style.setProperty("--dy", Math.sin(a) * d + "px");
+    s.style.background = l === "R" ? PAL[RAINBOW[i % 7]] : (l === 10 ? "#FFD24C" : PAL[l]); s.style.animationDelay = (i * 18) + "ms";
+    layer.appendChild(s); setTimeout(() => s.remove(), 900);
+  }
+}
 function syncTools() {
   document.querySelectorAll("#tools .tool[aria-pressed]").forEach(b => b.setAttribute("aria-pressed", b.id === "tool-" + tool));
   document.querySelectorAll("#tools .size").forEach((b, i) => b.setAttribute("aria-pressed", i === sizeIx));
-  document.querySelectorAll("#swatches .sw").forEach(b => b.setAttribute("aria-pressed", b.id === "sw-" + colour));
+  document.querySelectorAll("#crayons .crayon").forEach(b => b.setAttribute("aria-pressed", b.id === "cr-" + colour));
+  document.documentElement.style.setProperty("--cur", colour === "R" ? PAL[2] : PAL[colour]);
+  $("#tools").classList.toggle("rainbow", colour === "R");
   setHint();
 }
 $("#clearNo").onclick = () => ($("#clearSheet").hidden = true);
-$("#clearYes").onclick = () => { pushUndo(); lab.fill(0); bump.fill(0); paintAll(); saveDraft(); $("#clearSheet").hidden = true; };
+$("#clearYes").onclick = () => { pushUndo(); lab.fill(0); bump.fill(0); paintAll(); saveDraft(); $("#clearSheet").hidden = true; sparkle(256, 256, 24, { size: 10, speed: 4, jitter: 120 }); };
 
 /* ---------- pictures to colour (our own simple outlines) ---------- */
 function outline(pts, r) { for (let k = 0; k < pts.length - 1; k++) { const [a, b] = [pts[k], pts[k + 1]], n = Math.ceil(Math.hypot(b[0] - a[0], b[1] - a[1]) / 2); for (let i = 0; i <= n; i++) dab(a[0] + (b[0] - a[0]) * i / n, a[1] + (b[1] - a[1]) * i / n, r, 1, 0.7); } }
@@ -694,12 +852,12 @@ function openTpl() {
   TPL.forEach((fn, i) => {
     const b = document.createElement("button"); b.className = "tpl"; b.id = "tpl-" + i;
     const c = document.createElement("canvas"); c.width = c.height = 128;
-    const keepL = lab, keepB = bump; lab = new Uint8Array(W * H); bump = new Float32Array(W * H); fn();
+    const keepL = lab, keepB = bump; lab = new Uint8Array(W * H); bump = new Float32Array(W * H); fxOn = false; fn(); fxOn = true;
     const g = c.getContext("2d"), im = g.createImageData(128, 128);
     for (let y = 0; y < 128; y++) for (let x = 0; x < 128; x++) { const l = lab[x * 4 + W * y * 4], o = 4 * (x + 128 * y); if (l) { im.data[o] = RGB[l][0]; im.data[o + 1] = RGB[l][1]; im.data[o + 2] = RGB[l][2]; im.data[o + 3] = 255; } }
     g.putImageData(im, 0, 0); lab = keepL; bump = keepB;
     b.appendChild(c); b.append(T[LANG].tpls[i]);
-    b.onclick = () => { pushUndo(); lab = new Uint8Array(W * H); bump = new Float32Array(W * H); fn(); paintAll(); saveDraft(); $("#tplSheet").hidden = true; tool = "fill"; colour = [3, 4, 5][i]; syncTools(); };
+    b.onclick = () => { pushUndo(); lab = new Uint8Array(W * H); bump = new Float32Array(W * H); fn(); paintAll(); saveDraft(); $("#tplSheet").hidden = true; tool = "fill"; colour = [3, 4, 5][i]; syncTools(); sparkle(256, 256, 30, { size: 11, speed: 4.5, jitter: 160 }); };
     box.appendChild(b);
   });
   paintAll();
@@ -833,7 +991,7 @@ function applyWords() {
 /* ---------- boot: a picture ready to colour, or the child's saved drawing ---------- */
 $("#back").href = window.SHOP_URL || "/";
 applyWords(); buildTray();
-if (!loadDraft()) { TPL[0](); colour = 3; tool = "fill"; }
+fxOn = false; if (!loadDraft()) { TPL[0](); colour = 3; tool = "fill"; } fxOn = true;
 paintAll(); syncTools(); syncUndo();
 </script>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>

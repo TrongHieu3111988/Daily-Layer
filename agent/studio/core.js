@@ -406,7 +406,8 @@
     return new Uint8Array(buf);
   };
   Sculpt.model3mf = function (parts) {   // parts: [{name, hex, pos, idx}]
-    const mats = parts.map(p => `<base name="${p.name}" displaycolor="${p.hex.toUpperCase()}FF"/>`).join("");
+    // m:colorgroup: the colour form Bambu Studio / Orca / PrusaSlicer read (Bambu ignores basematerials)
+    const mats = parts.map(p => `<m:color color="${p.hex.toUpperCase()}FF"/>`).join("");
     let objs = "", items = "";
     parts.forEach((p, n) => {
       const vs = [], ts = [];
@@ -415,7 +416,7 @@
       objs += `<object id="${n + 2}" name="${p.name}" type="model" pid="1" pindex="${n}"><mesh><vertices>${vs.join("")}</vertices><triangles>${ts.join("")}</triangles></mesh></object>`;
       items += `<item objectid="${n + 2}"/>`;
     });
-    return `<?xml version="1.0" encoding="UTF-8"?><model unit="millimeter" xml:lang="en-US" xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02"><resources><basematerials id="1">${mats}</basematerials>${objs}</resources><build>${items}</build></model>`;
+    return `<?xml version="1.0" encoding="UTF-8"?><model unit="millimeter" xml:lang="en-US" xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02" xmlns:m="http://schemas.microsoft.com/3dmanufacturing/material/2015/02"><resources><m:colorgroup id="1">${mats}</m:colorgroup>${objs}</resources><build>${items}</build></model>`;
   };
 
   // minimal zip (store, no compression) — enough for STL/3MF delivery

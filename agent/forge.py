@@ -102,7 +102,8 @@ def write_stl(path, v, f, name="forge"):
 
 def write_3mf(path, parts):
     """parts: list of (name, v, f, hexcolor). One build item per part, colors as basematerials."""
-    mats = "".join(f'<base name="{n}" displaycolor="{c}FF"/>' for n, _, _, c in parts)
+    # colours as m:colorgroup (read by Bambu Studio / Orca / PrusaSlicer); basematerials is ignored by Bambu
+    mats = "".join(f'<m:color color="{c.upper()}FF"/>' for n, _, _, c in parts)
     objs, items = [], []
     for i, (n, v, f, c) in enumerate(parts):
         vs = "".join(f'<vertex x="{a:.3f}" y="{b:.3f}" z="{d:.3f}"/>' for a, b, d in v)
@@ -111,8 +112,8 @@ def write_3mf(path, parts):
         objs.append(f'<object id="{oid}" name="{n}" type="model" pid="1" pindex="{i}"><mesh><vertices>{vs}</vertices><triangles>{ts}</triangles></mesh></object>')
         items.append(f'<item objectid="{oid}"/>')
     model = ('<?xml version="1.0" encoding="UTF-8"?><model unit="millimeter" xml:lang="en-US" '
-             'xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02"><resources>'
-             f'<basematerials id="1">{mats}</basematerials>{"".join(objs)}</resources><build>{"".join(items)}</build></model>')
+             'xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02" xmlns:m="http://schemas.microsoft.com/3dmanufacturing/material/2015/02"><resources>'
+             f'<m:colorgroup id="1">{mats}</m:colorgroup>{"".join(objs)}</resources><build>{"".join(items)}</build></model>')
     ct = ('<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'
           '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'
           '<Default Extension="model" ContentType="application/vnd.ms-package.3dmanufacturing-3dmodel+xml"/></Types>')

@@ -140,8 +140,8 @@
    ],
    "download": "",
    "cover": "products/twist-vase-petal/cover.jpg",
-   "build_seconds": 6.4,
-   "download_bytes": 2470750,
+   "build_seconds": 6.9,
+   "download_bytes": 2095070,
    "dropped": "2026-10-28"
   },
   {
@@ -280,7 +280,7 @@
    "download": "",
    "cover": "products/sculpt-penguin/cover.jpg",
    "build_seconds": 0,
-   "download_bytes": 10918958,
+   "download_bytes": 10940448,
    "dropped": "2026-10-28"
   },
   {
@@ -419,7 +419,7 @@
    "download": "",
    "cover": "products/sculpt-kitten/cover.jpg",
    "build_seconds": 0,
-   "download_bytes": 9927835,
+   "download_bytes": 9953127,
    "dropped": "2026-10-28"
   },
   {
@@ -558,7 +558,7 @@
    "download": "",
    "cover": "products/sculpt-frog/cover.jpg",
    "build_seconds": 0,
-   "download_bytes": 10012560,
+   "download_bytes": 10044227,
    "dropped": "2026-10-28"
   },
   {
@@ -678,7 +678,7 @@
    "download": "",
    "cover": "products/sculpt-fox/cover.jpg",
    "build_seconds": 0,
-   "download_bytes": 11416849,
+   "download_bytes": 11446362,
    "dropped": "2026-10-28"
   },
   {
@@ -817,7 +817,7 @@
    "download": "",
    "cover": "products/sculpt-chick/cover.jpg",
    "build_seconds": 0,
-   "download_bytes": 9664364,
+   "download_bytes": 9679023,
    "dropped": "2026-10-28"
   },
   {
@@ -937,7 +937,7 @@
    "download": "",
    "cover": "products/sculpt-bunny/cover.jpg",
    "build_seconds": 0,
-   "download_bytes": 10347133,
+   "download_bytes": 10362509,
    "dropped": "2026-10-28"
   },
   {
@@ -1057,7 +1057,7 @@
    "download": "",
    "cover": "products/sculpt-bear/cover.jpg",
    "build_seconds": 0,
-   "download_bytes": 10839723,
+   "download_bytes": 10860583,
    "dropped": "2026-10-28"
   },
   {
@@ -1196,7 +1196,7 @@
    "download": "",
    "cover": "products/sculpt-axolotl/cover.jpg",
    "build_seconds": 0,
-   "download_bytes": 9743197,
+   "download_bytes": 9768720,
    "dropped": "2026-10-28"
   },
   {
@@ -1256,8 +1256,8 @@
    ],
    "download": "",
    "cover": "products/rib-planter-saucer/cover.jpg",
-   "build_seconds": 5.2,
-   "download_bytes": 1408966,
+   "build_seconds": 5.3,
+   "download_bytes": 1206501,
    "dropped": "2026-10-28"
   },
   {
@@ -1275,11 +1275,11 @@
    "parts": [
     {
      "name": "stand",
-     "triangles": 298996,
+     "triangles": 301960,
      "watertight": true,
      "bad_edges": 0,
      "shells": 1,
-     "volume_cm3": 73.49,
+     "volume_cm3": 73.5,
      "size_mm": [
       76.0,
       65.9,
@@ -1298,8 +1298,8 @@
    ],
    "download": "",
    "cover": "products/phone-stand-aframe/cover.jpg",
-   "build_seconds": 14.8,
-   "download_bytes": 5066880,
+   "build_seconds": 14.3,
+   "download_bytes": 2901265,
    "dropped": "2026-10-28"
   },
   {
@@ -1416,8 +1416,8 @@
    ],
    "download": "products/gyro-rings-5/gyro-rings-5_files.zip",
    "cover": "products/gyro-rings-5/cover.jpg",
-   "build_seconds": 1.1,
-   "download_bytes": 215110,
+   "build_seconds": 1.6,
+   "download_bytes": 142111,
    "dropped": "2026-10-28"
   },
   {
@@ -1596,11 +1596,11 @@
    "parts": [
     {
      "name": "bin",
-     "triangles": 361832,
+     "triangles": 362196,
      "watertight": true,
      "bad_edges": 0,
      "shells": 1,
-     "volume_cm3": 46.55,
+     "volume_cm3": 46.56,
      "size_mm": [
       120.0,
       62.0,
@@ -1619,8 +1619,8 @@
    ],
    "download": "",
    "cover": "products/desk-bin-3cell/cover.jpg",
-   "build_seconds": 13.7,
-   "download_bytes": 4149983,
+   "build_seconds": 14.5,
+   "download_bytes": 2653800,
    "dropped": "2026-10-28"
   },
   {
@@ -1638,7 +1638,7 @@
    "parts": [
     {
      "name": "body",
-     "triangles": 127280,
+     "triangles": 127284,
      "watertight": true,
      "bad_edges": 0,
      "shells": 1,
@@ -1666,7 +1666,7 @@
     },
     {
      "name": "eye_l",
-     "triangles": 9284,
+     "triangles": 9388,
      "watertight": true,
      "bad_edges": 0,
      "shells": 1,
@@ -1680,7 +1680,7 @@
     },
     {
      "name": "eye_r",
-     "triangles": 9284,
+     "triangles": 9388,
      "watertight": true,
      "bad_edges": 0,
      "shells": 1,
@@ -1718,8 +1718,8 @@
    ],
    "download": "",
    "cover": "products/chibi-whale-4part/cover.jpg",
-   "build_seconds": 10.1,
-   "download_bytes": 5158213,
+   "build_seconds": 10.4,
+   "download_bytes": 5163078,
    "dropped": "2026-10-28"
   },
   {
@@ -1777,6 +1777,6 @@
   "members": 0,
   "costs_usd": 0.0
  },
- "updated": "2026-10-29 00:38",
+ "updated": "2026-10-29 01:27",
  "featured": "sculpt-axolotl"
 }

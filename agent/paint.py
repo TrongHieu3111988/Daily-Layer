@@ -94,14 +94,23 @@ def write_obj(path_obj, v, f, lab, cols, names):
     return mtl
 
 
+def paint_code(s):
+    """PrusaSlicer/Bambu triangle paint string for filament s (1-based), whole triangle."""
+    return format(s << 2, "X") if s < 3 else format(s - 3, "X") + "C"
+
+
 def write_3mf_painted(path, v, f, lab, cols, names, title):
-    """One solid object, each triangle tagged with its colour (3MF core basematerials, per-triangle pid/p1)."""
-    mats = "".join(f'<base name="{n}" displaycolor="{hexcol(cols[i])}FF"/>' for i, n in enumerate(names))
+    """One solid object, each triangle tagged with its colour.
+    m:colorgroup + pid/p1 is what Bambu Studio / Orca import as colours (BambuStudio bbs_3mf.cpp reads m:colorgroup,
+    not basematerials); slic3rpe:mmu_segmentation gives PrusaSlicer the same colours as filament painting."""
+    cg = "".join(f'<m:color color="{hexcol(cols[i])}FF"/>' for i in range(len(names)))
     vs = "".join(f'<vertex x="{a:.3f}" y="{b:.3f}" z="{d:.3f}"/>' for a, b, d in v)
-    ts = "".join(f'<triangle v1="{a}" v2="{b}" v3="{d}" pid="1" p1="{l}"/>' for (a, b, d), l in zip(f, lab))
+    ts = "".join(f'<triangle v1="{a}" v2="{b}" v3="{d}" pid="1" p1="{l}" slic3rpe:mmu_segmentation="{paint_code(int(l) + 1)}"/>' for (a, b, d), l in zip(f, lab))
     model = ('<?xml version="1.0" encoding="UTF-8"?><model unit="millimeter" xml:lang="en-US" '
-             'xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02"><resources>'
-             f'<basematerials id="1">{mats}</basematerials>'
+             'xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02" '
+             'xmlns:m="http://schemas.microsoft.com/3dmanufacturing/material/2015/02" '
+             'xmlns:slic3rpe="http://schemas.slic3r.org/3mf/2017/06">'
+             f'<metadata name="Title">{title}</metadata><resources><m:colorgroup id="1">{cg}</m:colorgroup>'
              f'<object id="2" name="{title}" type="model" pid="1" pindex="{int(np.bincount(lab).argmax())}"><mesh><vertices>{vs}</vertices><triangles>{ts}</triangles></mesh></object>'
              '</resources><build><item objectid="2"/></build></model>')
     ct = ('<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'

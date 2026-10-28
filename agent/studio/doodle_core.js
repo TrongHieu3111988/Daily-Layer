@@ -302,12 +302,16 @@
     return { obj: enc(out.join("")), mtl: enc(mtl) };
   }
   // 3MF: one solid object, colour per triangle (3MF core basematerials)
+  // 3MF: one solid object, colour per triangle.
+  // m:colorgroup + pid/p1 is what Bambu Studio / Orca read as triangle colours (checked in BambuStudio bbs_3mf.cpp);
+  // slic3rpe:mmu_segmentation carries the same colours as PrusaSlicer multi-material painting (filament 1..n).
+  const paintCode = s => (s < 3 ? (s << 2).toString(16).toUpperCase() : (s - 3).toString(16).toUpperCase() + "C");
   function model3mf(pos, idx, faceLab, palette, names, title) {
     const used = [...new Set(faceLab)].sort((a, b) => a - b), slot = new Map(used.map((l, i) => [l, i]));
-    const mats = used.map(l => `<base name="${names[l]}" displaycolor="${palette[l].toUpperCase()}FF"/>`).join("");
+    const cols = used.map(l => `<m:color color="${palette[l].toUpperCase()}FF"/>`).join("");
     const vs = []; for (let q = 0; q < pos.length; q += 3) vs.push(`<vertex x="${pos[q].toFixed(3)}" y="${pos[q + 1].toFixed(3)}" z="${pos[q + 2].toFixed(3)}"/>`);
-    const ts = []; for (let t = 0; t < faceLab.length; t++) ts.push(`<triangle v1="${idx[3 * t]}" v2="${idx[3 * t + 1]}" v3="${idx[3 * t + 2]}" pid="1" p1="${slot.get(faceLab[t])}"/>`);
-    return `<?xml version="1.0" encoding="UTF-8"?><model unit="millimeter" xml:lang="en-US" xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02"><resources><basematerials id="1">${mats}</basematerials><object id="2" name="${title}" type="model" pid="1" pindex="0"><mesh><vertices>${vs.join("")}</vertices><triangles>${ts.join("")}</triangles></mesh></object></resources><build><item objectid="2"/></build></model>`;
+    const ts = []; for (let t = 0; t < faceLab.length; t++) { const k = slot.get(faceLab[t]); ts.push(`<triangle v1="${idx[3 * t]}" v2="${idx[3 * t + 1]}" v3="${idx[3 * t + 2]}" pid="1" p1="${k}" slic3rpe:mmu_segmentation="${paintCode(k + 1)}"/>`); }
+    return `<?xml version="1.0" encoding="UTF-8"?><model unit="millimeter" xml:lang="en-US" xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02" xmlns:m="http://schemas.microsoft.com/3dmanufacturing/material/2015/02" xmlns:slic3rpe="http://schemas.slic3r.org/3mf/2017/06"><metadata name="Title">${title}</metadata><resources><m:colorgroup id="1">${cols}</m:colorgroup><object id="2" name="${title}" type="model" pid="1" pindex="0"><mesh><vertices>${vs.join("")}</vertices><triangles>${ts.join("")}</triangles></mesh></object></resources><build><item objectid="2"/></build></model>`;
   }
 
   const Doodle = { build, shape, edt, stl, obj, model3mf, check };
