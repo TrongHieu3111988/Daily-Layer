@@ -172,8 +172,9 @@
     const pos = [], idx = [], vmap = new Map();
     const ids = new Int32Array(8), val = new Float64Array(8);
     const self = this;
+    const NN = N * N * N;          // key stays below 2^53 for any grid we use
     function vert(a, b) {          // a, b are sample ids, val via field
-      const key = a < b ? a * 4294967296 + b : b * 4294967296 + a;
+      const key = a < b ? a * NN + b : b * NN + a;
       let v = vmap.get(key);
       if (v !== undefined) return v;
       const fa = field[a], fb = field[b], t = fa / (fa - fb);

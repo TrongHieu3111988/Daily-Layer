@@ -3,15 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="description" content="Sculpt clay in your browser, paint it, and download a print-ready STL and multi-colour 3MF.">
+<meta name="description" content="Sculpt clay in your browser with ZBrush-style brushes, paint it, and download a print-ready STL and multi-colour 3MF.">
 <title>Sculpt Studio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@500;600;700;800&display=swap">
 <style>
-/* Layout: one-screen studio. Top bar (back, title, undo/redo, print), canvas fills the middle, a thumb-reach tool dock at the bottom. */
+/* Layout: one-screen studio. Top bar (back, title, resolution, undo/redo, print), canvas in the middle,
+   a scrollable brush shelf plus size/intensity and modifiers at the bottom within thumb reach. */
 :root{
   --bg:#EAF1F8; --panel:#FFFFFF; --ink:#18213A; --muted:#5D6A86; --line:#D4DDEA;
-  --accent:#FF6B4A; --accent-ink:#FFFFFF; --sel:#18213A; --sel-ink:#FFFFFF; --stage:#DCE7F2; --good:#1E9E6A;
+  --accent:#FF6B4A; --accent-ink:#FFFFFF; --sel:#18213A; --sel-ink:#FFFFFF; --stage:#D9E3EE; --good:#1E9E6A;
   --shadow:0 2px 6px rgba(24,33,58,.08),0 10px 30px rgba(24,33,58,.10);
   --f-display:"Baloo 2","Nunito",ui-rounded,system-ui,sans-serif;
   --f-body:"Nunito",ui-rounded,system-ui,-apple-system,"Segoe UI",sans-serif;
@@ -32,51 +33,55 @@ body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:1
 button{font:inherit;color:inherit;cursor:pointer}
 :focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .app{height:100%;display:flex;flex-direction:column}
-.bar{display:flex;align-items:center;gap:8px;padding-block:10px;padding-left:max(12px,env(safe-area-inset-left,0px));padding-right:max(12px,env(safe-area-inset-right,0px))}
-.bar h1{font-family:var(--f-display);font-weight:800;font-size:22px;margin:0 auto 0 4px;letter-spacing:-.01em;white-space:nowrap}
+.bar{display:flex;align-items:center;gap:6px;padding-block:8px;padding-left:max(10px,env(safe-area-inset-left,0px));padding-right:max(10px,env(safe-area-inset-right,0px))}
+.bar h1{font-family:var(--f-display);font-weight:800;font-size:21px;margin:0 auto 0 2px;letter-spacing:-.01em;white-space:nowrap}
 .bar h1 span{color:var(--accent)}
-.ibtn{width:42px;height:42px;border-radius:14px;border:1px solid var(--line);background:var(--panel);display:grid;place-items:center;flex:none}
+.ibtn{width:40px;height:40px;border-radius:13px;border:1px solid var(--line);background:var(--panel);display:grid;place-items:center;flex:none;text-decoration:none;color:var(--ink)}
 .ibtn:disabled{opacity:.4;cursor:default}
-.ibtn svg{width:22px;height:22px}
-.pill{height:42px;border-radius:14px;padding:0 16px;border:0;background:var(--accent);color:var(--accent-ink);font-weight:800;font-size:15px;display:flex;align-items:center;gap:8px;flex:none;box-shadow:var(--shadow)}
+.ibtn svg{width:21px;height:21px}
+.pill{height:40px;border-radius:13px;padding:0 14px;border:0;background:var(--accent);color:var(--accent-ink);font-weight:800;font-size:14.5px;display:flex;align-items:center;gap:7px;flex:none;box-shadow:var(--shadow)}
 .pill.ghost{background:var(--panel);color:var(--ink);border:1px solid var(--line);box-shadow:none}
-.lang{height:42px;min-width:42px;border-radius:14px;border:1px solid var(--line);background:var(--panel);font-weight:800;font-size:13px}
-a.back{display:grid;place-items:center;text-decoration:none;color:var(--ink)}
-@media (max-width:420px){.bar h1{font-size:19px}.pill .lbl{display:none}.pill{padding:0 12px}}
+.pill:disabled{opacity:.5}
+.res{font-variant-numeric:tabular-nums}
+@media (max-width:460px){.bar h1{font-size:17px}.pill .lbl{display:none}.pill{padding:0 11px}.hide-s{display:none}}
 
-.stage{position:relative;flex:1;min-height:0;margin-inline:max(10px,env(safe-area-inset-left,0px));border-radius:22px;overflow:hidden;
-  background:radial-gradient(120% 90% at 50% 20%,var(--panel) 0%,var(--stage) 70%)}
+.stage{position:relative;flex:1;min-height:0;margin-inline:max(8px,env(safe-area-inset-left,0px));border-radius:20px;overflow:hidden;
+  background:radial-gradient(120% 90% at 50% 18%,var(--panel) 0%,var(--stage) 72%)}
 .stage canvas{display:block;width:100%;height:100%;touch-action:none}
-.hint{position:absolute;left:50%;transform:translateX(-50%);bottom:10px;font-size:12.5px;color:var(--muted);background:color-mix(in srgb,var(--panel) 80%,transparent);padding:4px 10px;border-radius:999px;white-space:nowrap;pointer-events:none}
-.badge{position:absolute;right:10px;top:10px;font-size:12px;font-weight:700;color:var(--muted);background:color-mix(in srgb,var(--panel) 85%,transparent);padding:4px 10px;border-radius:999px}
+.hint{position:absolute;left:50%;transform:translateX(-50%);bottom:8px;font-size:12px;color:var(--muted);background:color-mix(in srgb,var(--panel) 82%,transparent);padding:4px 10px;border-radius:999px;white-space:nowrap;pointer-events:none;max-width:94%;overflow:hidden;text-overflow:ellipsis}
+.badge{position:absolute;right:8px;top:8px;font-size:11.5px;font-weight:800;color:var(--muted);background:color-mix(in srgb,var(--panel) 85%,transparent);padding:3px 9px;border-radius:999px;font-variant-numeric:tabular-nums}
+.busy{position:absolute;inset:0;display:grid;place-items:center;background:color-mix(in srgb,var(--bg) 55%,transparent);font-weight:800}
 
-.dock{padding-block:10px 12px;padding-left:max(10px,env(safe-area-inset-left,0px));padding-right:max(10px,env(safe-area-inset-right,0px));display:grid;gap:10px}
-.tools{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
-.tool{border:1px solid var(--line);background:var(--panel);border-radius:16px;padding:8px 2px 6px;display:flex;flex-direction:column;align-items:center;gap:2px;font-weight:800;font-size:12.5px;min-width:0}
-.tool svg{width:26px;height:26px}
+.dock{padding-block:8px 10px;display:grid;gap:8px}
+.shelf{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-left:max(8px,env(safe-area-inset-left,0px));padding-right:max(8px,env(safe-area-inset-right,0px));scroll-snap-type:x proximity}
+.shelf::-webkit-scrollbar{display:none}
+.tool{flex:none;width:66px;border:1px solid var(--line);background:var(--panel);border-radius:15px;padding:7px 2px 5px;display:flex;flex-direction:column;align-items:center;gap:1px;font-weight:800;font-size:11.5px;scroll-snap-align:start}
+.tool svg{width:25px;height:25px}
 .tool[aria-pressed="true"]{background:var(--sel);color:var(--sel-ink);border-color:var(--sel)}
-.row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.size{display:flex;align-items:center;gap:8px;flex:1;min-width:150px}
-.size label{font-weight:800;font-size:13px;color:var(--muted)}
-.size input{flex:1;accent-color:var(--accent);height:28px}
-.swatches{display:flex;gap:6px;flex-wrap:wrap}
-.sw{width:30px;height:30px;border-radius:50%;border:2px solid var(--line);padding:0}
-.sw[aria-pressed="true"]{outline:3px solid var(--sel);outline-offset:2px}
-.toggle{height:34px;border-radius:12px;border:1px solid var(--line);background:var(--panel);padding:0 12px;font-weight:800;font-size:13px}
+.ctl{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding-left:max(10px,env(safe-area-inset-left,0px));padding-right:max(10px,env(safe-area-inset-right,0px))}
+.slider{display:flex;align-items:center;gap:6px;flex:1;min-width:130px}
+.slider label{font-weight:800;font-size:12.5px;color:var(--muted);min-width:30px}
+.slider input{flex:1;accent-color:var(--accent);height:26px;min-width:0}
+.toggle{height:32px;border-radius:11px;border:1px solid var(--line);background:var(--panel);padding:0 10px;font-weight:800;font-size:12.5px}
 .toggle[aria-pressed="true"]{background:var(--sel);color:var(--sel-ink);border-color:var(--sel)}
+.swatches{display:flex;gap:6px;flex-wrap:wrap}
+.sw{width:28px;height:28px;border-radius:50%;border:2px solid var(--line);padding:0}
+.sw[aria-pressed="true"]{outline:3px solid var(--sel);outline-offset:2px}
 
 .sheet{position:fixed;inset:0;z-index:20;background:rgba(10,14,28,.5);display:grid;place-items:end center;padding-top:env(safe-area-inset-top,0px)}
 .card{background:var(--panel);width:100%;max-width:560px;border-radius:24px 24px 0 0;max-height:92%;overflow:auto;
   padding:20px max(18px,env(safe-area-inset-right,0px)) max(20px,env(safe-area-inset-bottom,0px)) max(18px,env(safe-area-inset-left,0px));display:grid;gap:14px}
 @media (min-width:700px){.sheet{place-items:center}.card{border-radius:24px}}
-.card h2{font-family:var(--f-display);font-weight:800;font-size:26px;margin:0;line-height:1.1}
+.card h2{font-family:var(--f-display);font-weight:800;font-size:25px;margin:0;line-height:1.1}
 .card p{margin:0;color:var(--muted);line-height:1.5}
-.starts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
-.start{border:1px solid var(--line);background:var(--bg);border-radius:18px;padding:12px 4px;display:grid;justify-items:center;gap:6px;font-weight:800}
-.start svg{width:44px;height:44px}
+.grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.opt{border:1px solid var(--line);background:var(--bg);border-radius:16px;padding:12px 4px;display:grid;justify-items:center;gap:4px;font-weight:800}
+.opt small{font-weight:700;color:var(--muted);font-size:11.5px}
+.opt[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent) inset}
+.opt svg{width:42px;height:42px}
 .stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 .stat{background:var(--bg);border-radius:14px;padding:10px}
-.stat b{display:block;font-family:var(--f-display);font-size:20px;font-variant-numeric:tabular-nums}
+.stat b{display:block;font-family:var(--f-display);font-size:19px;font-variant-numeric:tabular-nums}
 .stat span{font-size:12px;color:var(--muted);font-weight:700}
 .ok{color:var(--good);font-weight:800;display:flex;gap:8px;align-items:center}
 .safety{background:var(--bg);border-radius:14px;padding:12px 14px;font-size:13.5px;line-height:1.5}
@@ -84,9 +89,8 @@ a.back{display:grid;place-items:center;text-decoration:none;color:var(--ink)}
 .actions{display:flex;gap:10px;flex-wrap:wrap}
 .actions .pill{flex:1;justify-content:center}
 .msg{font-size:13.5px;color:var(--muted);min-height:1.2em}
-.chips{display:flex;gap:6px;flex-wrap:wrap}
-.chip{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;border:1px solid var(--line);border-radius:999px;padding:3px 10px}
-.chip i{width:12px;height:12px;border-radius:50%;display:inline-block;border:1px solid rgba(0,0,0,.2)}
+.keys{font-size:12.5px;color:var(--muted);line-height:1.6}
+.keys kbd{font-family:inherit;font-weight:800;border:1px solid var(--line);border-radius:6px;padding:0 5px;background:var(--bg)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 
@@ -94,34 +98,35 @@ a.back{display:grid;place-items:center;text-decoration:none;color:var(--ink)}
 <body>
 <div class="app">
   <div class="bar">
-    <a class="ibtn back" id="back" href="#" aria-label="Back to the shop"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></a>
+    <a class="ibtn" id="back" href="#" aria-label="Back to the shop"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></a>
     <h1>Sculpt <span>Studio</span></h1>
+    <button class="pill ghost res" id="resBtn" aria-label="Resolution">128³</button>
     <button class="ibtn" id="undo" aria-label="Undo" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 010 12h-3"/></svg></button>
     <button class="ibtn" id="redo" aria-label="Redo" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14l5-5-5-5"/><path d="M20 9H10a6 6 0 000 12h3"/></svg></button>
-    <button class="lang" id="lang" aria-label="Language">EN</button>
-    <button class="pill ghost" id="newBtn" aria-label="New"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+    <button class="ibtn hide-s" id="lang" aria-label="Language">EN</button>
+    <button class="ibtn" id="newBtn" aria-label="New"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
     <button class="pill" id="printBtn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V3h12v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M7 14h10v7H7z"/></svg><span class="lbl" data-t="print">In tượng</span></button>
   </div>
 
   <div class="stage" id="stage">
     <div class="badge" id="badge">—</div>
-    <div class="hint" id="hint" data-t="hintSculpt">Vuốt lên tượng để nặn · vuốt ra ngoài hoặc dùng 2 ngón để xoay</div>
+    <div class="hint" id="hint"></div>
+    <div class="busy" id="busy" hidden></div>
   </div>
 
   <div class="dock">
-    <div class="tools" role="group" aria-label="Tools">
-      <button class="tool" data-tool="rotate" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 11-2.3-5.6"/><path d="M20 4v5h-5"/></svg><span data-t="rotate">Xoay</span></button>
-      <button class="tool" data-tool="add" aria-pressed="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="13" r="7"/><path d="M12 10v6M9 13h6"/></svg><span data-t="add">Đắp</span></button>
-      <button class="tool" data-tool="carve" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="13" r="7"/><path d="M9 13h6"/></svg><span data-t="carve">Khoét</span></button>
-      <button class="tool" data-tool="smooth" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M3 15c3-4 6-4 9 0s6 4 9 0"/><path d="M3 9c3-2 6-2 9 0s6 2 9 0" opacity=".5"/></svg><span data-t="smooth">Vuốt</span></button>
-      <button class="tool" data-tool="paint" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4l6 6-8 8H6v-6z"/><path d="M4 21h6"/></svg><span data-t="paint">Tô màu</span></button>
-      <button class="tool" data-tool="eye" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="7"/><circle cx="13.5" cy="11" r="3" fill="currentColor"/></svg><span data-t="eye">Mắt</span></button>
+    <div class="shelf" id="shelf" role="group" aria-label="Brushes"></div>
+    <div class="ctl">
+      <div class="slider"><label for="size" data-t="size">Cỡ</label><input type="range" id="size" min="2" max="30" value="10"></div>
+      <div class="slider"><label for="power" data-t="power">Lực</label><input type="range" id="power" min="5" max="100" value="45"></div>
     </div>
-    <div class="row">
-      <div class="size"><label for="size" data-t="size">Cỡ</label><input type="range" id="size" min="3" max="26" value="12"></div>
+    <div class="ctl">
+      <button class="toggle" id="invert" aria-pressed="false" data-t="invert">Đảo chiều</button>
       <button class="toggle" id="mirror" aria-pressed="true" data-t="mirror">Đối xứng</button>
+      <button class="toggle" id="lazy" aria-pressed="true" data-t="lazy">Nét mượt</button>
+      <span id="maskOps" hidden><button class="toggle" id="maskClear" data-t="maskClear">Xoá che</button> <button class="toggle" id="maskInv" data-t="maskInv">Đảo che</button></span>
+      <div class="swatches" id="swatches" role="group" aria-label="Colours" hidden></div>
     </div>
-    <div class="swatches" id="swatches" role="group" aria-label="Colours"></div>
   </div>
 </div>
 
@@ -129,29 +134,41 @@ a.back{display:grid;place-items:center;text-decoration:none;color:var(--ink)}
   <div class="card">
     <h2 id="newTitle" data-t="newTitle">Bắt đầu tượng mới</h2>
     <p data-t="newText">Chọn một cục đất để nặn. Tượng đang làm sẽ được thay thế.</p>
-    <div class="starts">
-      <button class="start" data-start="ball"><svg viewBox="0 0 48 48"><circle cx="24" cy="26" r="16" fill="var(--accent)"/></svg><span data-t="ball">Bóng</span></button>
-      <button class="start" data-start="egg"><svg viewBox="0 0 48 48"><ellipse cx="24" cy="26" rx="13" ry="17" fill="var(--accent)"/></svg><span data-t="egg">Trứng</span></button>
-      <button class="start" data-start="pebble"><svg viewBox="0 0 48 48"><ellipse cx="24" cy="32" rx="19" ry="9" fill="var(--accent)"/></svg><span data-t="pebble">Sỏi</span></button>
-      <button class="start" data-start="block"><svg viewBox="0 0 48 48"><rect x="9" y="11" width="30" height="30" rx="6" fill="var(--accent)"/></svg><span data-t="block">Khối</span></button>
+    <div class="grid4">
+      <button class="opt" data-start="ball"><svg viewBox="0 0 48 48"><circle cx="24" cy="26" r="16" fill="var(--accent)"/></svg><span data-t="ball">Bóng</span></button>
+      <button class="opt" data-start="egg"><svg viewBox="0 0 48 48"><ellipse cx="24" cy="26" rx="13" ry="17" fill="var(--accent)"/></svg><span data-t="egg">Trứng</span></button>
+      <button class="opt" data-start="pebble"><svg viewBox="0 0 48 48"><ellipse cx="24" cy="32" rx="19" ry="9" fill="var(--accent)"/></svg><span data-t="pebble">Sỏi</span></button>
+      <button class="opt" data-start="block"><svg viewBox="0 0 48 48"><rect x="9" y="11" width="30" height="30" rx="6" fill="var(--accent)"/></svg><span data-t="block">Khối</span></button>
     </div>
-    <div class="actions"><button class="pill ghost" id="newCancel" data-t="cancel">Huỷ</button></div>
+    <div class="actions"><button class="pill ghost" data-close data-t="cancel">Huỷ</button></div>
+  </div>
+</div>
+
+<div class="sheet" id="resSheet" hidden role="dialog" aria-modal="true" aria-labelledby="resTitle">
+  <div class="card">
+    <h2 id="resTitle" data-t="resTitle">Độ mịn của đất</h2>
+    <p data-t="resText">Mịn hơn thì chi tiết sắc hơn nhưng máy phải làm việc nhiều hơn. Tăng độ mịn giữ nguyên tượng (giống Subdivide); giảm thì mất bớt chi tiết nhỏ.</p>
+    <div class="grid4" id="resOpts">
+      <button class="opt" data-res="96"><b>96³</b><small data-t="resLow">Nhanh</small></button>
+      <button class="opt" data-res="128"><b>128³</b><small data-t="resMid">Cân bằng</small></button>
+      <button class="opt" data-res="160"><b>160³</b><small data-t="resHigh">Mịn</small></button>
+      <button class="opt" data-res="192"><b>192³</b><small data-t="resMax">Máy tính mạnh</small></button>
+    </div>
+    <div class="keys" id="keys"></div>
+    <div class="actions"><button class="pill ghost" data-close data-t="close">Đóng</button></div>
   </div>
 </div>
 
 <div class="sheet" id="printSheet" hidden role="dialog" aria-modal="true" aria-labelledby="printTitle">
   <div class="card">
     <h2 id="printTitle" data-t="printTitle">In tượng của bé</h2>
-    <div class="size"><label for="height" data-t="height">Chiều cao</label><input type="range" id="height" min="30" max="140" value="70"><b class="mono" id="heightVal">70 mm</b></div>
-    <div class="row">
-      <button class="toggle" id="thicken" aria-pressed="true" data-t="thicken">Làm dày chỗ mỏng</button>
-    </div>
+    <div class="slider"><label for="height" data-t="height">Chiều cao</label><input type="range" id="height" min="30" max="160" value="70"><b id="heightVal">70 mm</b></div>
+    <div class="ctl" style="padding:0"><button class="toggle" id="thicken" aria-pressed="true" data-t="thicken">Làm dày chỗ mỏng</button></div>
     <div class="stats">
       <div class="stat"><b id="sSize">—</b><span data-t="sSize">Kích thước (mm)</span></div>
       <div class="stat"><b id="sGram">—</b><span data-t="sGram">Nhựa PLA ước tính</span></div>
-      <div class="stat"><b id="sParts">—</b><span data-t="sParts">Màu in</span></div>
+      <div class="stat"><b id="sCols">—</b><span data-t="sCols">Màu in</span></div>
     </div>
-    <div class="chips" id="colChips"></div>
     <div class="ok" id="checkLine"></div>
     <div class="safety"><b data-t="safeTitle">An toàn cho bé</b>
       <ul><li data-t="safe1">Dành cho bé từ 3 tuổi, có người lớn giám sát.</li>
@@ -159,7 +176,7 @@ a.back{display:grid;place-items:center;text-decoration:none;color:var(--ink)}
           <li data-t="safe3">Không cho bé ngậm hay cắn. Chà nhẹ chỗ sắc sau khi in.</li></ul></div>
     <p class="msg" id="printMsg" aria-live="polite"></p>
     <div class="actions">
-      <button class="pill ghost" id="printCancel" data-t="close">Đóng</button>
+      <button class="pill ghost" data-close data-t="close">Đóng</button>
       <button class="pill" id="download" data-t="download">Tải file in</button>
     </div>
   </div>
@@ -340,8 +357,9 @@ a.back{display:grid;place-items:center;text-decoration:none;color:var(--ink)}
     const pos = [], idx = [], vmap = new Map();
     const ids = new Int32Array(8), val = new Float64Array(8);
     const self = this;
+    const NN = N * N * N;          // key stays below 2^53 for any grid we use
     function vert(a, b) {          // a, b are sample ids, val via field
-      const key = a < b ? a * 4294967296 + b : b * 4294967296 + a;
+      const key = a < b ? a * NN + b : b * NN + a;
       let v = vmap.get(key);
       if (v !== undefined) return v;
       const fa = field[a], fb = field[b], t = fa / (fa - fb);
@@ -563,6 +581,375 @@ a.back{display:grid;place-items:center;text-decoration:none;color:var(--ink)}
   if (typeof module !== "undefined") module.exports = Sculpt;
 })(typeof window !== "undefined" ? window : globalThis);
 
+// Sculpt Studio engine v2: chunked voxel field for high resolution, local remeshing,
+// ZBrush-style brushes, mask channel, chunk-level undo, ray marching on the field.
+// Export (printField/meshTet/colourParts/toPrint) is borrowed from core.js (window.Sculpt).
+(function (root) {
+  "use strict";
+  const Base = root.Sculpt || (typeof require !== "undefined" ? require("./core.js") : null);
+  const C = 16;                                 // samples per chunk edge
+
+  function Sculpt2(N) { this.alloc(N); this.undo = []; this.redo = []; this.rec = null; }
+  const P = Sculpt2.prototype;
+  // borrow exporters and helpers from v1
+  for (const k of ["printField", "meshTet", "colourParts", "toPrint", "printable", "idx", "pos"]) P[k] = Base.prototype[k];
+
+  P.alloc = function (N) {
+    this.N = N; this.h = 2 / (N - 1); this.clamp = 0.25;
+    this.f = new Float32Array(N * N * N).fill(this.clamp);
+    this.c = new Uint8Array(N * N * N);
+    this.m = new Uint8Array(N * N * N);      // mask 0..255 (255 = fully protected)
+    this.K = Math.ceil(N / C);               // chunks per axis (by sample index)
+    this.dirty = new Set();
+    this.markAll();
+  };
+  P.markAll = function () { for (let i = 0; i < this.K ** 3; i++) this.dirty.add(i); };
+  P.chunkId = function (a, b, c) { return a + this.K * (b + this.K * c); };
+
+  // ---------- starting shapes ----------
+  P.reset = function (kind, color) {
+    const N = this.N, cl = this.clamp;
+    for (let k = 0; k < N; k++) for (let j = 0; j < N; j++) for (let i = 0; i < N; i++) {
+      const x = -1 + i * this.h, y = -1 + j * this.h, z = -1 + k * this.h;
+      let d;
+      if (kind === "egg") { const yy = y + 0.05, sy = yy > 0 ? 0.62 : 0.5; d = (Math.hypot(x / 0.42, yy / sy, z / 0.42) - 1) * 0.42; }
+      else if (kind === "pebble") d = (Math.hypot(x / 0.6, (y + 0.25) / 0.3, z / 0.5) - 1) * 0.3;
+      else if (kind === "block") {
+        const qx = Math.abs(x) - 0.32, qy = Math.abs(y + 0.1) - 0.32, qz = Math.abs(z) - 0.32;
+        d = Math.hypot(Math.max(qx, 0), Math.max(qy, 0), Math.max(qz, 0)) + Math.min(Math.max(qx, qy, qz), 0) - 0.06;
+      } else d = Math.hypot(x, y + 0.05, z) - 0.45;
+      const id = i + N * (j + N * k);
+      const b = i === 0 || j === 0 || k === 0 || i === N - 1 || j === N - 1 || k === N - 1;
+      this.f[id] = b ? cl : Math.max(-cl, Math.min(cl, d));
+      this.c[id] = color; this.m[id] = 0;
+    }
+    this.undo.length = 0; this.redo.length = 0; this.markAll();
+  };
+
+  // ---------- resolution (subdivide) ----------
+  P.resample = function (N2) {
+    const o = { N: this.N, f: this.f, c: this.c, m: this.m, h: this.h };
+    this.alloc(N2);
+    for (let k = 0; k < N2; k++) for (let j = 0; j < N2; j++) for (let i = 0; i < N2; i++) {
+      const id = i + N2 * (j + N2 * k);
+      if (i === 0 || j === 0 || k === 0 || i === N2 - 1 || j === N2 - 1 || k === N2 - 1) { this.f[id] = this.clamp; continue; }
+      const gx = i * (o.N - 1) / (N2 - 1), gy = j * (o.N - 1) / (N2 - 1), gz = k * (o.N - 1) / (N2 - 1);
+      this.f[id] = tri(o.f, o.N, gx, gy, gz);
+      const ni = Math.round(gx) + o.N * (Math.round(gy) + o.N * Math.round(gz));
+      this.c[id] = o.c[ni]; this.m[id] = o.m[ni];
+    }
+    this.undo.length = 0; this.redo.length = 0;
+  };
+  function tri(f, N, gx, gy, gz) {
+    const i = Math.min(Math.max(Math.floor(gx), 0), N - 2), j = Math.min(Math.max(Math.floor(gy), 0), N - 2), k = Math.min(Math.max(Math.floor(gz), 0), N - 2);
+    const u = gx - i, v = gy - j, w = gz - k, a = i + N * (j + N * k), s = N, s2 = N * N;
+    const c00 = f[a] * (1 - u) + f[a + 1] * u, c10 = f[a + s] * (1 - u) + f[a + s + 1] * u;
+    const c01 = f[a + s2] * (1 - u) + f[a + s2 + 1] * u, c11 = f[a + s2 + s] * (1 - u) + f[a + s2 + s + 1] * u;
+    return (c00 * (1 - v) + c10 * v) * (1 - w) + (c01 * (1 - v) + c11 * v) * w;
+  }
+  P.sample = function (x, y, z) {
+    const g = (this.N - 1) / 2;
+    return tri(this.f, this.N, (x + 1) * g, (y + 1) * g, (z + 1) * g);
+  };
+  P.gradient = function (x, y, z) {
+    const e = this.h * 0.75;
+    const gx = this.sample(x + e, y, z) - this.sample(x - e, y, z);
+    const gy = this.sample(x, y + e, z) - this.sample(x, y - e, z);
+    const gz = this.sample(x, y, z + e) - this.sample(x, y, z - e);
+    const L = Math.hypot(gx, gy, gz) || 1;
+    return [gx / L, gy / L, gz / L];
+  };
+
+  // ray march: o, d (unit) in world; returns {p, n} or null
+  P.raycast = function (o, d) {
+    let t0 = 0, t1 = 1e9;
+    for (let a = 0; a < 3; a++) {
+      if (Math.abs(d[a]) < 1e-9) { if (o[a] < -1 || o[a] > 1) return null; continue; }
+      let ta = (-1 - o[a]) / d[a], tb = (1 - o[a]) / d[a]; if (ta > tb) [ta, tb] = [tb, ta];
+      t0 = Math.max(t0, ta); t1 = Math.min(t1, tb);
+    }
+    if (t0 > t1) return null;
+    const step = this.h * 0.5;
+    let t = t0 + this.h, prevT = t, prev = this.sample(o[0] + d[0] * t, o[1] + d[1] * t, o[2] + d[2] * t);
+    for (t = t + step; t < t1; t += Math.max(step, Math.min(Math.abs(prev) * 0.7, this.h * 3))) {
+      const v = this.sample(o[0] + d[0] * t, o[1] + d[1] * t, o[2] + d[2] * t);
+      if (v < 0 && prev >= 0) {
+        let lo = prevT, hi = t;
+        for (let it = 0; it < 12; it++) { const mid = (lo + hi) / 2; const vm = this.sample(o[0] + d[0] * mid, o[1] + d[1] * mid, o[2] + d[2] * mid); if (vm < 0) hi = mid; else lo = mid; }
+        const p = [o[0] + d[0] * hi, o[1] + d[1] * hi, o[2] + d[2] * hi];
+        return { p, n: this.gradient(p[0], p[1], p[2]), t: hi };
+      }
+      prev = v; prevT = t;
+    }
+    return null;
+  };
+
+  // ---------- undo by chunk ----------
+  P.beginStroke = function () { this.rec = new Map(); };
+  P.endStroke = function () {
+    if (this.rec && this.rec.size) { this.undo.push(this.rec); if (this.undo.length > 30) this.undo.shift(); this.redo.length = 0; }
+    this.rec = null;
+  };
+  P.cancelStroke = function () {           // revert the stroke in progress
+    if (!this.rec) return;
+    this.swapRecord(this.rec); this.rec = null;
+  };
+  P.saveChunk = function (cid) {
+    if (!this.rec || this.rec.has(cid)) return;
+    const [ox, oy, oz] = this.chunkOrigin(cid), N = this.N;
+    const ex = Math.min(C, N - ox), ey = Math.min(C, N - oy), ez = Math.min(C, N - oz), n = ex * ey * ez;
+    const f = new Float32Array(n), c = new Uint8Array(n), m = new Uint8Array(n);
+    let q = 0;
+    for (let k = 0; k < ez; k++) for (let j = 0; j < ey; j++) { const base = ox + N * (oy + j + N * (oz + k)); for (let i = 0; i < ex; i++, q++) { f[q] = this.f[base + i]; c[q] = this.c[base + i]; m[q] = this.m[base + i]; } }
+    this.rec.set(cid, { f, c, m });
+  };
+  P.chunkOrigin = function (cid) { const K = this.K; return [(cid % K) * C, (Math.floor(cid / K) % K) * C, Math.floor(cid / (K * K)) * C]; };
+  P.swapRecord = function (rec) {
+    const N = this.N;
+    for (const [cid, d] of rec) {
+      const [ox, oy, oz] = this.chunkOrigin(cid);
+      const ex = Math.min(C, N - ox), ey = Math.min(C, N - oy), ez = Math.min(C, N - oz);
+      let q = 0;
+      for (let k = 0; k < ez; k++) for (let j = 0; j < ey; j++) {
+        const base = ox + N * (oy + j + N * (oz + k));
+        for (let i = 0; i < ex; i++, q++) {
+          const id = base + i;
+          let t = this.f[id]; this.f[id] = d.f[q]; d.f[q] = t;
+          t = this.c[id]; this.c[id] = d.c[q]; d.c[q] = t;
+          t = this.m[id]; this.m[id] = d.m[q]; d.m[q] = t;
+        }
+      }
+      this.markSampleBox(ox, oy, oz, ox + ex - 1, oy + ey - 1, oz + ez - 1);
+    }
+  };
+  P.doUndo = function () { const r = this.undo.pop(); if (!r) return false; this.swapRecord(r); this.redo.push(r); return true; };
+  P.doRedo = function () { const r = this.redo.pop(); if (!r) return false; this.swapRecord(r); this.undo.push(r); return true; };
+
+  // mark chunks whose cells touch samples in [i0..i1]
+  P.markSampleBox = function (i0, j0, k0, i1, j1, k1) {
+    const K = this.K;
+    const a0 = Math.max(0, Math.floor((i0 - 1) / C)), a1 = Math.min(K - 1, Math.floor(i1 / C));
+    const b0 = Math.max(0, Math.floor((j0 - 1) / C)), b1 = Math.min(K - 1, Math.floor(j1 / C));
+    const c0 = Math.max(0, Math.floor((k0 - 1) / C)), c1 = Math.min(K - 1, Math.floor(k1 / C));
+    for (let c = c0; c <= c1; c++) for (let b = b0; b <= b1; b++) for (let a = a0; a <= a1; a++) this.dirty.add(this.chunkId(a, b, c));
+  };
+
+  // ---------- brushes ----------
+  const fall = t => { const u = 1 - t * t; return u * u; };        // smooth falloff, 1 at centre, 0 at edge
+  // iterate samples within radius R of p; cb(id, x, y, z, w) where w = falloff
+  P.region = function (p, R, cb) {
+    const N = this.N, h = this.h;
+    const i0 = Math.max(1, Math.floor((p[0] - R + 1) / h)), i1 = Math.min(N - 2, Math.ceil((p[0] + R + 1) / h));
+    const j0 = Math.max(1, Math.floor((p[1] - R + 1) / h)), j1 = Math.min(N - 2, Math.ceil((p[1] + R + 1) / h));
+    const k0 = Math.max(1, Math.floor((p[2] - R + 1) / h)), k1 = Math.min(N - 2, Math.ceil((p[2] + R + 1) / h));
+    if (i0 > i1 || j0 > j1 || k0 > k1) return;
+    if (this.rec) {
+      const a0 = Math.floor(i0 / C), a1 = Math.floor(i1 / C), b0 = Math.floor(j0 / C), b1 = Math.floor(j1 / C), c0 = Math.floor(k0 / C), c1 = Math.floor(k1 / C);
+      for (let c = c0; c <= c1; c++) for (let b = b0; b <= b1; b++) for (let a = a0; a <= a1; a++) this.saveChunk(this.chunkId(a, b, c));
+    }
+    for (let k = k0; k <= k1; k++) {
+      const z = -1 + k * h, dz = z - p[2];
+      for (let j = j0; j <= j1; j++) {
+        const y = -1 + j * h, dy = y - p[1];
+        let id = i0 + N * (j + N * k);
+        for (let i = i0; i <= i1; i++, id++) {
+          const x = -1 + i * h, dx = x - p[0];
+          const d = Math.sqrt(dx * dx + dy * dy + dz * dz);
+          if (d >= R) continue;
+          cb(id, x, y, z, fall(d / R));
+        }
+      }
+    }
+    this.markSampleBox(i0, j0, k0, i1, j1, k1);
+  };
+
+  /* op: {tool, p, n, r, s (0..1), invert, color, viewDir}
+     Field convention: negative inside. Moving the surface outward = lowering f. */
+  P.brush = function (op) {
+    const { tool, p, r } = op, n = op.n || [0, 1, 0], h = this.h, cl = this.clamp;
+    const sgn = op.invert ? -1 : 1, s = op.s, f = this.f, mk = this.m;
+    const keep = id => 1 - mk[id] / 255;
+    const amt = s * r * 0.22;                       // per-dab displacement in world units
+    if (tool === "standard") {                       // push along the hit normal
+      const src = this.copyBox(p, r * 1.4);
+      this.region(p, r, (id, x, y, z, w) => {
+        const a = sgn * amt * w * keep(id);
+        f[id] = clampv(src(x - n[0] * a, y - n[1] * a, z - n[2] * a), cl);
+      });
+    } else if (tool === "inflate") {                 // grow along the local surface normal
+      this.region(p, r, (id, x, y, z, w) => { f[id] = clampv(f[id] - sgn * amt * 0.8 * w * keep(id), cl); });
+    } else if (tool === "clay") {                    // flat-topped layers of clay
+      const off = amt * 1.2, px = p[0] + n[0] * off * sgn, py = p[1] + n[1] * off * sgn, pz = p[2] + n[2] * off * sgn;
+      this.region(p, r, (id, x, y, z, w) => {
+        const plane = (x - px) * n[0] + (y - py) * n[1] + (z - pz) * n[2];
+        const target = sgn > 0 ? Math.min(f[id], plane) : Math.max(f[id], -plane);
+        f[id] = clampv(f[id] + (target - f[id]) * Math.min(1, w * 1.6) * s * keep(id), cl);
+      });
+    } else if (tool === "flatten") {                 // trim everything above a plane through the hit
+      const px = p[0] - n[0] * amt * 0.3, py = p[1] - n[1] * amt * 0.3, pz = p[2] - n[2] * amt * 0.3;
+      this.region(p, r, (id, x, y, z, w) => {
+        const plane = (x - px) * n[0] + (y - py) * n[1] + (z - pz) * n[2];
+        const target = Math.max(f[id], plane);
+        f[id] = clampv(f[id] + (target - f[id]) * Math.min(1, w * 1.5) * s * keep(id), cl);
+      });
+    } else if (tool === "smooth") {
+      const N = this.N, s1 = N, s2 = N * N;
+      const tmp = [];
+      this.region(p, r, (id, x, y, z, w) => {
+        const avg = (f[id - 1] + f[id + 1] + f[id - s1] + f[id + s1] + f[id - s2] + f[id + s2]) / 6;
+        tmp.push(id, f[id] + (avg - f[id]) * Math.min(1, w * (0.4 + s)) * keep(id));
+      });
+      for (let q = 0; q < tmp.length; q += 2) f[tmp[q]] = tmp[q + 1];
+    } else if (tool === "pinch") {                   // pull material towards the brush centre line
+      const src = this.copyBox(p, r * 1.3);
+      this.region(p, r, (id, x, y, z, w) => {
+        let dx = x - p[0], dy = y - p[1], dz = z - p[2];
+        const dn = dx * n[0] + dy * n[1] + dz * n[2]; dx -= dn * n[0]; dy -= dn * n[1]; dz -= dn * n[2];
+        const a = sgn * 0.35 * s * w * keep(id);
+        f[id] = clampv(src(x + dx * a, y + dy * a, z + dz * a), cl);
+      });
+    } else if (tool === "dam") {                     // Dam Standard: carve a sharp crease and pinch it
+      const rr = r * 0.6;
+      this.region(p, rr, (id, x, y, z, w) => { f[id] = clampv(f[id] + sgn * amt * 0.9 * w * w * keep(id), cl); });
+      this.brush({ tool: "pinch", p, n, r, s: s * 0.8, invert: op.invert });
+    } else if (tool === "mask") {
+      this.region(p, r, (id, x, y, z, w) => {
+        if (f[id] > -3 * h) mk[id] = op.invert ? Math.max(0, mk[id] - 255 * w * s * 2) : Math.min(255, mk[id] + 255 * w * s * 2);
+      });
+    } else if (tool === "paint") {
+      this.region(p, r, (id, x, y, z, w) => { if (f[id] > -3.5 * h && w > 0.15 && keep(id) > 0.5) this.c[id] = op.color; });
+    } else if (tool === "blob") {                    // add a ball (used by Eyes)
+      const k = Math.max(r * 0.35, 1.5 * h);
+      this.region(p, r + 2 * h, (id, x, y, z) => {
+        const d = Math.hypot(x - p[0], y - p[1], z - p[2]) - r;
+        const hh = Math.max(k - Math.abs(f[id] - d), 0) / k;
+        const nv = Math.min(f[id], d) - hh * hh * k * 0.25;
+        f[id] = clampv(nv, cl);
+        if (d < h) this.c[id] = op.color;
+      });
+    }
+  };
+  function clampv(v, cl) { return v < -cl ? -cl : v > cl ? cl : v; }
+
+  // snapshot a box of the field, return a trilinear sampler over it (so brushes read pre-dab values)
+  P.copyBox = function (p, R) {
+    const N = this.N, h = this.h, g = (N - 1) / 2;
+    const i0 = Math.max(0, Math.floor((p[0] - R + 1) / h) - 1), i1 = Math.min(N - 1, Math.ceil((p[0] + R + 1) / h) + 1);
+    const j0 = Math.max(0, Math.floor((p[1] - R + 1) / h) - 1), j1 = Math.min(N - 1, Math.ceil((p[1] + R + 1) / h) + 1);
+    const k0 = Math.max(0, Math.floor((p[2] - R + 1) / h) - 1), k1 = Math.min(N - 1, Math.ceil((p[2] + R + 1) / h) + 1);
+    const W = i1 - i0 + 1, H = j1 - j0 + 1, D = k1 - k0 + 1, box = new Float32Array(W * H * D);
+    for (let k = 0; k < D; k++) for (let j = 0; j < H; j++) { const b = i0 + N * (j0 + j + N * (k0 + k)); box.set(this.f.subarray(b, b + W), W * (j + H * k)); }
+    const f = this.f, cl = this.clamp;
+    return (x, y, z) => {
+      const gx = (x + 1) * g - i0, gy = (y + 1) * g - j0, gz = (z + 1) * g - k0;
+      if (gx < 0 || gy < 0 || gz < 0 || gx > W - 1 || gy > H - 1 || gz > D - 1) return this.sample(x, y, z);
+      const i = Math.min(Math.floor(gx), W - 2), j = Math.min(Math.floor(gy), H - 2), k = Math.min(Math.floor(gz), D - 2);
+      const u = gx - i, v = gy - j, w = gz - k, a = i + W * (j + H * k), s = W, s2 = W * H;
+      const c00 = box[a] * (1 - u) + box[a + 1] * u, c10 = box[a + s] * (1 - u) + box[a + s + 1] * u;
+      const c01 = box[a + s2] * (1 - u) + box[a + s2 + 1] * u, c11 = box[a + s2 + s] * (1 - u) + box[a + s2 + s + 1] * u;
+      return (c00 * (1 - v) + c10 * v) * (1 - w) + (c01 * (1 - v) + c11 * v) * w;
+    };
+  };
+
+  // Move: drag a region; uses the field as it was when the drag started
+  // grabs: [{p, sx}] where sx = 1 or -1 (mirror the drag in x)
+  P.moveBegin = function (grabs, r) { this.moveState = grabs.map(g => ({ p: g.p, sx: g.sx, r, src: this.copyBox(g.p, r * 2.6) })); };
+  P.moveTo = function (delta) {
+    if (!this.moveState) return;
+    for (const st of this.moveState) this.moveOne(st, [delta[0] * st.sx, delta[1], delta[2]]);
+  };
+  P.moveOne = function (st, delta) {
+    const { p, r, src } = st, f = this.f, mk = this.m, cl = this.clamp;
+    const reach = r + Math.hypot(delta[0], delta[1], delta[2]);
+    const c = [p[0] + delta[0] * 0.5, p[1] + delta[1] * 0.5, p[2] + delta[2] * 0.5];
+    this.region(c, reach, (id, x, y, z) => {
+      // weight by distance from the displaced grab point, sample the original field backwards
+      const dx = x - p[0] - delta[0], dy = y - p[1] - delta[1], dz = z - p[2] - delta[2];
+      const d = Math.sqrt(dx * dx + dy * dy + dz * dz) / r;
+      const w = (d < 1 ? fall(d) : 0) * (1 - mk[id] / 255);
+      f[id] = clampv(src(x - delta[0] * w, y - delta[1] * w, z - delta[2] * w), cl);
+    });
+  };
+  P.moveEnd = function () { this.moveState = null; };
+
+  P.clearMask = function () { this.beginStroke(); for (let cid = 0; cid < this.K ** 3; cid++) this.saveChunk(cid); this.m.fill(0); this.endStroke(); this.markAll(); };
+  P.invertMask = function () { this.beginStroke(); for (let cid = 0; cid < this.K ** 3; cid++) this.saveChunk(cid); for (let i = 0; i < this.m.length; i++) this.m[i] = this.f[i] < 0.02 ? 255 - this.m[i] : 0; this.endStroke(); this.markAll(); };
+
+  // ---------- chunk meshing (surface nets) with field-gradient normals ----------
+  // returns {pos, nor, lab, msk, idx} for chunk cid
+  P.meshChunk = function (cid) {
+    const N = this.N, f = this.f, h = this.h, M = N - 1;
+    const [ox, oy, oz] = this.chunkOrigin(cid);
+    // cells owned: [ox, min(ox+C, M)); we also need cells at ox-1 for quads
+    const x0 = Math.max(ox - 1, 0), y0 = Math.max(oy - 1, 0), z0 = Math.max(oz - 1, 0);
+    const x1 = Math.min(ox + C, M), y1 = Math.min(oy + C, M), z1 = Math.min(oz + C, M);
+    const W = x1 - x0, H = y1 - y0, D = z1 - z0;
+    if (W <= 0 || H <= 0 || D <= 0) return null;
+    const vid = new Int32Array(W * H * D).fill(-1);
+    const pos = [], nor = [], lab = [], msk = [];
+    const v = new Float32Array(8);
+    const off = [0, 1, N, N + 1, N * N, N * N + 1, N * N + N, N * N + N + 1];
+    const cx = [0, 1, 0, 1, 0, 1, 0, 1], cy = [0, 0, 1, 1, 0, 0, 1, 1], cz = [0, 0, 0, 0, 1, 1, 1, 1];
+    const E = [[0, 1], [2, 3], [4, 5], [6, 7], [0, 2], [1, 3], [4, 6], [5, 7], [0, 4], [1, 5], [2, 6], [3, 7]];
+    for (let k = z0; k < z1; k++) for (let j = y0; j < y1; j++) for (let i = x0; i < x1; i++) {
+      const a = i + N * (j + N * k);
+      let inside = 0;
+      for (let q = 0; q < 8; q++) { v[q] = f[a + off[q]]; if (v[q] < 0) inside++; }
+      if (inside === 0 || inside === 8) continue;
+      let sx = 0, sy = 0, sz = 0, n = 0;
+      for (let e = 0; e < 12; e++) {
+        const A = E[e][0], B = E[e][1];
+        if ((v[A] < 0) === (v[B] < 0)) continue;
+        const t = v[A] / (v[A] - v[B]);
+        sx += cx[A] + t * (cx[B] - cx[A]); sy += cy[A] + t * (cy[B] - cy[A]); sz += cz[A] + t * (cz[B] - cz[A]); n++;
+      }
+      const px = -1 + (i + sx / n) * h, py = -1 + (j + sy / n) * h, pz = -1 + (k + sz / n) * h;
+      vid[(i - x0) + W * ((j - y0) + H * (k - z0))] = pos.length / 3;
+      pos.push(px, py, pz);
+      const g = this.gradient(px, py, pz); nor.push(g[0], g[1], g[2]);
+      let best = 0, bv = -1e9; for (let q = 0; q < 8; q++) if (v[q] < 0 && v[q] > bv) { bv = v[q]; best = q; }
+      lab.push(this.c[a + off[best]]);
+      let mm = 0; for (let q = 0; q < 8; q++) mm = Math.max(mm, this.m[a + off[q]]);
+      msk.push(mm);
+    }
+    const idx = [];
+    const cell = (i, j, k) => (i < x0 || j < y0 || k < z0 || i >= x1 || j >= y1 || k >= z1) ? -1 : vid[(i - x0) + W * ((j - y0) + H * (k - z0))];
+    const ex1 = Math.min(ox + C, M), ey1 = Math.min(oy + C, M), ez1 = Math.min(oz + C, M);
+    const push = (q0, q1, q2, q3, flip) => {
+      if (q0 < 0 || q1 < 0 || q2 < 0 || q3 < 0) return;
+      if (flip) idx.push(q0, q1, q2, q0, q2, q3); else idx.push(q0, q2, q1, q0, q3, q2);
+    };
+    // edges owned by this chunk: start sample in [ox, ex1) x [oy, ey1) x [oz, ez1)
+    for (let k = oz; k < ez1; k++) for (let j = oy; j < ey1; j++) for (let i = ox; i < ex1; i++) {
+      const a = i + N * (j + N * k), inA = f[a] < 0;
+      if (j >= 1 && k >= 1 && (f[a + 1] < 0) !== inA) push(cell(i, j - 1, k - 1), cell(i, j, k - 1), cell(i, j, k), cell(i, j - 1, k), inA);
+      if (i >= 1 && k >= 1 && (f[a + N] < 0) !== inA) push(cell(i - 1, j, k - 1), cell(i - 1, j, k), cell(i, j, k), cell(i, j, k - 1), inA);
+      if (i >= 1 && j >= 1 && (f[a + N * N] < 0) !== inA) push(cell(i - 1, j - 1, k), cell(i, j - 1, k), cell(i, j, k), cell(i - 1, j, k), inA);
+    }
+    return { pos: new Float32Array(pos), nor: new Float32Array(nor), lab: new Uint8Array(lab), msk: new Uint8Array(msk), idx: new Uint32Array(idx) };
+  };
+
+  // ---------- compact save (Int8 field + labels), for autosave ----------
+  P.serialize = function () {
+    const n = this.f.length, out = new Uint8Array(4 + 2 * n);
+    new DataView(out.buffer).setUint32(0, this.N, true);
+    for (let i = 0; i < n; i++) out[4 + i] = Math.max(-127, Math.min(127, Math.round(this.f[i] / this.clamp * 127))) & 255;
+    out.set(this.c, 4 + n);
+    return out;
+  };
+  P.deserialize = function (u8) {
+    const N = new DataView(u8.buffer, u8.byteOffset).getUint32(0, true), n = N * N * N;
+    if (u8.length !== 4 + 2 * n || N < 32 || N > 256) return false;
+    this.alloc(N);
+    for (let i = 0; i < n; i++) this.f[i] = ((u8[4 + i] << 24 >> 24) / 127) * this.clamp;
+    this.c.set(u8.subarray(4 + n, 4 + 2 * n));
+    return true;
+  };
+
+  root.Sculpt2 = Sculpt2;
+  if (typeof module !== "undefined") module.exports = Sculpt2;
+})(typeof window !== "undefined" ? window : globalThis);
+
 window.SHOP_URL = "/";
 </script>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
@@ -573,76 +960,89 @@ const $ = s => document.querySelector(s);
 
 /* ---------- words ---------- */
 const T = {
-  vi: { print:"In tượng", hintSculpt:"Vuốt lên tượng để nặn · vuốt ra ngoài hoặc dùng 2 ngón để xoay", hintRotate:"Chế độ chỉ xoay: kéo ở đâu cũng xoay · chụm hai ngón để phóng to",
-        rotate:"Xoay", add:"Đắp", carve:"Khoét", smooth:"Vuốt", paint:"Tô màu", eye:"Mắt", size:"Cỡ", mirror:"Đối xứng",
-        newTitle:"Bắt đầu tượng mới", newText:"Chọn một cục đất để nặn. Tượng đang làm sẽ được thay thế.", ball:"Bóng", egg:"Trứng", pebble:"Sỏi", block:"Khối", cancel:"Huỷ",
-        printTitle:"In tượng của bé", height:"Chiều cao", thicken:"Làm dày chỗ mỏng", sSize:"Kích thước (mm)", sGram:"Nhựa PLA ước tính", sParts:"Màu in",
+  vi: { print:"In tượng", size:"Cỡ", power:"Lực", invert:"Đảo chiều", mirror:"Đối xứng", lazy:"Nét mượt", maskClear:"Xoá che", maskInv:"Đảo che",
+        hint:"Vuốt lên tượng để nặn · vuốt ra ngoài hoặc 2 ngón để xoay", hintRotate:"Chỉ xoay: kéo ở đâu cũng xoay · chụm 2 ngón để phóng to",
+        hintMove:"Kéo: nắm một vùng rồi kéo đi · vuốt ra ngoài để xoay", hintMask:"Che: tô lên chỗ muốn giữ nguyên, cọ khác sẽ không đụng tới",
+        tools:{ standard:"Nặn", clay:"Đắp lớp", inflate:"Phồng", move:"Kéo", smooth:"Mịn", pinch:"Vuốt nhọn", dam:"Khắc rãnh", flatten:"Mài phẳng", mask:"Che", paint:"Tô màu", eyes:"Mắt", rotate:"Xoay" },
+        newTitle:"Bắt đầu tượng mới", newText:"Chọn một cục đất để nặn. Tượng đang làm sẽ được thay thế.", ball:"Bóng", egg:"Trứng", pebble:"Sỏi", block:"Khối", cancel:"Huỷ", close:"Đóng",
+        resTitle:"Độ mịn của đất", resText:"Mịn hơn thì chi tiết sắc hơn nhưng máy phải làm việc nhiều hơn. Tăng độ mịn giữ nguyên tượng (giống Subdivide); giảm thì mất bớt chi tiết nhỏ.",
+        resLow:"Nhanh", resMid:"Cân bằng", resHigh:"Mịn", resMax:"Máy tính mạnh", working:"Đang xử lý…",
+        keys:"Phím tắt: <kbd>Alt</kbd> đảo chiều · <kbd>Shift</kbd> làm mịn · <kbd>[</kbd> <kbd>]</kbd> đổi cỡ · <kbd>Ctrl</kbd>+<kbd>Z</kbd> hoàn tác · <kbd>X</kbd> đối xứng",
+        printTitle:"In tượng của bé", height:"Chiều cao", thicken:"Làm dày chỗ mỏng", sSize:"Kích thước (mm)", sGram:"Nhựa PLA ước tính", sCols:"Màu in",
         safeTitle:"An toàn cho bé", safe1:"Dành cho bé từ 3 tuổi, có người lớn giám sát.", safe2:"Tượng nhiều màu in thành một khối liền, không có chi tiết rời.",
-        safe3:"Không cho bé ngậm hay cắn. Chà nhẹ chỗ sắc sau khi in.", close:"Đóng", download:"Tải file in",
-        checked:"Đã kiểm tra: bề mặt kín, in được", notClosed:"Còn chỗ hở, hãy vuốt mịn rồi thử lại", empty:"Chưa có gì để in. Hãy nặn một chút đã!",
-        preparing:"Đang chuẩn bị file…", saved:"Đã lưu file. Mở bằng Bambu Studio, Orca hoặc PrusaSlicer.", declined:"Đã huỷ tải.",
+        safe3:"Không cho bé ngậm hay cắn. Chà nhẹ chỗ sắc sau khi in.", download:"Tải file in",
+        checked:"Đã kiểm tra: bề mặt kín, in được", notClosed:"Còn chỗ hở, hãy làm mịn rồi thử lại", empty:"Chưa có gì để in. Hãy nặn một chút đã!",
+        preparing:"Đang chuẩn bị file, chờ vài giây…", saved:"Đã lưu file. Mở bằng Bambu Studio, Orca hoặc PrusaSlicer.", declined:"Đã huỷ tải.",
         noSave:"Trình xem này không lưu được file.", tooSmall:"Tượng dưới 40 mm có thể có chi tiết nhỏ. Nên in to hơn cho bé.",
-        colours:["Kem","Trời","Lá","Nắng","San hô","Tím","Trắng","Mực"] },
-  en: { print:"Print it", hintSculpt:"Drag on the sculpture to shape it · drag outside it or use two fingers to turn", hintRotate:"Turn-only mode: drag anywhere to turn · pinch to zoom",
-        rotate:"Rotate", add:"Add", carve:"Carve", smooth:"Smooth", paint:"Paint", eye:"Eyes", size:"Size", mirror:"Mirror",
-        newTitle:"Start a new sculpture", newText:"Pick a lump of clay. Your current sculpture will be replaced.", ball:"Ball", egg:"Egg", pebble:"Pebble", block:"Block", cancel:"Cancel",
-        printTitle:"Print your sculpture", height:"Height", thicken:"Thicken thin spots", sSize:"Size (mm)", sGram:"Estimated PLA", sParts:"Print colours",
+        colours:["Kem","Trời","Lá","Nắng","San hô","Tím","Trắng","Mực","Nâu","Hồng"] },
+  en: { print:"Print it", size:"Size", power:"Strength", invert:"Invert", mirror:"Mirror", lazy:"Smooth line", maskClear:"Clear mask", maskInv:"Invert mask",
+        hint:"Drag on the sculpture to shape it · drag outside or use two fingers to turn", hintRotate:"Turn only: drag anywhere to turn · pinch to zoom",
+        hintMove:"Move: grab an area and drag it · drag outside to turn", hintMask:"Mask: paint what you want to keep; other brushes leave it alone",
+        tools:{ standard:"Standard", clay:"Clay", inflate:"Inflate", move:"Move", smooth:"Smooth", pinch:"Pinch", dam:"Crease", flatten:"Flatten", mask:"Mask", paint:"Paint", eyes:"Eyes", rotate:"Rotate" },
+        newTitle:"Start a new sculpture", newText:"Pick a lump of clay. Your current sculpture will be replaced.", ball:"Ball", egg:"Egg", pebble:"Pebble", block:"Block", cancel:"Cancel", close:"Close",
+        resTitle:"Clay resolution", resText:"Higher resolution keeps sharper detail but needs more computing. Going up keeps your sculpture (like Subdivide); going down loses small detail.",
+        resLow:"Fast", resMid:"Balanced", resHigh:"Fine", resMax:"Strong computer", working:"Working…",
+        keys:"Shortcuts: <kbd>Alt</kbd> invert · <kbd>Shift</kbd> smooth · <kbd>[</kbd> <kbd>]</kbd> size · <kbd>Ctrl</kbd>+<kbd>Z</kbd> undo · <kbd>X</kbd> mirror",
+        printTitle:"Print your sculpture", height:"Height", thicken:"Thicken thin spots", sSize:"Size (mm)", sGram:"Estimated PLA", sCols:"Print colours",
         safeTitle:"Safety for kids", safe1:"For ages 3 and up, with an adult nearby.", safe2:"Multi-colour prints come out as one solid piece with no loose parts.",
-        safe3:"Not for mouthing or chewing. Sand any sharp spots after printing.", close:"Close", download:"Download print files",
+        safe3:"Not for mouthing or chewing. Sand any sharp spots after printing.", download:"Download print files",
         checked:"Checked: closed surface, ready to print", notClosed:"Some gaps remain. Smooth a little and try again.", empty:"Nothing to print yet. Sculpt something first!",
-        preparing:"Preparing files…", saved:"Saved. Open it in Bambu Studio, Orca or PrusaSlicer.", declined:"Download cancelled.",
+        preparing:"Preparing files, a few seconds…", saved:"Saved. Open it in Bambu Studio, Orca or PrusaSlicer.", declined:"Download cancelled.",
         noSave:"This viewer can't save files.", tooSmall:"Under 40 mm may give small details. Print bigger for little hands.",
-        colours:["Cream","Sky","Leaf","Sun","Coral","Lilac","White","Ink"] }
+        colours:["Cream","Sky","Leaf","Sun","Coral","Lilac","White","Ink","Brown","Pink"] }
 };
 let lang = (navigator.language || "vi").toLowerCase().startsWith("vi") ? "vi" : "en";
 try { lang = localStorage.getItem("ss-lang") || lang; } catch (e) {}
-function t(k) { return T[lang][k]; }
-function applyLang() {
-  document.documentElement.lang = lang;
-  document.querySelectorAll("[data-t]").forEach(el => { el.textContent = t(el.dataset.t); });
-  $("#lang").textContent = lang === "vi" ? "EN" : "VI";
-  renderSwatches(); updateHint();
+const t = k => T[lang][k];
+
+/* ---------- brushes ---------- */
+const ICON = {
+  standard:'<path d="M3 17c4 0 5-7 9-7s5 7 9 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>',
+  clay:'<path d="M3 17h18M6 17v-4h12v4M8 13v-3h8v3" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/>',
+  inflate:'<circle cx="12" cy="12" r="7" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>',
+  move:'<path d="M12 3v18M3 12h18M12 3l-3 3M12 3l3 3M12 21l-3-3M12 21l3-3M3 12l3-3M3 12l3 3M21 12l-3-3M21 12l-3 3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
+  smooth:'<path d="M3 15c3-4 6-4 9 0s6 4 9 0" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M3 9c3-2 6-2 9 0s6 2 9 0" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" opacity=".45"/>',
+  pinch:'<path d="M4 6l8 7 8-7M4 18l8-5 8 5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>',
+  dam:'<path d="M3 8c5 0 6 9 9 9s4-9 9-9" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M12 17v-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>',
+  flatten:'<path d="M3 15h18" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M6 15c0-4 3-7 6-7s6 3 6 7" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="2 3"/>',
+  mask:'<rect x="4" y="5" width="16" height="14" rx="3" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M4 14l5-4 4 3 3-2 4 3" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>',
+  paint:'<path d="M14 4l6 6-8 8H6v-6z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/><path d="M4 21h6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>',
+  eyes:'<circle cx="12" cy="12" r="7" fill="none" stroke="currentColor" stroke-width="2.2"/><circle cx="13.5" cy="11" r="3" fill="currentColor"/>',
+  rotate:'<path d="M20 12a8 8 0 11-2.3-5.6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>'
+};
+const ORDER = ["standard", "clay", "move", "smooth", "inflate", "pinch", "dam", "flatten", "paint", "eyes", "mask", "rotate"];
+function renderShelf() {
+  $("#shelf").innerHTML = ORDER.map(k => `<button class="tool" data-tool="${k}" aria-pressed="${k === tool}"><svg viewBox="0 0 24 24">${ICON[k]}</svg><span>${T[lang].tools[k]}</span></button>`).join("");
 }
 
-/* ---------- palette (label index -> colour) ---------- */
-const PAL = ["#F2E3C6", "#5AA9E6", "#6CC57C", "#FFD166", "#F2665E", "#A78BFA", "#FBFBF8", "#22283A"];
+/* ---------- palette ---------- */
+const PAL = ["#F2E3C6", "#5AA9E6", "#6CC57C", "#FFD166", "#F2665E", "#A78BFA", "#FBFBF8", "#22283A", "#A86B45", "#F7A1B5"];
 const WHITE = 6, INK = 7;
 let colour = 1;
 function renderSwatches() {
-  const box = $("#swatches"); box.innerHTML = "";
-  PAL.forEach((hex, i) => {
-    const b = document.createElement("button");
-    b.className = "sw"; b.style.background = hex; b.setAttribute("aria-pressed", i === colour);
-    b.setAttribute("aria-label", T[lang].colours[i]); b.onclick = () => { colour = i; renderSwatches(); };
-    box.appendChild(b);
-  });
+  $("#swatches").innerHTML = PAL.map((h, i) => `<button class="sw" data-col="${i}" style="background:${h}" aria-pressed="${i === colour}" aria-label="${T[lang].colours[i]}"></button>`).join("");
 }
 
 /* ---------- engine ---------- */
-const N = 64;
-const S = new window.Sculpt(N);
-let restored = false;
-try {
-  const raw = localStorage.getItem("ss-sculpt");
-  if (raw) {
-    const bin = Uint8Array.from(atob(raw), ch => ch.charCodeAt(0));
-    const n = N * N * N;
-    if (bin.length === 2 * n) { for (let i = 0; i < n; i++) S.f[i] = ((bin[i] << 24 >> 24) / 127) * S.clamp; S.c.set(bin.subarray(n)); restored = true; }
-  }
-} catch (e) {}
-if (!restored) S.reset("egg", 1);
+const S = new window.Sculpt2(128);
+async function restore() {
+  try {
+    const raw = localStorage.getItem("ss2-sculpt"); if (!raw) return false;
+    const gz = Uint8Array.from(atob(raw), c => c.charCodeAt(0));
+    const buf = await new Response(new Blob([gz]).stream().pipeThrough(new DecompressionStream("gzip"))).arrayBuffer();
+    return S.deserialize(new Uint8Array(buf));
+  } catch (e) { return false; }
+}
 let saveTimer = 0;
 function scheduleSave() {
   clearTimeout(saveTimer);
-  saveTimer = setTimeout(() => {
+  saveTimer = setTimeout(async () => {
     try {
-      const n = N * N * N, bin = new Uint8Array(2 * n);
-      for (let i = 0; i < n; i++) bin[i] = (Math.max(-127, Math.min(127, Math.round(S.f[i] / S.clamp * 127))) & 255);
-      bin.set(S.c, n);
-      let s = ""; for (let i = 0; i < bin.length; i += 0x8000) s += String.fromCharCode.apply(null, bin.subarray(i, i + 0x8000));
-      localStorage.setItem("ss-sculpt", btoa(s));
+      const gz = new Uint8Array(await new Response(new Blob([S.serialize()]).stream().pipeThrough(new CompressionStream("gzip"))).arrayBuffer());
+      let s = ""; for (let i = 0; i < gz.length; i += 0x8000) s += String.fromCharCode.apply(null, gz.subarray(i, i + 0x8000));
+      localStorage.setItem("ss2-sculpt", btoa(s));
     } catch (e) {}
-  }, 600);
+  }, 900);
 }
 
 /* ---------- scene ---------- */
@@ -652,209 +1052,287 @@ renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 stage.prepend(renderer.domElement);
 const scene = new THREE.Scene();
-const cam = new THREE.PerspectiveCamera(35, 1, 0.05, 50);
-cam.position.set(0.9, 0.55, 2.3);
-scene.add(new THREE.HemisphereLight(0xffffff, 0x9aa8c0, 1.5));
-const key = new THREE.DirectionalLight(0xffffff, 2.0); key.position.set(-1.5, 2.5, 2); scene.add(key);
-const rim = new THREE.DirectionalLight(0xffffff, 0.8); rim.position.set(2, 0.5, -2); scene.add(rim);
-const disc = new THREE.Mesh(new THREE.CylinderGeometry(0.75, 0.78, 0.04, 64), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.9 }));
-disc.position.y = -0.94; scene.add(disc);
+const cam = new THREE.PerspectiveCamera(32, 1, 0.05, 50);
+cam.position.set(0.95, 0.5, 2.4);
 const controls = new OrbitControls(cam, renderer.domElement);
 controls.target.set(0, -0.05, 0); controls.enableDamping = true; controls.enablePan = false;
-controls.minDistance = 1.2; controls.maxDistance = 5;
+controls.minDistance = 0.6; controls.maxDistance = 5; controls.rotateSpeed = 0.9;
 controls.touches = { ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_ROTATE };
-controls.rotateSpeed = 0.9;
-let geo = new THREE.BufferGeometry();
-const mat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.62, metalness: 0 });
-const meshObj = new THREE.Mesh(geo, mat); scene.add(meshObj);
-const cursor = new THREE.Mesh(new THREE.SphereGeometry(1, 24, 16), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.22, depthWrite: false }));
-cursor.visible = false; scene.add(cursor);
+
+// clay matcap, painted procedurally: soft key light top-left, warm bounce, dark rim
+function makeMatcap() {
+  const c = document.createElement("canvas"); c.width = c.height = 256;
+  const g = c.getContext("2d");
+  const base = g.createRadialGradient(128, 128, 10, 128, 128, 128);
+  base.addColorStop(0, "#f4f1ee"); base.addColorStop(0.7, "#cfc8c2"); base.addColorStop(0.93, "#8a827c"); base.addColorStop(1, "#5b5551");
+  g.fillStyle = base; g.fillRect(0, 0, 256, 256);
+  const hi = g.createRadialGradient(92, 78, 2, 92, 78, 70);
+  hi.addColorStop(0, "rgba(255,255,255,.95)"); hi.addColorStop(1, "rgba(255,255,255,0)");
+  g.fillStyle = hi; g.fillRect(0, 0, 256, 256);
+  const bo = g.createRadialGradient(170, 200, 4, 170, 200, 70);
+  bo.addColorStop(0, "rgba(255,226,200,.35)"); bo.addColorStop(1, "rgba(255,226,200,0)");
+  g.fillStyle = bo; g.fillRect(0, 0, 256, 256);
+  const tex = new THREE.CanvasTexture(c); tex.colorSpace = THREE.SRGBColorSpace; return tex;
+}
+const mat = new THREE.MeshMatcapMaterial({ matcap: makeMatcap(), vertexColors: true });
+const chunkMeshes = new Map();
 const palLin = PAL.map(h => new THREE.Color(h));
+const ring = new THREE.Mesh(new THREE.TorusGeometry(1, 0.035, 8, 48), new THREE.MeshBasicMaterial({ color: 0xff6b4a, transparent: true, opacity: 0.85, depthTest: false }));
+ring.renderOrder = 10; ring.visible = false; scene.add(ring);
+const ring2 = ring.clone(); scene.add(ring2);
 
-let dirty = true;
-function remesh() {
-  const m = S.mesh();
-  const old = geo; geo = new THREE.BufferGeometry(); meshObj.geometry = geo; old.dispose();
-  geo.setAttribute("position", new THREE.BufferAttribute(m.pos, 3));
-  const cols = new Float32Array(m.col.length * 3);
-  for (let i = 0; i < m.col.length; i++) { const c = palLin[m.col[i]]; cols[3 * i] = c.r; cols[3 * i + 1] = c.g; cols[3 * i + 2] = c.b; }
-  geo.setAttribute("color", new THREE.BufferAttribute(cols, 3));
-  geo.setIndex(new THREE.BufferAttribute(m.idx, 1));
-  geo.computeVertexNormals(); geo.computeBoundingSphere(); geo.computeBoundingBox();
-  $("#badge").textContent = (m.idx.length / 3).toLocaleString() + " ▲";
+function remeshDirty() {
+  if (!S.dirty.size) return;
+  for (const cid of S.dirty) {
+    const m = S.meshChunk(cid);
+    let obj = chunkMeshes.get(cid);
+    if (!m || !m.idx.length) { if (obj) { scene.remove(obj); obj.geometry.dispose(); chunkMeshes.delete(cid); } continue; }
+    const g = new THREE.BufferGeometry();
+    g.setAttribute("position", new THREE.BufferAttribute(m.pos, 3));
+    g.setAttribute("normal", new THREE.BufferAttribute(m.nor, 3));
+    const col = new Float32Array(m.lab.length * 3);
+    for (let i = 0; i < m.lab.length; i++) {
+      const c = palLin[m.lab[i]] || palLin[0], k = 1 - 0.6 * (m.msk[i] / 255);
+      col[3 * i] = c.r * k; col[3 * i + 1] = c.g * k; col[3 * i + 2] = c.b * k;
+    }
+    g.setAttribute("color", new THREE.BufferAttribute(col, 3));
+    g.setIndex(new THREE.BufferAttribute(m.idx, 1));
+    if (obj) { obj.geometry.dispose(); obj.geometry = g; }
+    else { obj = new THREE.Mesh(g, mat); chunkMeshes.set(cid, obj); scene.add(obj); }
+  }
+  S.dirty.clear();
+  let tris = 0; for (const o of chunkMeshes.values()) tris += o.geometry.index.count / 3;
+  $("#badge").textContent = S.N + "³ · " + Math.round(tris).toLocaleString() + " ▲";
 }
-function resize() {
-  const r = stage.getBoundingClientRect(); if (!r.width) return;
-  renderer.setSize(r.width, r.height, false); cam.aspect = r.width / r.height; cam.updateProjectionMatrix();
-}
+function clearScene() { for (const o of chunkMeshes.values()) { scene.remove(o); o.geometry.dispose(); } chunkMeshes.clear(); }
+function resize() { const r = stage.getBoundingClientRect(); if (!r.width) return; renderer.setSize(r.width, r.height, false); cam.aspect = r.width / r.height; cam.updateProjectionMatrix(); }
 new ResizeObserver(resize).observe(stage); resize();
-(function loop() {
-  if (dirty) { remesh(); dirty = false; }
-  controls.update(); renderer.render(scene, cam); requestAnimationFrame(loop);
-})();
+(function loop() { remeshDirty(); controls.update(); renderer.render(scene, cam); requestAnimationFrame(loop); })();
 
-/* ---------- tools ---------- */
-let tool = "add", mirror = true;
-function setTool(name) {
-  tool = name;
-  document.querySelectorAll(".tool").forEach(b => b.setAttribute("aria-pressed", b.dataset.tool === name));
+/* ---------- state + UI ---------- */
+let tool = "standard", mirror = true, invert = false, lazy = true, shiftHeld = false, altHeld = false;
+const radius = () => +$("#size").value / 100;
+const power = () => +$("#power").value / 100;
+function setTool(k) {
+  tool = k;
+  document.querySelectorAll(".tool").forEach(b => b.setAttribute("aria-pressed", b.dataset.tool === k));
+  $("#swatches").hidden = !(k === "paint" || k === "eyes");
+  $("#maskOps").hidden = k !== "mask";
   updateHint();
 }
-function updateHint() { $("#hint").textContent = tool === "rotate" ? t("hintRotate") : t("hintSculpt"); }
-document.querySelectorAll(".tool").forEach(b => b.onclick = () => setTool(b.dataset.tool));
-$("#mirror").onclick = () => { mirror = !mirror; $("#mirror").setAttribute("aria-pressed", mirror); };
-const radius = () => +$("#size").value / 100;
+function updateHint() {
+  $("#hint").textContent = tool === "rotate" ? t("hintRotate") : tool === "move" ? t("hintMove") : tool === "mask" ? t("hintMask") : t("hint");
+}
+function applyLang() {
+  document.documentElement.lang = lang;
+  document.querySelectorAll("[data-t]").forEach(el => { el.textContent = t(el.dataset.t); });
+  $("#keys").innerHTML = t("keys");
+  $("#lang").textContent = lang === "vi" ? "EN" : "VI";
+  renderShelf(); renderSwatches(); updateHint();
+}
+$("#shelf").addEventListener("click", e => { const b = e.target.closest(".tool"); if (b) setTool(b.dataset.tool); });
+$("#swatches").addEventListener("click", e => { const b = e.target.closest(".sw"); if (b) { colour = +b.dataset.col; renderSwatches(); } });
+function bindToggle(id, get, set) { const b = $(id); b.onclick = () => { set(!get()); b.setAttribute("aria-pressed", get()); }; }
+bindToggle("#invert", () => invert, v => invert = v);
+bindToggle("#mirror", () => mirror, v => mirror = v);
+bindToggle("#lazy", () => lazy, v => lazy = v);
+$("#maskClear").onclick = () => { S.clearMask(); updateUndo(); scheduleSave(); };
+$("#maskInv").onclick = () => { S.invertMask(); updateUndo(); scheduleSave(); };
 
-const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
-function hitAt(ev) {
+/* ---------- picking ---------- */
+const ndc = new THREE.Vector2(), ray = new THREE.Raycaster();
+function screenRay(ev) {
   const r = renderer.domElement.getBoundingClientRect();
   ndc.set(((ev.clientX - r.left) / r.width) * 2 - 1, -((ev.clientY - r.top) / r.height) * 2 + 1);
   ray.setFromCamera(ndc, cam);
-  const hits = ray.intersectObject(meshObj, false);
-  return hits.length ? hits[0] : null;
+  return ray.ray;
 }
-function apply(hit, first) {
-  const p = hit.point, n = hit.face ? hit.face.normal.clone().transformDirection(meshObj.matrixWorld) : new THREE.Vector3(0, 0, 1);
-  const r = radius();
-  const pts = [[p.x, p.y, p.z, n]];
-  if (mirror && Math.abs(p.x) > r * 0.25) pts.push([-p.x, p.y, p.z, new THREE.Vector3(-n.x, n.y, n.z)]);
-  for (const [x, y, z, nn] of pts) {
-    if (tool === "add") S.dab("add", [x + nn.x * r * 0.25, y + nn.y * r * 0.25, z + nn.z * r * 0.25], r, colour, 0.45);
-    else if (tool === "carve") S.dab("carve", [x - nn.x * r * 0.15, y - nn.y * r * 0.15, z - nn.z * r * 0.15], r, colour, 0.45);
-    else if (tool === "smooth") S.dab("smooth", [x, y, z], r * 1.3, colour, 0.7);
-    else if (tool === "paint") S.dab("paint", [x, y, z], r, colour, 1);
-    else if (tool === "eye" && first) {
-      const er = Math.max(r * 0.7, 0.035);
-      S.dab("add", [x + nn.x * er * 0.35, y + nn.y * er * 0.35, z + nn.z * er * 0.35], er, WHITE, 1);
-      S.dab("add", [x + nn.x * er * 0.95, y + nn.y * er * 0.95, z + nn.z * er * 0.95], er * 0.5, INK, 1);
-    }
+function pick(ev) {
+  const R = screenRay(ev);
+  return S.raycast([R.origin.x, R.origin.y, R.origin.z], [R.direction.x, R.direction.y, R.direction.z]);
+}
+function placeRing(obj, p, n, r) {
+  obj.visible = true; obj.position.set(p[0], p[1], p[2]); obj.scale.setScalar(r);
+  obj.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), new THREE.Vector3(n[0], n[1], n[2]));
+}
+
+/* ---------- strokes ---------- */
+let drawing = false, pointers = new Set(), strokeStart = 0, lastP = null, lazyP = null, lazyN = null;
+let movePlane = null, moveStart = null;
+function activeTool() { return shiftHeld && tool !== "rotate" ? "smooth" : tool; }
+function dabAt(p, n, first) {
+  const tl = activeTool(), r = radius(), s = power(), inv = invert !== altHeld;
+  const spots = [[p, n, 1]];
+  if (mirror && Math.abs(p[0]) > r * 0.2) spots.push([[-p[0], p[1], p[2]], [-n[0], n[1], n[2]], -1]);
+  for (const [pp, nn] of spots) {
+    if (tl === "eyes") {
+      if (!first) continue;
+      const er = Math.max(r * 0.6, 0.03);
+      S.brush({ tool: "blob", p: [pp[0] + nn[0] * er * 0.35, pp[1] + nn[1] * er * 0.35, pp[2] + nn[2] * er * 0.35], r: er, color: WHITE });
+      S.brush({ tool: "blob", p: [pp[0] + nn[0] * er * 0.95, pp[1] + nn[1] * er * 0.95, pp[2] + nn[2] * er * 0.95], r: er * 0.52, color: INK });
+    } else if (tl === "smooth") S.brush({ tool: "smooth", p: pp, n: nn, r: r * 1.2, s: Math.min(1, s * 1.4) });
+    else S.brush({ tool: tl, p: pp, n: nn, r, s, invert: inv, color: colour });
   }
-  dirty = true;
 }
-let drawing = false, lastP = null, pointers = new Set();
-// Runs before the orbit controls see the touch (capture phase on the parent):
-// a touch that lands on the sculpture shapes it; a touch on empty space turns the view.
-// A second finger always turns/zooms, and cancels a stroke that the first finger just began.
-let strokeStart = 0;
 stage.addEventListener("pointerdown", ev => {
   if (ev.target !== renderer.domElement) return;
   pointers.add(ev.pointerId);
   if (pointers.size > 1) {
-    if (drawing) {
-      drawing = false;
-      if (performance.now() - strokeStart < 350 && S.doUndo()) { S.redo.length = 0; dirty = true; updateUndo(); }
-    }
-    controls.enableRotate = true;
-    return;
+    if (drawing) { drawing = false; if (performance.now() - strokeStart < 350) { S.cancelStroke(); S.moveEnd(); } else { S.endStroke(); S.moveEnd(); } updateUndo(); }
+    controls.enableRotate = true; return;
   }
-  const hit = tool === "rotate" ? null : hitAt(ev);
+  const hit = tool === "rotate" ? null : pick(ev);
   controls.enableRotate = !hit;
-  if (!hit) { cursor.visible = false; return; }
-  S.snapshot(); updateUndo();
-  drawing = true; strokeStart = performance.now(); lastP = hit.point.clone(); apply(hit, true);
+  if (!hit) { ring.visible = ring2.visible = false; return; }
+  drawing = true; strokeStart = performance.now();
+  S.beginStroke();
+  if (activeTool() === "move") {
+    const grabs = [{ p: hit.p, sx: 1 }];
+    if (mirror && Math.abs(hit.p[0]) > radius() * 0.2) grabs.push({ p: [-hit.p[0], hit.p[1], hit.p[2]], sx: -1 });
+    S.moveBegin(grabs, radius() * 1.3);
+    const camDir = new THREE.Vector3(); cam.getWorldDirection(camDir);
+    movePlane = new THREE.Plane().setFromNormalAndCoplanarPoint(camDir.negate(), new THREE.Vector3(...hit.p));
+    moveStart = new THREE.Vector3(...hit.p);
+  } else {
+    lazyP = hit.p.slice(); lazyN = hit.n.slice(); lastP = hit.p.slice();
+    dabAt(hit.p, hit.n, true);
+  }
 }, true);
 renderer.domElement.addEventListener("pointermove", ev => {
-  const hit = tool === "rotate" ? null : hitAt(ev);
-  if (hit) { cursor.visible = true; cursor.position.copy(hit.point); cursor.scale.setScalar(tool === "eye" ? Math.max(radius() * 0.7, 0.035) : radius()); }
-  else cursor.visible = false;
-  if (!drawing || !hit || pointers.size > 1 || tool === "eye") return;
-  if (hit.point.distanceTo(lastP) < radius() * 0.35) return;
-  lastP = hit.point.clone(); apply(hit, false);
+  if (drawing && pointers.size === 1 && activeTool() === "move" && movePlane) {
+    const R = screenRay(ev), q = new THREE.Vector3();
+    if (R.intersectPlane(movePlane, q)) { const d = q.sub(moveStart); S.moveTo([d.x, d.y, d.z]); }
+    return;
+  }
+  const hit = tool === "rotate" ? null : pick(ev);
+  if (hit && !(drawing && pointers.size > 1)) {
+    const r = activeTool() === "eyes" ? Math.max(radius() * 0.6, 0.03) : radius();
+    placeRing(ring, hit.p, hit.n, r);
+    if (mirror && Math.abs(hit.p[0]) > radius() * 0.2) placeRing(ring2, [-hit.p[0], hit.p[1], hit.p[2]], [-hit.n[0], hit.n[1], hit.n[2]], r); else ring2.visible = false;
+  } else if (!drawing) { ring.visible = ring2.visible = false; }
+  if (!drawing || !hit || pointers.size > 1 || activeTool() === "eyes") return;
+  let p = hit.p, n = hit.n;
+  if (lazy) {   // the brush trails the finger a little, which steadies lines
+    for (let a = 0; a < 3; a++) { lazyP[a] += (p[a] - lazyP[a]) * 0.35; lazyN[a] += (n[a] - lazyN[a]) * 0.35; }
+    const L = Math.hypot(...lazyN) || 1; p = lazyP.slice(); n = lazyN.map(v => v / L);
+  }
+  const step = radius() * 0.22;
+  if (Math.hypot(p[0] - lastP[0], p[1] - lastP[1], p[2] - lastP[2]) < step) return;
+  lastP = p.slice(); dabAt(p, n, false);
 });
-function endStroke(ev) { pointers.delete(ev.pointerId); if (drawing) { drawing = false; scheduleSave(); } if (!pointers.size) controls.enableRotate = true; }
+function endStroke(ev) {
+  pointers.delete(ev.pointerId);
+  if (drawing && !pointers.size) { drawing = false; S.moveEnd(); movePlane = null; S.endStroke(); updateUndo(); scheduleSave(); }
+  if (!pointers.size) controls.enableRotate = true;
+}
 renderer.domElement.addEventListener("pointerup", endStroke);
 renderer.domElement.addEventListener("pointercancel", endStroke);
-renderer.domElement.addEventListener("pointerleave", () => { cursor.visible = false; });
+renderer.domElement.addEventListener("pointerleave", () => { if (!drawing) ring.visible = ring2.visible = false; });
 
 function updateUndo() { $("#undo").disabled = !S.undo.length; $("#redo").disabled = !S.redo.length; }
-$("#undo").onclick = () => { if (S.doUndo()) { dirty = true; updateUndo(); scheduleSave(); } };
-$("#redo").onclick = () => { if (S.doRedo()) { dirty = true; updateUndo(); scheduleSave(); } };
+$("#undo").onclick = () => { if (S.doUndo()) { updateUndo(); scheduleSave(); } };
+$("#redo").onclick = () => { if (S.doRedo()) { updateUndo(); scheduleSave(); } };
 addEventListener("keydown", e => {
+  if (e.key === "Shift") shiftHeld = true;
+  if (e.key === "Alt") { altHeld = true; e.preventDefault(); }
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z") { e.preventDefault(); (e.shiftKey ? $("#redo") : $("#undo")).click(); }
-  if (e.key === "Escape") { $("#newSheet").hidden = true; $("#printSheet").hidden = true; }
+  if (e.key === "[") $("#size").value = +$("#size").value - 1;
+  if (e.key === "]") $("#size").value = +$("#size").value + 1;
+  if (e.key.toLowerCase() === "x" && !e.ctrlKey && !e.metaKey) $("#mirror").click();
+  if (e.key === "Escape") document.querySelectorAll(".sheet").forEach(s => s.hidden = true);
 });
+addEventListener("keyup", e => { if (e.key === "Shift") shiftHeld = false; if (e.key === "Alt") altHeld = false; });
+addEventListener("blur", () => { shiftHeld = altHeld = false; });
 
-/* ---------- new ---------- */
-$("#newBtn").onclick = () => { $("#newSheet").hidden = false; };
-$("#newCancel").onclick = () => { $("#newSheet").hidden = true; };
-document.querySelectorAll("[data-start]").forEach(b => b.onclick = () => {
-  S.snapshot(); const u = S.undo.slice(); S.reset(b.dataset.start, colour === WHITE || colour === INK ? 1 : colour); S.undo = u;
-  dirty = true; updateUndo(); scheduleSave(); $("#newSheet").hidden = true; setTool("add");
+/* ---------- sheets ---------- */
+document.querySelectorAll(".sheet").forEach(sh => {
+  sh.addEventListener("click", e => { if (e.target === sh || e.target.closest("[data-close]")) sh.hidden = true; });
 });
-$("#newSheet").addEventListener("click", e => { if (e.target.id === "newSheet") $("#newSheet").hidden = true; });
+$("#newBtn").onclick = () => { $("#newSheet").hidden = false; };
+document.querySelectorAll("[data-start]").forEach(b => b.onclick = () => {
+  S.reset(b.dataset.start, colour === WHITE || colour === INK ? 1 : colour);
+  clearScene(); updateUndo(); scheduleSave(); $("#newSheet").hidden = true; setTool("standard");
+});
+function renderRes() { $("#resBtn").textContent = S.N + "³"; document.querySelectorAll("[data-res]").forEach(b => b.setAttribute("aria-pressed", +b.dataset.res === S.N)); }
+$("#resBtn").onclick = () => { renderRes(); $("#resSheet").hidden = false; };
+document.querySelectorAll("[data-res]").forEach(b => b.onclick = () => {
+  const N2 = +b.dataset.res; if (N2 === S.N) { $("#resSheet").hidden = true; return; }
+  $("#busy").textContent = t("working"); $("#busy").hidden = false; $("#resSheet").hidden = true;
+  setTimeout(() => { S.resample(N2); clearScene(); renderRes(); updateUndo(); scheduleSave(); $("#busy").hidden = true; }, 30);
+});
 
 /* ---------- print ---------- */
-let lastExport = null;
-function prepareExport() {
+let lastStats = null;
+function computeStats() {
   const H = +$("#height").value;
   $("#heightVal").textContent = H + " mm";
   const out = S.printable({ heightMM: H, baseFrac: 0.06, thicken: $("#thicken").getAttribute("aria-pressed") === "true" ? 0.6 : 0 });
-  if (!out || !out.mesh.idx.length) { lastExport = null; $("#checkLine").textContent = t("empty"); $("#download").disabled = true; return; }
+  if (!out || !out.mesh.idx.length) { lastStats = null; $("#checkLine").textContent = t("empty"); $("#download").disabled = true; return; }
   const body = S.toPrint(out.mesh, out.pf.cut, out.pf.top, H);
   let mn = [1e9, 1e9, 1e9], mx = [-1e9, -1e9, -1e9];
   for (let q = 0; q < body.pos.length; q += 3) for (let e = 0; e < 3; e++) { mn[e] = Math.min(mn[e], body.pos[q + e]); mx[e] = Math.max(mx[e], body.pos[q + e]); }
   const vol = window.Sculpt.volume(body.pos, body.idx) / 1000;
-  const parts = S.colourParts(out.pf).map(p => ({ label: p.label, ...S.toPrint(p.mesh, out.pf.cut, out.pf.top, H, body.centre) }));
-  lastExport = { body, parts, H, check: out.check };
+  const used = new Set(); for (let n = 0; n < out.pf.f.length; n++) if (out.pf.f[n] < 0) used.add(S.c[n]);
+  lastStats = { out, body, H };
   $("#sSize").textContent = mx.map((v, i) => Math.round(v - mn[i])).join("×");
   $("#sGram").textContent = "≈ " + Math.max(1, Math.round(vol * 1.24 * 0.45)) + " g";
-  $("#sParts").textContent = parts.length;
-  $("#colChips").innerHTML = parts.map(p => `<span class="chip"><i style="background:${PAL[p.label]}"></i>${T[lang].colours[p.label]}</span>`).join("");
+  $("#sCols").textContent = used.size;
   $("#checkLine").innerHTML = out.check.watertight
     ? `<svg width="18" height="18" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7.5" fill="currentColor" opacity=".15"/><path d="M4.5 8.2l2.3 2.3 4.7-5" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg>${t("checked")}`
     : t("notClosed");
   $("#download").disabled = !out.check.watertight;
   $("#printMsg").textContent = H < 40 ? t("tooSmall") : "";
 }
-let prepTimer = 0;
-function schedulePrep() { clearTimeout(prepTimer); prepTimer = setTimeout(prepareExport, 120); }
-$("#printBtn").onclick = () => { $("#printSheet").hidden = false; $("#printMsg").textContent = ""; prepareExport(); };
-$("#printCancel").onclick = () => { $("#printSheet").hidden = true; };
-$("#printSheet").addEventListener("click", e => { if (e.target.id === "printSheet") $("#printSheet").hidden = true; });
-$("#height").oninput = () => { $("#heightVal").textContent = $("#height").value + " mm"; schedulePrep(); };
-$("#thicken").onclick = () => { const b = $("#thicken"); b.setAttribute("aria-pressed", b.getAttribute("aria-pressed") !== "true"); schedulePrep(); };
+let statTimer = 0;
+function scheduleStats() { clearTimeout(statTimer); $("#download").disabled = true; statTimer = setTimeout(computeStats, 250); }
+$("#printBtn").onclick = () => { $("#printSheet").hidden = false; $("#printMsg").textContent = t("working"); $("#download").disabled = true; setTimeout(computeStats, 30); };
+$("#height").oninput = () => { $("#heightVal").textContent = $("#height").value + " mm"; scheduleStats(); };
+$("#thicken").onclick = () => { const b = $("#thicken"); b.setAttribute("aria-pressed", b.getAttribute("aria-pressed") !== "true"); scheduleStats(); };
 
 let downloads = null;
 if (window.claude?.use) window.claude.use("downloads").then(d => { downloads = d; });
-$("#download").onclick = async () => {
-  if (!lastExport) return;
-  $("#printMsg").textContent = t("preparing");
-  const SC = window.Sculpt, enc = s => new TextEncoder().encode(s);
-  const stamp = new Date().toISOString().slice(0, 10);
-  const base = "sculpt-" + stamp;
-  const model = SC.model3mf(lastExport.parts.map(p => ({ name: T.en.colours[p.label].toLowerCase(), hex: PAL[p.label], pos: p.pos, idx: p.idx })));
-  const readme = [
-    "Sculpt Studio by Daily Layer", "",
-    base + ".stl  - one solid piece, print in a single colour",
-    base + "_colours.3mf - one part per colour for multi-colour printers (AMS/MMU).",
-    "  Bambu Studio / Orca: when asked, load it as a single object with multiple parts, then give each part its filament.", "",
-    "Height: " + lastExport.H + " mm. Flat base included. No supports needed for most sculptures.", "",
-    "Safety: for ages 3+, adult supervision. Multi-colour prints come out as one solid piece.",
-    "Not for mouthing or chewing; FDM prints have layer lines. Sand sharp spots after printing."
-  ].join("\n");
-  const zip = SC.zip([
-    { name: base + ".stl", data: SC.stl(lastExport.body.pos, lastExport.body.idx, "Sculpt Studio") },
-    { name: base + "_colours.3mf", data: SC.package3mf(model) },
-    { name: "README.txt", data: enc(readme) }
-  ]);
-  const name = base + ".zip";
-  if (downloads) {
-    try { await downloads.save({ filename: name, data: zip }); $("#printMsg").textContent = t("saved"); }
-    catch (e) { $("#printMsg").textContent = e && e.code === "declined" ? t("declined") : t("noSave"); }
-    return;
-  }
-  try {
-    const url = URL.createObjectURL(new Blob([zip], { type: "application/zip" }));
-    const a = document.createElement("a"); a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 4000);
-    $("#printMsg").textContent = t("saved");
-  } catch (e) { $("#printMsg").textContent = t("noSave"); }
+$("#download").onclick = () => {
+  if (!lastStats) return;
+  $("#printMsg").textContent = t("preparing"); $("#download").disabled = true;
+  setTimeout(async () => {
+    const SC = window.Sculpt, enc = s => new TextEncoder().encode(s), { out, body, H } = lastStats;
+    const parts = S.colourParts(out.pf).map(p => ({ label: p.label, ...S.toPrint(p.mesh, out.pf.cut, out.pf.top, H, body.centre) }));
+    const base = "sculpt-" + new Date().toISOString().slice(0, 10);
+    const model = SC.model3mf(parts.map(p => ({ name: T.en.colours[p.label].toLowerCase(), hex: PAL[p.label], pos: p.pos, idx: p.idx })));
+    const readme = ["Sculpt Studio by Daily Layer", "",
+      base + ".stl  - one solid piece, print in a single colour",
+      base + "_colours.3mf - one part per colour for multi-colour printers (AMS/MMU).",
+      "  Bambu Studio / Orca: when asked, load it as a single object with multiple parts, then give each part its filament.", "",
+      "Height: " + H + " mm. Flat base included. Resolution " + S.N + "^3.", "",
+      "Safety: for ages 3+, adult supervision. Multi-colour prints come out as one solid piece.",
+      "Not for mouthing or chewing; FDM prints have layer lines. Sand sharp spots after printing."].join("\n");
+    const zip = SC.zip([{ name: base + ".stl", data: SC.stl(body.pos, body.idx, "Sculpt Studio") },
+                        { name: base + "_colours.3mf", data: SC.package3mf(model) },
+                        { name: "README.txt", data: enc(readme) }]);
+    const name = base + ".zip";
+    $("#download").disabled = false;
+    if (downloads) {
+      try { await downloads.save({ filename: name, data: zip }); $("#printMsg").textContent = t("saved"); }
+      catch (e) { $("#printMsg").textContent = e && e.code === "declined" ? t("declined") : t("noSave"); }
+      return;
+    }
+    try {
+      const url = URL.createObjectURL(new Blob([zip], { type: "application/zip" }));
+      const a = document.createElement("a"); a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 4000);
+      $("#printMsg").textContent = t("saved");
+    } catch (e) { $("#printMsg").textContent = t("noSave"); }
+  }, 40);
 };
 
-/* ---------- language + back ---------- */
+/* ---------- boot ---------- */
 $("#lang").onclick = () => { lang = lang === "vi" ? "en" : "vi"; try { localStorage.setItem("ss-lang", lang); } catch (e) {} applyLang(); };
-$("#back").href = window.SHOP_URL || "../";
-applyLang(); setTool("add"); updateUndo();
+$("#back").href = window.SHOP_URL || "/";
+applyLang(); setTool("standard");
+(async () => {
+  if (!(await restore())) S.reset("egg", 1);
+  clearScene(); S.markAll(); renderRes(); updateUndo();
+})();
 </script>
 </body>
 </html>
