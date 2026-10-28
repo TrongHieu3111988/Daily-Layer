@@ -1,7 +1,0 @@
-agent
-.git
-.github
-README.md
-wrangler.jsonc
-.assetsignore
-node_modules
