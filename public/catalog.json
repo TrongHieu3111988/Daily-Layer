@@ -300,7 +300,7 @@
    "parts": [
     {
      "name": "body",
-     "triangles": 175132,
+     "triangles": 175068,
      "watertight": true,
      "bad_edges": 0,
      "shells": 1,
@@ -316,7 +316,7 @@
    "colour_parts": [
     {
      "name": "grey",
-     "triangles": 177912,
+     "triangles": 177916,
      "watertight": true,
      "bad_edges": 0,
      "shells": 1,
@@ -344,7 +344,7 @@
     },
     {
      "name": "pink",
-     "triangles": 2524,
+     "triangles": 2476,
      "watertight": true,
      "bad_edges": 0,
      "shells": 3,
@@ -352,31 +352,31 @@
      "size_mm": [
       27.1,
       18.8,
-      23.3
+      23.2
      ],
-     "min_z": 39.04
+     "min_z": 39.13
     },
     {
      "name": "ink",
-     "triangles": 5116,
+     "triangles": 6148,
      "watertight": true,
      "bad_edges": 0,
-     "shells": 2,
-     "volume_cm3": 0.31,
+     "shells": 3,
+     "volume_cm3": 0.33,
      "size_mm": [
       23.4,
-      6.5,
-      6.9
+      9.8,
+      15.7
      ],
-     "min_z": 42.99
+     "min_z": 34.11
     },
     {
      "name": "white",
-     "triangles": 19480,
+     "triangles": 19620,
      "watertight": true,
      "bad_edges": 0,
      "shells": 6,
-     "volume_cm3": 1.28,
+     "volume_cm3": 1.25,
      "size_mm": [
       26.7,
       8.1,
@@ -419,7 +419,7 @@
    "download": "",
    "cover": "products/sculpt-kitten/cover.jpg",
    "build_seconds": 0,
-   "download_bytes": 9913788,
+   "download_bytes": 9927835,
    "dropped": "2026-10-28"
   },
   {
@@ -439,7 +439,7 @@
    "parts": [
     {
      "name": "body",
-     "triangles": 174440,
+     "triangles": 174464,
      "watertight": true,
      "bad_edges": 0,
      "shells": 1,
@@ -455,11 +455,11 @@
    "colour_parts": [
     {
      "name": "green",
-     "triangles": 178388,
+     "triangles": 178500,
      "watertight": true,
      "bad_edges": 0,
      "shells": 1,
-     "volume_cm3": 132.67,
+     "volume_cm3": 132.87,
      "size_mm": [
       60.9,
       58.6,
@@ -483,15 +483,15 @@
     },
     {
      "name": "lime",
-     "triangles": 19424,
+     "triangles": 17124,
      "watertight": true,
      "bad_edges": 0,
      "shells": 1,
-     "volume_cm3": 2.43,
+     "volume_cm3": 2.17,
      "size_mm": [
       25.3,
       13.7,
-      41.1
+      36.4
      ],
      "min_z": 2.59
     },
@@ -511,17 +511,17 @@
     },
     {
      "name": "ink",
-     "triangles": 5080,
+     "triangles": 6816,
      "watertight": true,
      "bad_edges": 0,
-     "shells": 2,
-     "volume_cm3": 0.52,
+     "shells": 5,
+     "volume_cm3": 0.55,
      "size_mm": [
       33.1,
-      7.8,
-      9.0
+      11.5,
+      21.8
      ],
-     "min_z": 55.29
+     "min_z": 42.5
     }
    ],
    "watertight": true,
@@ -558,7 +558,7 @@
    "download": "",
    "cover": "products/sculpt-frog/cover.jpg",
    "build_seconds": 0,
-   "download_bytes": 10003254,
+   "download_bytes": 10012560,
    "dropped": "2026-10-28"
   },
   {
@@ -578,7 +578,7 @@
    "parts": [
     {
      "name": "body",
-     "triangles": 198496,
+     "triangles": 198516,
      "watertight": true,
      "bad_edges": 0,
      "shells": 1,
@@ -608,25 +608,25 @@
     },
     {
      "name": "ink",
-     "triangles": 10968,
+     "triangles": 12092,
      "watertight": true,
      "bad_edges": 0,
-     "shells": 5,
-     "volume_cm3": 0.45,
+     "shells": 6,
+     "volume_cm3": 0.48,
      "size_mm": [
       32.3,
       28.1,
-      30.8
+      35.4
      ],
-     "min_z": 35.01
+     "min_z": 30.41
     },
     {
      "name": "white",
-     "triangles": 31116,
+     "triangles": 31332,
      "watertight": true,
      "bad_edges": 0,
      "shells": 5,
-     "volume_cm3": 2.38,
+     "volume_cm3": 2.35,
      "size_mm": [
       38.2,
       18.1,
@@ -678,7 +678,7 @@
    "download": "",
    "cover": "products/sculpt-fox/cover.jpg",
    "build_seconds": 0,
-   "download_bytes": 11392078,
+   "download_bytes": 11416849,
    "dropped": "2026-10-28"
   },
   {
@@ -1077,11 +1077,11 @@
    "parts": [
     {
      "name": "body",
-     "triangles": 170296,
+     "triangles": 170332,
      "watertight": true,
      "bad_edges": 0,
      "shells": 1,
-     "volume_cm3": 118.48,
+     "volume_cm3": 118.47,
      "size_mm": [
       89.6,
       74.6,
@@ -1093,11 +1093,11 @@
    "colour_parts": [
     {
      "name": "rose",
-     "triangles": 160872,
+     "triangles": 160860,
      "watertight": true,
      "bad_edges": 0,
      "shells": 1,
-     "volume_cm3": 111.37,
+     "volume_cm3": 111.33,
      "size_mm": [
       50.4,
       74.6,
@@ -1121,31 +1121,31 @@
     },
     {
      "name": "cream",
-     "triangles": 11516,
+     "triangles": 11524,
      "watertight": true,
      "bad_edges": 0,
      "shells": 1,
-     "volume_cm3": 1.43,
+     "volume_cm3": 1.44,
      "size_mm": [
       16.7,
       10.9,
-      32.8
+      33.2
      ],
      "min_z": 5.44
     },
     {
      "name": "ink",
-     "triangles": 4208,
+     "triangles": 5008,
      "watertight": true,
      "bad_edges": 0,
-     "shells": 2,
-     "volume_cm3": 0.4,
+     "shells": 3,
+     "volume_cm3": 0.41,
      "size_mm": [
       28.9,
       7.0,
-      7.7
+      16.3
      ],
-     "min_z": 46.94
+     "min_z": 38.38
     },
     {
      "name": "white",
@@ -1196,7 +1196,7 @@
    "download": "",
    "cover": "products/sculpt-axolotl/cover.jpg",
    "build_seconds": 0,
-   "download_bytes": 9727453,
+   "download_bytes": 9743197,
    "dropped": "2026-10-28"
   },
   {
@@ -1777,6 +1777,6 @@
   "members": 0,
   "costs_usd": 0.0
  },
- "updated": "2026-10-29 00:20",
+ "updated": "2026-10-29 00:38",
  "featured": "sculpt-axolotl"
 }

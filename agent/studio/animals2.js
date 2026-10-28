@@ -28,6 +28,12 @@ function kit(s) {
     eye: (x, y, z, r) => { k.blob([x, y, z], r, "ink"); k.blob([x + 0.3 * r * Math.sign(x || 1), y + 0.35 * r, z + 0.68 * r], r * 0.28, "white"); },
     smoothAll: (passes, region = [[0, 0, 0], 1.2]) => { for (let i = 0; i < passes; i++) s.brush({ tool: "smooth", p: region[0], r: region[1], s: 0.35 }); },
     paint: (p, r, col) => s.brush({ tool: "paint", p, r, s: 1, color: L(col) }),
+    // mouth: carve a soft groove, then ink it so it still reads after smoothing and on the print
+    smile: (pts, r, depth = 0.7) => {
+      const dense = []; for (let i = 0; i < pts.length - 1; i++) for (let t = 0; t < 1; t += 0.25) dense.push([pts[i][0] + (pts[i + 1][0] - pts[i][0]) * t, pts[i][1] + (pts[i + 1][1] - pts[i][1]) * t]);
+      dense.push(pts[pts.length - 1]);
+      k.stroke("dam", dense, r, depth); k.stroke("paint", dense, r * 1.05, 1, { color: "ink" });
+    },
   };
   return k;
 }
@@ -45,10 +51,10 @@ const ANIMALS = {
     k.stroke("paint", muzzle, 0.045, 1, { color: "white" });
     k.blob([0, 0.0, 0.47], 0.04, "ink");                          // nose
     k.mirror(sx => k.eye(0.13 * sx, 0.14, 0.32, 0.045));
-    k.stroke("dam", k.arc(0, -0.08, 0.05, 0.03, Math.PI * 0.15, Math.PI * 0.85, 8), 0.02, 0.6);   // smile
     k.stroke("paint", muzzle.filter(([x, y]) => y < -0.02), 0.04, 1, { color: "white" });
     k.mirror(sx => { for (let t = 0; t <= 1; t += 0.2) k.paint([0.25 * sx, 0.55 - 0.18 * t, 0.06 - 0.04 * t], 0.06, "ink"); });  // dark ear tips
     k.mirror(sx => { for (let t = 0; t <= 1.01; t += 0.25) k.paint([0.14 * sx * (1 - t), 0.03 - 0.06 * t, 0.36], 0.08, "white"); });
+    k.smile(k.arc(0, -0.06, 0.06, 0.035, Math.PI * 1.15, Math.PI * 1.85, 10), 0.032);   // smile (after the white repaint)
     k.paint([0, -0.3, 0.36], 0.2, "white");                       // chest
     // big fluffy tail curling around the side
     k.line([0.22, -0.55, -0.25], [0.48, -0.45, 0.0], 0.13, 0.17, "orange", 12);
@@ -61,9 +67,9 @@ const ANIMALS = {
     k.blob([0, -0.38, 0], 0.4, "green");
     for (let y = -0.3; y <= 0.0; y += 0.05) k.blob([0, y, 0.02], 0.36 - (y + 0.3) * 0.25, "green");
     k.mirror(sx => { k.blob([0.17 * sx, 0.1, 0.12], 0.14, "green"); k.blob([0.17 * sx, 0.14, 0.23], 0.085, "white"); k.blob([0.18 * sx, 0.15, 0.3], 0.05, "ink"); k.blob([0.2 * sx, 0.18, 0.345], 0.016, "white"); });
-    k.stroke("dam", k.arc(0, -0.08, 0.2, 0.09, Math.PI * 1.08, Math.PI * 1.92, 20), 0.025, 0.7);   // wide smile
     k.mirror(sx => k.paint([0.25 * sx, -0.08, 0.28], 0.06, "pink"));
-    k.stroke("paint", [[0, -0.22], [0, -0.3], [0, -0.38], [0, -0.46], [0, -0.54], [0, -0.6], [-0.06, -0.4], [0.06, -0.4], [-0.06, -0.52], [0.06, -0.52]], 0.17, 1, { color: "lime" });   // belly
+    k.stroke("paint", [[0, -0.29], [0, -0.33], [0, -0.38], [0, -0.46], [0, -0.54], [0, -0.6], [-0.06, -0.4], [0.06, -0.4], [-0.06, -0.52], [0.06, -0.52]], 0.17, 1, { color: "lime" });   // belly
+    k.smile(k.arc(0, -0.02, 0.19, 0.07, Math.PI * 1.08, Math.PI * 1.92, 22), 0.026);   // wide smile, above the belly
     k.mirror(sx => { k.line([0.3 * sx, -0.6, 0.12], [0.36 * sx, -0.66, 0.32], 0.1, 0.07, "green", 8); k.blob([0.36 * sx, -0.67, 0.36], 0.08, "green"); });   // feet
     k.mirror(sx => k.line([0.32 * sx, -0.25, 0.18], [0.18 * sx, -0.42, 0.36], 0.08, 0.06, "green", 10)); // arms
   },
@@ -77,7 +83,7 @@ const ANIMALS = {
       }
     });
     k.mirror(sx => k.eye(0.15 * sx, 0.04, 0.33, 0.045));
-    k.stroke("dam", k.arc(0, -0.08, 0.09, 0.045, Math.PI * 1.12, Math.PI * 1.88, 14), 0.022, 0.65);
+    k.smile(k.arc(0, -0.07, 0.1, 0.05, Math.PI * 1.12, Math.PI * 1.88, 14), 0.026);   // smile
     k.mirror(sx => k.paint([0.24 * sx, -0.06, 0.28], 0.055, "magenta"));
     k.line([0, -0.3, -0.35], [0, -0.42, -0.62], 0.16, 0.06, "rose", 14);                        // tail
     k.line([0, -0.2, -0.32], [0, -0.32, -0.6], 0.03, 0.02, "magenta", 10);                       // tail fin ridge
@@ -93,7 +99,8 @@ const ANIMALS = {
     k.mirror(sx => k.blob([0.06 * sx, -0.02, 0.36], 0.065, "white"));                             // muzzle puffs
     k.blob([0, 0.04, 0.39], 0.03, "pink");                                                        // nose
     k.mirror(sx => k.eye(0.14 * sx, 0.13, 0.31, 0.05));
-    k.stroke("dam", [[0, 0.02], [0, -0.03]], 0.018, 0.55);
+    k.smile([[0, 0.01], [0, -0.035]], 0.024, 0.5);
+    k.mirror(sx => k.smile(k.arc(0.04 * sx, -0.04, 0.04, 0.03, Math.PI * 1.0, Math.PI * 2.0, 10), 0.024, 0.3));   // little w-shaped smile
     // tabby stripes on the forehead and back
     for (const dx of [-0.07, 0, 0.07]) k.stroke("paint", [[dx, 0.3], [dx * 1.1, 0.24]], 0.022, 1, { color: "slate", from: [0, 0.4, 1] });
     for (const y of [-0.15, -0.3, -0.45]) k.stroke("paint", k.arc(0, y, 0.3, 0.02, Math.PI * 0.75, Math.PI * 1.25, 10), 0.03, 1, { color: "slate", from: [0, 0, -1] });
