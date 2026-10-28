@@ -3,6 +3,512 @@
  "started": "2026-10-28",
  "products": [
   {
+   "slug": "sculpt-chick",
+   "title": "Chubby Chick",
+   "price": 2.49,
+   "blurb": "Round little chick with a tuft, rosy cheeks and orange feet. Sculpted in Sculpt Studio and split by colour for AMS.",
+   "tags": [
+    "figure",
+    "cute",
+    "animal",
+    "kids",
+    "multicolor"
+   ],
+   "line": "figure",
+   "print_hint": "Sculpted in Sculpt Studio. Single-colour STL plus colour-split 3MF; 0.12-0.16 mm layers, no supports for most printers.",
+   "parts": [
+    {
+     "name": "body",
+     "triangles": 97512,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 82.55,
+     "size_mm": [
+      59.6,
+      50.2,
+      70.4
+     ],
+     "min_z": -0.0
+    }
+   ],
+   "colour_parts": [
+    {
+     "name": "yellow",
+     "triangles": 99508,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 2,
+     "volume_cm3": 80.65,
+     "size_mm": [
+      59.6,
+      48.5,
+      70.4
+     ],
+     "min_z": -0.0
+    },
+    {
+     "name": "orange",
+     "triangles": 8920,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 3,
+     "volume_cm3": 1.29,
+     "size_mm": [
+      24.1,
+      17.3,
+      48.0
+     ],
+     "min_z": -0.0
+    },
+    {
+     "name": "pink",
+     "triangles": 2348,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 2,
+     "volume_cm3": 0.21,
+     "size_mm": [
+      30.6,
+      6.1,
+      6.7
+     ],
+     "min_z": 37.86
+    },
+    {
+     "name": "ink",
+     "triangles": 2868,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 2,
+     "volume_cm3": 0.26,
+     "size_mm": [
+      21.1,
+      6.3,
+      6.7
+     ],
+     "min_z": 45.33
+    },
+    {
+     "name": "white",
+     "triangles": 788,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 2,
+     "volume_cm3": 0.04,
+     "size_mm": [
+      19.3,
+      3.1,
+      3.9
+     ],
+     "min_z": 47.39
+    }
+   ],
+   "watertight": true,
+   "web": [
+    {
+     "file": "products/sculpt-chick/web_yellow.bin",
+     "color": "#FFD24C",
+     "name": "yellow"
+    },
+    {
+     "file": "products/sculpt-chick/web_orange.bin",
+     "color": "#FF9B3D",
+     "name": "orange"
+    },
+    {
+     "file": "products/sculpt-chick/web_pink.bin",
+     "color": "#F7A1B5",
+     "name": "pink"
+    },
+    {
+     "file": "products/sculpt-chick/web_ink.bin",
+     "color": "#24283A",
+     "name": "ink"
+    },
+    {
+     "file": "products/sculpt-chick/web_white.bin",
+     "color": "#FBFBF8",
+     "name": "white"
+    }
+   ],
+   "download": "",
+   "cover": "products/sculpt-chick/cover.jpg",
+   "build_seconds": 0,
+   "download_bytes": 3155413,
+   "dropped": "2026-10-28"
+  },
+  {
+   "slug": "sculpt-bunny",
+   "title": "Round Bunny",
+   "price": 2.49,
+   "blurb": "Soft bunny with tall ears, pink nose and a fluffy tail. One solid piece, colour-split 3MF included.",
+   "tags": [
+    "figure",
+    "cute",
+    "animal",
+    "kids",
+    "multicolor"
+   ],
+   "line": "figure",
+   "print_hint": "Sculpted in Sculpt Studio. Single-colour STL plus colour-split 3MF; 0.12-0.16 mm layers, no supports for most printers.",
+   "parts": [
+    {
+     "name": "body",
+     "triangles": 102844,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 44.94,
+     "size_mm": [
+      39.0,
+      44.2,
+      70.8
+     ],
+     "min_z": -0.0
+    }
+   ],
+   "colour_parts": [
+    {
+     "name": "white",
+     "triangles": 14776,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 4,
+     "volume_cm3": 1.53,
+     "size_mm": [
+      17.8,
+      44.2,
+      30.3
+     ],
+     "min_z": 9.17
+    },
+    {
+     "name": "cream",
+     "triangles": 108312,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 2,
+     "volume_cm3": 42.71,
+     "size_mm": [
+      39.0,
+      37.9,
+      70.8
+     ],
+     "min_z": -0.0
+    },
+    {
+     "name": "pink",
+     "triangles": 9064,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 5,
+     "volume_cm3": 0.49,
+     "size_mm": [
+      23.6,
+      19.8,
+      36.9
+     ],
+     "min_z": 29.09
+    },
+    {
+     "name": "ink",
+     "triangles": 2496,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 2,
+     "volume_cm3": 0.12,
+     "size_mm": [
+      17.1,
+      4.9,
+      5.0
+     ],
+     "min_z": 34.58
+    }
+   ],
+   "watertight": true,
+   "web": [
+    {
+     "file": "products/sculpt-bunny/web_white.bin",
+     "color": "#FBFBF8",
+     "name": "white"
+    },
+    {
+     "file": "products/sculpt-bunny/web_cream.bin",
+     "color": "#F4E9D4",
+     "name": "cream"
+    },
+    {
+     "file": "products/sculpt-bunny/web_pink.bin",
+     "color": "#F7A1B5",
+     "name": "pink"
+    },
+    {
+     "file": "products/sculpt-bunny/web_ink.bin",
+     "color": "#24283A",
+     "name": "ink"
+    }
+   ],
+   "download": "",
+   "cover": "products/sculpt-bunny/cover.jpg",
+   "build_seconds": 0,
+   "download_bytes": 3422659,
+   "dropped": "2026-10-28"
+  },
+  {
+   "slug": "sculpt-bear",
+   "title": "Bear Cub",
+   "price": 2.49,
+   "blurb": "Chubby bear cub with a tan muzzle and belly. Prints as one piece with no loose parts.",
+   "tags": [
+    "figure",
+    "cute",
+    "animal",
+    "kids",
+    "multicolor"
+   ],
+   "line": "figure",
+   "print_hint": "Sculpted in Sculpt Studio. Single-colour STL plus colour-split 3MF; 0.12-0.16 mm layers, no supports for most printers.",
+   "parts": [
+    {
+     "name": "body",
+     "triangles": 105216,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 97.82,
+     "size_mm": [
+      50.5,
+      51.1,
+      70.9
+     ],
+     "min_z": 0.0
+    }
+   ],
+   "colour_parts": [
+    {
+     "name": "brown",
+     "triangles": 113436,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 6,
+     "volume_cm3": 92.59,
+     "size_mm": [
+      50.5,
+      50.0,
+      70.9
+     ],
+     "min_z": 0.0
+    },
+    {
+     "name": "tan",
+     "triangles": 22864,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 5,
+     "volume_cm3": 4.7,
+     "size_mm": [
+      39.6,
+      23.7,
+      66.3
+     ],
+     "min_z": 1.73
+    },
+    {
+     "name": "ink",
+     "triangles": 3544,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 3,
+     "volume_cm3": 0.35,
+     "size_mm": [
+      21.9,
+      12.5,
+      12.5
+     ],
+     "min_z": 43.95
+    },
+    {
+     "name": "white",
+     "triangles": 572,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 2,
+     "volume_cm3": 0.03,
+     "size_mm": [
+      20.1,
+      2.8,
+      3.4
+     ],
+     "min_z": 52.45
+    }
+   ],
+   "watertight": true,
+   "web": [
+    {
+     "file": "products/sculpt-bear/web_brown.bin",
+     "color": "#A86B45",
+     "name": "brown"
+    },
+    {
+     "file": "products/sculpt-bear/web_tan.bin",
+     "color": "#E2C29B",
+     "name": "tan"
+    },
+    {
+     "file": "products/sculpt-bear/web_ink.bin",
+     "color": "#24283A",
+     "name": "ink"
+    },
+    {
+     "file": "products/sculpt-bear/web_white.bin",
+     "color": "#FBFBF8",
+     "name": "white"
+    }
+   ],
+   "download": "",
+   "cover": "products/sculpt-bear/cover.jpg",
+   "build_seconds": 0,
+   "download_bytes": 3548608,
+   "dropped": "2026-10-28"
+  },
+  {
+   "slug": "sculpt-penguin",
+   "title": "Little Penguin",
+   "price": 2.49,
+   "blurb": "Little penguin with a white tummy, orange beak and feet. Colour-split for multi-material printers.",
+   "tags": [
+    "figure",
+    "cute",
+    "animal",
+    "kids",
+    "multicolor"
+   ],
+   "line": "figure",
+   "print_hint": "Sculpted in Sculpt Studio. Single-colour STL plus colour-split 3MF; 0.12-0.16 mm layers, no supports for most printers.",
+   "parts": [
+    {
+     "name": "body",
+     "triangles": 102560,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 109.56,
+     "size_mm": [
+      57.2,
+      51.9,
+      71.0
+     ],
+     "min_z": 0.0
+    }
+   ],
+   "colour_parts": [
+    {
+     "name": "black",
+     "triangles": 102332,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 101.84,
+     "size_mm": [
+      57.2,
+      47.2,
+      71.0
+     ],
+     "min_z": 0.0
+    },
+    {
+     "name": "orange",
+     "triangles": 10788,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 3,
+     "volume_cm3": 1.76,
+     "size_mm": [
+      26.6,
+      22.9,
+      53.4
+     ],
+     "min_z": 0.0
+    },
+    {
+     "name": "white",
+     "triangles": 33368,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 5,
+     "volume_cm3": 5.35,
+     "size_mm": [
+      28.4,
+      16.3,
+      64.0
+     ],
+     "min_z": 0.0
+    },
+    {
+     "name": "pink",
+     "triangles": 748,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 2,
+     "volume_cm3": 0.04,
+     "size_mm": [
+      28.1,
+      3.0,
+      4.5
+     ],
+     "min_z": 45.19
+    },
+    {
+     "name": "ink",
+     "triangles": 3240,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 2,
+     "volume_cm3": 0.37,
+     "size_mm": [
+      21.9,
+      7.2,
+      7.9
+     ],
+     "min_z": 52.25
+    }
+   ],
+   "watertight": true,
+   "web": [
+    {
+     "file": "products/sculpt-penguin/web_black.bin",
+     "color": "#2E3140",
+     "name": "black"
+    },
+    {
+     "file": "products/sculpt-penguin/web_orange.bin",
+     "color": "#FF9B3D",
+     "name": "orange"
+    },
+    {
+     "file": "products/sculpt-penguin/web_white.bin",
+     "color": "#FBFBF8",
+     "name": "white"
+    },
+    {
+     "file": "products/sculpt-penguin/web_pink.bin",
+     "color": "#F7A1B5",
+     "name": "pink"
+    },
+    {
+     "file": "products/sculpt-penguin/web_ink.bin",
+     "color": "#24283A",
+     "name": "ink"
+    }
+   ],
+   "download": "",
+   "cover": "products/sculpt-penguin/cover.jpg",
+   "build_seconds": 0,
+   "download_bytes": 3588566,
+   "dropped": "2026-10-28"
+  },
+  {
    "slug": "xmas-flat-ornaments-4",
    "title": "Nordic Flat Ornaments (set of 4)",
    "price": 2.99,
@@ -722,6 +1228,6 @@
   "members": 0,
   "costs_usd": 0.0
  },
- "updated": "2026-10-28 18:09",
- "featured": "xmas-flat-ornaments-4"
+ "updated": "2026-10-28 19:22",
+ "featured": "sculpt-chick"
 }
