@@ -103,7 +103,13 @@ details.safe ul{margin:4px 0 0;padding-left:18px}
 .cardrow{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
 
 /* ---------- crayon box ---------- */
-.paper canvas#fx,.paper canvas#under{pointer-events:none}
+.paper canvas#fx,.paper canvas#under,.paper canvas#guide{pointer-events:none}
+.themechip{position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:4;display:flex;align-items:center;gap:8px;background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:999px;padding:4px 4px 4px 14px;font-weight:800;font-size:14px;box-shadow:0 4px 14px rgba(0,0,0,.12);white-space:nowrap}
+.themechip i{width:10px;height:10px;border-radius:50%;background:var(--tint,#4FA8E8)}
+.themechip button{width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:inherit;font-weight:900;cursor:pointer;display:grid;place-items:center;padding:0}
+.card h3{margin:2px 0 -4px;font-size:16px;font-weight:800}
+.card .sub{margin:-6px 0 0;color:var(--muted);font-size:13.5px}
+.tpl.theme canvas{background:color-mix(in srgb,var(--tint) 10%,var(--paper))}
 .paper.wobble{animation:wobble .45s ease}
 @keyframes wobble{20%{transform:rotate(-1.6deg)}45%{transform:rotate(1.3deg)}70%{transform:rotate(-.7deg)}}
 .hint.warn{color:var(--warn)}
@@ -159,10 +165,12 @@ details.safe ul{margin:4px 0 0;padding-left:18px}
 
   <main class="stage" id="stage">
     <div class="paper" id="paper">
+      <canvas id="guide" width="1024" height="1024" aria-hidden="true"></canvas>
       <canvas id="under" width="1024" height="1024" aria-hidden="true"></canvas>
       <canvas id="draw" width="1024" height="1024" aria-label="Drawing paper"></canvas>
       <canvas id="fx" aria-hidden="true"></canvas>
     </div>
+    <div class="themechip" id="themeChip" hidden><i id="themeDot"></i><span id="themeName"></span><button id="themeOff" type="button">✕</button></div>
     <div class="view3d" id="view3d" hidden><canvas id="c3d"></canvas></div>
     <div class="hint" id="hint"></div>
     <div class="busy" id="busy" hidden><div><div class="blob"></div><span id="busyMsg"></span></div></div>
@@ -196,8 +204,11 @@ details.safe ul{margin:4px 0 0;padding-left:18px}
 <div class="pickfx" id="pickfx" aria-hidden="true"></div>
 <div class="sheet" id="tplSheet" hidden role="dialog" aria-modal="true" aria-labelledby="tplTitle">
   <div class="card">
-    <h2 id="tplTitle">Pick a picture to colour</h2>
-    <p id="tplText">It replaces what is on the paper. You can undo.</p>
+    <h2 id="themesTitle">Draw an object, get it in 3D</h2>
+    <p class="sub" id="themesText"></p>
+    <div class="tpls" id="themes"></div>
+    <h3 id="tplTitle">Pick a picture to colour</h3>
+    <p class="sub" id="tplText">It replaces what is on the paper. You can undo.</p>
     <div class="tpls" id="tpls"></div>
     <div class="cardrow"><button class="pill ghost" id="tplClose">Close</button></div>
   </div>
@@ -211,6 +222,7 @@ details.safe ul{margin:4px 0 0;padding-left:18px}
 </div>
 
 <script id="doodle-core">/*DOODLE*/</script>
+<script id="doodle-themes">/*THEMES*/</script>
 <script>
 "use strict";
 const $ = s => document.querySelector(s);
@@ -219,7 +231,7 @@ const T = {
   vi: { go: "Thành 3D", busy: "Đang thổi phồng tranh…", redraw: "Vẽ tiếp", dl: "Tải file in", puff: "Độ phồng", size: "Kích thước", body: "Màu phần trống",
         loop: "Móc khoá", fine: "Mịn hơn", safeTitle: "An toàn cho bé",
         safe: ["Dành cho bé từ 3 tuổi, có người lớn giám sát.", "Tranh in thành một miếng liền, không có chi tiết rời.", "Không gắn nam châm nhỏ: bé có thể nuốt.", "Không cho bé ngậm hay cắn. Chà nhẹ chỗ sắc sau khi in."],
-        tools: { pen: "Bút sáp", fill: "Xô màu", eye: "Mắt", eraser: "Tẩy", tpl: "Tranh mẫu", clear: "Giấy mới" },
+        tools: { pen: "Bút sáp", fill: "Xô màu", eye: "Mắt", eraser: "Tẩy", tpl: "Mẫu và đồ vật 3D", clear: "Giấy mới" },
         hints: { pen: "Vẽ con vật hoặc hình bé thích · nét vẽ sẽ nổi lên", fill: "Chạm vào bên trong hình để tô màu", eye: "Chạm để dán mắt tròn xoe",
                  eraser: "Kéo để tẩy", rainbow: "Bút cầu vồng: vẽ một nét là ra đủ 7 màu! Thử vẽ một vòng cung nhé", view: "Kéo để xoay · chụm 2 ngón để phóng to" },
         leak: "Hình còn hở nên màu sẽ tràn ra ngoài. Nối kín nét vẽ rồi tô lại nhé!", empty: "Giấy còn trống. Bé vẽ gì đó trước đã!",
@@ -228,13 +240,17 @@ const T = {
         many: n => `${n} màu: máy có 1 AMS (4 khe) cần gộp bớt màu khi nhập vào Bambu Studio.`,
         preparing: "Đang chuẩn bị file…", saved: "Đã lưu. Kéo file .obj vào Bambu Studio, máy tự gán màu cho từng cuộn nhựa.", declined: "Đã huỷ tải.", noSave: "Trình xem này không lưu được file.",
         no3d: "Không tải được trình xem 3D, nhưng vẫn tải được file in.",
-        tplTitle: "Chọn tranh để tô", tplText: "Tranh mẫu sẽ thay cho giấy hiện tại. Có thể hoàn tác.", close: "Đóng",
+        tplTitle: "Tranh để tô (in dẹt)", tplText: "Tranh mẫu sẽ thay cho giấy hiện tại. Có thể hoàn tác.", close: "Đóng",
+        themesTitle: "Vẽ đồ vật thành 3D", themesText: "Bé vẽ theo nét chấm rồi trang trí hoa văn. Bấm Thành 3D là ra đồ vật tròn thật sự!",
+        themeHint: n => `Vẽ theo nét chấm hình ${n.toLowerCase()}, rồi tô hoa văn thật đẹp!`, notLike: n => `Hình chưa giống ${n.toLowerCase()} lắm. Bé vẽ theo nét chấm nhé!`,
+        like: s => s >= 0.75 ? "Giống y như thật! ★★★" : s >= 0.55 ? "Giống lắm! ★★" : "Đúng hình rồi! ★", busy3d: "Đang nặn đồ vật 3D…", freeDraw: "Vẽ tự do",
+        upright: "Đồ vật đứng thẳng trên bàn in. Bật support dạng cây (tree) cho phần nhô ra.", notFood: "Cốc, lọ in nhựa chỉ để chơi hoặc cắm bút, không đựng đồ ăn, nước uống.",
         clearTitle: "Bắt đầu tranh mới?", clearText: "Giấy sẽ được xoá sạch. Có thể hoàn tác.", cancel: "Huỷ", wipe: "Xoá giấy",
         tpls: ["Cá", "Ngôi sao", "Mèo"], cols: ["Mực", "Đỏ", "Cam", "Vàng", "Lá", "Trời", "Tím", "Hồng", "Nâu", "Trắng", "Chàm"], rainbow: "Bút cầu vồng", sizeLbl: "Cỡ nét", sizeNames: ["Nét nhỏ", "Nét vừa", "Nét to"] },
   en: { go: "Make it 3D", busy: "Puffing up the drawing…", redraw: "Keep drawing", dl: "Download print files", puff: "Puffiness", size: "Size", body: "Empty areas",
         loop: "Keyring loop", fine: "Extra smooth", safeTitle: "Safety for kids",
         safe: ["For ages 3 and up, with an adult nearby.", "The drawing prints as one solid piece with no loose parts.", "Don't glue small magnets on: children can swallow them.", "Not for mouthing or chewing. Sand any sharp spots after printing."],
-        tools: { pen: "Crayon", fill: "Paint pot", eye: "Eyes", eraser: "Eraser", tpl: "Pictures", clear: "New paper" },
+        tools: { pen: "Crayon", fill: "Paint pot", eye: "Eyes", eraser: "Eraser", tpl: "Pictures and 3D objects", clear: "New paper" },
         hints: { pen: "Draw an animal or any shape · crayon lines come out raised", fill: "Tap inside a shape to colour it", eye: "Tap to stick on googly eyes",
                  eraser: "Drag to erase", rainbow: "Rainbow crayon: one line, all seven colours! Try drawing an arch", view: "Drag to turn · pinch to zoom" },
         leak: "The shape has a gap, so the colour would spill out. Close the line and try again!", empty: "The paper is empty. Draw something first!",
@@ -243,7 +259,11 @@ const T = {
         many: n => `${n} colours: with one AMS (4 slots), merge some colours when importing into Bambu Studio.`,
         preparing: "Preparing files…", saved: "Saved. Drag the .obj into Bambu Studio and it matches each colour to a filament.", declined: "Download cancelled.", noSave: "This viewer can't save files.",
         no3d: "The 3D viewer didn't load, but the print files still download.",
-        tplTitle: "Pick a picture to colour", tplText: "It replaces what is on the paper. You can undo.", close: "Close",
+        tplTitle: "Pictures to colour (flat print)", tplText: "It replaces what is on the paper. You can undo.", close: "Close",
+        themesTitle: "Draw an object, get it in 3D", themesText: "Trace the dotted outline, then decorate it. Tap Make it 3D and it comes out round and real!",
+        themeHint: n => `Trace the dotted ${n.toLowerCase()}, then decorate it!`, notLike: n => `That doesn't look like a ${n.toLowerCase()} yet. Follow the dotted line!`,
+        like: s => s >= 0.75 ? "Just like the real thing! ★★★" : s >= 0.55 ? "Looks great! ★★" : "That's the shape! ★", busy3d: "Shaping your object…", freeDraw: "Free drawing",
+        upright: "Stands upright on the bed. Turn on tree supports for parts that stick out.", notFood: "Printed cups and vases are for play or pens only, not for food or drinks.",
         clearTitle: "Start a new drawing?", clearText: "The paper will be wiped clean. You can undo.", cancel: "Cancel", wipe: "Wipe the paper",
         tpls: ["Fish", "Star", "Cat"], cols: ["Ink", "Red", "Orange", "Sun", "Leaf", "Sky", "Lilac", "Pink", "Brown", "White", "Indigo"], rainbow: "Rainbow crayon", sizeLbl: "Line size", sizeNames: ["Thin", "Medium", "Thick"] }
 };
@@ -451,7 +471,7 @@ function fill(x, y) {
 let flashTimer = 0;
 function flash(m) { const h = $("#hint"); h.textContent = m; h.classList.add("warn"); clearTimeout(flashTimer); flashTimer = setTimeout(() => { h.classList.remove("warn"); setHint(); }, 3200); }
 function wobble() { const p = $("#paper"); p.classList.remove("wobble"); void p.offsetWidth; p.classList.add("wobble"); }
-function setHint() { $("#hint").textContent = $("#view3d").hidden ? (tool === "pen" && colour === "R" ? T[LANG].hints.rainbow : T[LANG].hints[tool]) || "" : T[LANG].hints.view; }
+function setHint() { $("#hint").textContent = $("#view3d").hidden ? (tool === "pen" && colour === "R" ? T[LANG].hints.rainbow : tool === "pen" && theme ? T[LANG].themeHint(themeName()) : T[LANG].hints[tool]) || "" : T[LANG].hints.view; }
 
 /* pointer drawing: points are smoothed into quadratic curves through the midpoints, so lines come out taut */
 let drawing = false, pts = [], travelled = 0, rb = { base: null, samples: [] };
@@ -637,24 +657,66 @@ function openTpl() {
     for (let y = 0; y < 128; y++) for (let x = 0; x < 128; x++) { const l = lab[x * 4 + W * y * 4], o = 4 * (x + 128 * y); if (l) { im.data[o] = RGB[l][0]; im.data[o + 1] = RGB[l][1]; im.data[o + 2] = RGB[l][2]; im.data[o + 3] = 255; } }
     g.putImageData(im, 0, 0); lab = keepL; bump = keepB; under = keepU;
     b.appendChild(c); b.append(T[LANG].tpls[i]);
-    b.onclick = () => { pushUndo(); lab = new Uint8Array(W * H); bump = new Float32Array(W * H); under = new Uint8Array(W * H); ctx.clearRect(0, 0, DS, DS); fn(); paintAll(); saveDraft(); $("#tplSheet").hidden = true; tool = "fill"; colour = [3, 4, 5][i]; syncTools(); sparkle(256, 256, 30, { size: 11, speed: 4.5, jitter: 160 }); };
+    b.onclick = () => { setTheme(null); pushUndo(); lab = new Uint8Array(W * H); bump = new Float32Array(W * H); under = new Uint8Array(W * H); ctx.clearRect(0, 0, DS, DS); fn(); paintAll(); saveDraft(); $("#tplSheet").hidden = true; tool = "fill"; colour = [3, 4, 5][i]; syncTools(); sparkle(256, 256, 30, { size: 11, speed: 4.5, jitter: 160 }); };
     box.appendChild(b);
   });
-  paintAll();
+  paintAll(); buildThemeCards();
   $("#tplSheet").hidden = false;
 }
 $("#tplClose").onclick = () => ($("#tplSheet").hidden = true);
+
+/* ---------- themes: trace a dotted object (cup, tree, balloon...) and get it back as a real round 3D object ---------- */
+const TH = window.DoodleThemes;
+let theme = null, themeMasks = null, lastScore = 0;
+const gv = $("#guide"), gctx = gv.getContext("2d");
+const themeName = (id = theme) => { const t = id && TH.byId(id); return t ? t[LANG] : ""; };
+function polyPath(g, poly, s) { g.beginPath(); poly.forEach(([x, y], i) => (i ? g.lineTo : g.moveTo).call(g, x * s, y * s)); g.closePath(); }
+// faint tint plus a dotted line to trace; the handle's joins inside the body are not drawn
+function drawGuideOn(g, t, s, lw, dash) {
+  const polys = TH.outlines(t), size = Math.round(512 * s);
+  const tint = document.createElement("canvas"); tint.width = tint.height = size; const tg = tint.getContext("2d"); tg.fillStyle = t.tint;
+  for (const p of polys) { polyPath(tg, p, s); tg.fill(); }
+  g.save(); g.globalAlpha = 0.13; g.drawImage(tint, 0, 0); g.restore();
+  g.save(); g.lineWidth = lw; g.setLineDash(dash); g.lineCap = "round"; g.lineJoin = "round"; g.strokeStyle = "rgba(36,40,58,.5)";
+  polyPath(g, polys[0], s); g.stroke();
+  if (polys.length > 1) { g.beginPath(); g.rect(0, 0, size, size); polys[0].slice().reverse().forEach(([x, y], i) => (i ? g.lineTo : g.moveTo).call(g, x * s, y * s)); g.closePath(); g.clip("evenodd");
+    for (const p of polys.slice(1)) { polyPath(g, p, s); g.stroke(); } }
+  g.restore();
+}
+function drawGuide() { gctx.clearRect(0, 0, DS, DS); if (theme) drawGuideOn(gctx, TH.byId(theme), K, 2.2 * K, [7 * K, 7 * K]); }
+function setTheme(id) {
+  theme = id && TH.byId(id) ? id : null; themeMasks = theme ? TH.masks(TH.byId(theme), W) : null;
+  try { localStorage.setItem("doodle-theme", theme || ""); } catch (e) {}
+  drawGuide(); $("#themeChip").hidden = !theme;
+  if (theme) { $("#themeName").textContent = themeName(); $("#themeChip").style.setProperty("--tint", TH.byId(theme).tint); }
+  setHint();
+}
+function pickTheme(id) {
+  pushUndo(); lab = new Uint8Array(W * H); bump = new Float32Array(W * H); under = new Uint8Array(W * H); ctx.clearRect(0, 0, DS, DS); paintAll(); saveDraft();
+  setTheme(id); $("#tplSheet").hidden = true; tool = "pen"; colour = 1; syncTools(); sparkle(256, 256, 30, { size: 11, speed: 4.5, jitter: 160 });
+}
+function buildThemeCards() {
+  const box = $("#themes"); box.innerHTML = "";
+  for (const t of TH.THEMES) {
+    const b = document.createElement("button"); b.className = "tpl theme"; b.id = "theme-" + t.id; b.style.setProperty("--tint", t.tint);
+    const c = document.createElement("canvas"); c.width = c.height = 128; drawGuideOn(c.getContext("2d"), t, 0.25, 2.2, [5, 4]);
+    b.appendChild(c); b.append(t[LANG]); b.onclick = () => pickTheme(t.id); box.appendChild(b);
+  }
+}
+$("#themeOff").onclick = () => setTheme(null);
 
 /* ---------- 3D: build in a worker so the page stays responsive ---------- */
 let worker = null, jobId = 0, result = null;
 try {
   const src = document.getElementById("doodle-core").textContent +
-    "\nonmessage = e => { const d = e.data; let r = null; try { r = Doodle.build(d.lab, d.bump, d.W, d.H, d.opts); } catch (err) { postMessage({ id: d.id, error: String(err) }); return; }" +
+    "\nonmessage = e => { const d = e.data; let r = null; try { r = (d.opts.theme ? Doodle.buildTheme : Doodle.build)(d.lab, d.bump, d.W, d.H, d.opts); } catch (err) { postMessage({ id: d.id, error: String(err) }); return; }" +
     " postMessage({ id: d.id, r }, r ? [r.pos.buffer, r.idx.buffer, r.faceLab.buffer] : []); };";
   worker = new Worker(URL.createObjectURL(new Blob([src], { type: "text/javascript" })));
 } catch (e) { worker = null; }
-function opts() { return { sizeMM: +$("#size").value, puff: +$("#puff").value, fillLabel: bodyLabel, loop: $("#loop").getAttribute("aria-pressed") === "true",
-                           quality: $("#fine").getAttribute("aria-pressed") === "true" ? 240 : 170 }; }
+function opts() { const fine = $("#fine").getAttribute("aria-pressed") === "true";
+  if (theme) return { sizeMM: +$("#size").value, fillLabel: bodyLabel, quality: fine ? 130 : 95, theme: TH.spec(TH.byId(theme), W) };
+  return { sizeMM: +$("#size").value, puff: +$("#puff").value, fillLabel: bodyLabel, loop: $("#loop").getAttribute("aria-pressed") === "true", quality: fine ? 240 : 170 }; }
+const localBuild = o => (o.theme ? window.Doodle.buildTheme : window.Doodle.build)(lab, bump, W, H, o);
 function buildModel() {
   const id = ++jobId, o = opts();
   return new Promise(res => {
@@ -662,14 +724,14 @@ function buildModel() {
     if (worker) {
       const h = e => { if (e.data.id !== id) return; worker.removeEventListener("message", h); done(e.data.r || null); };
       worker.addEventListener("message", h);
-      worker.onerror = () => { worker = null; setTimeout(() => done(window.Doodle.build(lab, bump, W, H, o)), 20); };
+      worker.onerror = () => { worker = null; setTimeout(() => done(localBuild(o)), 20); };
       worker.postMessage({ id, lab: lab.slice(), bump: bump.slice(), W, H, opts: o });
-    } else setTimeout(() => done(window.Doodle.build(lab, bump, W, H, o)), 30);
+    } else setTimeout(() => done(localBuild(o)), 30);
   });
 }
 async function rebuild() {
   if ($("#view3d").hidden) return;
-  $("#busyMsg").textContent = t("busy"); $("#busy").hidden = false; $("#download").disabled = true; $("#msg").textContent = "";
+  $("#busyMsg").textContent = theme ? t("busy3d") : t("busy"); $("#busy").hidden = false; $("#download").disabled = true; $("#msg").textContent = "";
   const r = await buildModel();
   $("#busy").hidden = true;
   if (!r) { $("#stats").textContent = ""; $("#note").textContent = t("empty"); $("#note").className = "note warn"; return; }
@@ -680,18 +742,22 @@ async function rebuild() {
   if (r.dropped) notes.push(T[LANG].dropped(r.dropped));
   if (cols > 4) notes.push(T[LANG].many(cols));
   notes.unshift(r.check.watertight ? t("ok") : t("notOk"));
+  if (r.upright) { notes.unshift(T[LANG].like(lastScore)); notes.push(t("upright")); if (TH.byId(theme)?.hollow) notes.push(t("notFood")); }
   $("#note").textContent = notes.join(" "); $("#note").className = "note " + (r.check.watertight && !r.dropped && cols <= 4 ? "ok" : "warn");
   $("#download").disabled = !r.check.watertight;
   if (window.Viewer3D) window.Viewer3D.show(r, PAL); else $("#msg").textContent = t("no3d");
 }
 $("#go").onclick = async () => {
   if (!lab.some(v => v)) { flash(t("empty")); return; }
+  if (theme) { lastScore = window.Doodle.themeMatch(lab, W, H, themeMasks.guide, themeMasks.keep, bodyLabel);
+    if (lastScore < 0.3) { flash(T[LANG].notLike(themeName())); wobble(); return; } }
+  $("#puff").closest(".slider").hidden = !!theme; $("#loop").hidden = !!theme; $("#themeChip").hidden = true;
   $("#paper").hidden = true; $("#view3d").hidden = false; $("#drawDock").hidden = true; $("#printDock").hidden = false;
   $("#go").hidden = true; $("#undo").hidden = true; $("#redo").hidden = true; setHint();
   window.Viewer3D?.resize?.();
   rebuild();
 };
-$("#redraw").onclick = () => { $("#paper").hidden = false; $("#view3d").hidden = true; $("#drawDock").hidden = false; $("#printDock").hidden = true; $("#go").hidden = false; $("#undo").hidden = false; $("#redo").hidden = false; setHint(); };
+$("#redraw").onclick = () => { $("#themeChip").hidden = !theme; $("#paper").hidden = false; $("#view3d").hidden = true; $("#drawDock").hidden = false; $("#printDock").hidden = true; $("#go").hidden = false; $("#undo").hidden = false; $("#redo").hidden = false; setHint(); };
 let rbTimer = 0; const later = () => { clearTimeout(rbTimer); rbTimer = setTimeout(rebuild, 350); };
 $("#puff").oninput = () => { $("#puffVal").textContent = $("#puff").value + " mm"; later(); };
 $("#size").oninput = () => { $("#sizeVal").textContent = $("#size").value + " mm"; later(); };
@@ -735,12 +801,13 @@ $("#download").onclick = async () => {
   $("#download").disabled = true; $("#msg").textContent = t("preparing");
   await new Promise(res => setTimeout(res, 30));
   const o = D.obj(r.pos, r.idx, r.faceLab, PAL, NAMES, base);
-  const m3 = await zip(package3mf(D.model3mf(r.pos, r.idx, r.faceLab, PAL, NAMES, "Doodle Puff")));
+  const m3 = await zip(package3mf(D.model3mf(r.pos, r.idx, r.faceLab, PAL, NAMES, theme ? "Doodle Puff " + TH.byId(theme).en : "Doodle Puff")));
   const readme = ["Doodle Puff by Daily Layer", "",
     base + "_painted.obj (+ .mtl): one solid piece with the drawing's colours. Bambu Studio: drag the .obj in; the import window matches each colour to a filament. Keep the .mtl next to it.",
     base + "_painted.3mf: the same coloured piece as a 3MF (colour per triangle). Bambu Studio 2.5+ offers to import its colours.",
     base + ".stl: single colour; the crayon lines and eyes are raised, so the drawing still shows.", "",
-    "Size " + r.size.map(v => v.toFixed(1)).join(" x ") + " mm. Lies flat on the bed, no supports. 0.16-0.2 mm layers, 3 walls, 15% infill.", "",
+    "Size " + r.size.map(v => v.toFixed(1)).join(" x ") + " mm. " + (r.upright ? "Stands upright on the bed. Turn on tree supports for parts that stick out (balloon, mushroom cap, ice cream scoop)." : "Lies flat on the bed, no supports.") + " 0.16-0.2 mm layers, 3 walls, 15% infill.", "",
+    ...(r.upright && TH.byId(theme)?.hollow ? ["Printed cups and vases are toys or pen pots only. PLA prints are not food safe: no food, drinks or hot water.", ""] : []),
     "Safety: for ages 3+, adult supervision. One solid piece, no loose parts. Don't glue on small magnets. Not for mouthing or chewing."].join("\n");
   const blob = await zip([
     { name: base + "_painted.obj", data: o.obj }, { name: base + ".mtl", data: o.mtl },
@@ -764,6 +831,7 @@ function applyWords() {
   $("#lPuff").textContent = t("puff"); $("#lSize").textContent = t("size"); $("#lBody").textContent = t("body");
   $("#loop").textContent = t("loop"); $("#fine").textContent = t("fine"); $("#safeTitle").textContent = t("safeTitle");
   $("#safeList").innerHTML = T[LANG].safe.map(s => `<li>${s}</li>`).join("");
+  $("#themesTitle").textContent = t("themesTitle"); $("#themesText").textContent = t("themesText"); $("#themeOff").setAttribute("aria-label", t("freeDraw")); $("#themeOff").title = t("freeDraw");
   $("#tplTitle").textContent = t("tplTitle"); $("#tplText").textContent = t("tplText"); $("#tplClose").textContent = t("close");
   $("#clearTitle").textContent = t("clearTitle"); $("#clearText").textContent = t("clearText"); $("#clearNo").textContent = t("cancel"); $("#clearYes").textContent = t("wipe");
 }
@@ -772,7 +840,9 @@ function applyWords() {
 $("#back").href = window.SHOP_URL || "/";
 applyWords(); buildTray();
 fxOn = false;
-loadDraft().then(ok => { if (!ok) { ctx.clearRect(0, 0, DS, DS); TPL[0](); colour = 3; tool = "fill"; } fxOn = true; paintAll(); syncTools(); syncUndo(); });
+loadDraft().then(ok => { if (!ok) { ctx.clearRect(0, 0, DS, DS); TPL[0](); colour = 3; tool = "fill"; }
+  else { let id = ""; try { id = localStorage.getItem("doodle-theme") || ""; } catch (e) {} if (id) setTheme(id); }
+  fxOn = true; paintAll(); syncTools(); syncUndo(); });
 </script>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 <script type="module">
@@ -801,13 +871,15 @@ window.Viewer3D = {
     ng.setAttribute("color", new THREE.BufferAttribute(col, 3)); g.dispose();
     if (mesh) { scene.remove(mesh); mesh.geometry.dispose(); }
     mesh = new THREE.Mesh(ng, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.55, metalness: 0 }));
-    ng.computeBoundingBox(); const bb = ng.boundingBox, ctr = bb.getCenter(new THREE.Vector3()), s = bb.getSize(new THREE.Vector3());
+    if (r.upright) mesh.rotation.x = -Math.PI / 2;    // print space is z up; the viewer is y up
+    mesh.updateMatrixWorld(true); const bb = new THREE.Box3().setFromObject(mesh), ctr = bb.getCenter(new THREE.Vector3()), s = bb.getSize(new THREE.Vector3());
     mesh.position.set(-ctr.x, -ctr.y, -ctr.z); scene.add(mesh);
     resize();
+    const kind = r.upright ? "up" : "flat"; if (framed !== kind) framed = false;
     if (!framed) {   // fit the whole piece with a margin, whatever the screen shape
       const tn = Math.tan(THREE.MathUtils.degToRad(cam.fov / 2)), d = Math.max(s.y / (2 * tn), s.x / (2 * tn * cam.aspect)) * 1.35 + s.z;
-      const dir = new THREE.Vector3(-0.3, -0.2, 0.93).normalize();
-      cam.position.copy(dir.multiplyScalar(d)); cam.near = d / 100; cam.far = d * 20; cam.updateProjectionMatrix(); controls.target.set(0, 0, 0); framed = true;
+      const dir = (r.upright ? new THREE.Vector3(0.45, 0.42, 0.9) : new THREE.Vector3(-0.3, -0.2, 0.93)).normalize();
+      cam.position.copy(dir.multiplyScalar(d)); cam.near = d / 100; cam.far = d * 20; cam.updateProjectionMatrix(); controls.target.set(0, 0, 0); framed = kind;
     }
   }
 };

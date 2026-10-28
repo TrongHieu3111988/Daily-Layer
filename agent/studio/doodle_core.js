@@ -75,6 +75,10 @@
     while (top) { const p = st[--top], x = p % W, y = (p - x) / W;
       if (x > 0) push(p - 1); if (x < W - 1) push(p + 1); if (y > 0) push(p - W); if (y < H - 1) push(p + W); }
     let filled = 0;
+    // paper the theme marks as a hole (inside a cup handle) stays empty, together with all paper connected to it
+    if (opts.keep) { for (let p = 0; p < W * H; p++) if (opts.keep[p]) push(p);
+      while (top) { const p = st[--top], x = p % W, y = (p - x) / W;
+        if (x > 0) push(p - 1); if (x < W - 1) push(p + 1); if (y > 0) push(p - W); if (y < H - 1) push(p + W); } }
     for (let p = 0; p < W * H; p++) if (lab[p] === 0 && !seen[p]) { lab[p] = opts.fillLabel; filled++; }
     // one solid piece: keep the biggest connected drawing, report the rest
     let inside = new Uint8Array(W * H); for (let p = 0; p < W * H; p++) inside[p] = lab[p] > 0 ? 1 : 0;
@@ -267,6 +271,152 @@
       vol += p[a] * (p[b + 1] * p[c + 2] - p[b + 2] * p[c + 1]) - p[a + 1] * (p[b] * p[c + 2] - p[b + 2] * p[c]) + p[a + 2] * (p[b] * p[c + 1] - p[b + 1] * p[c]); }
     return { pos: cutM.pos, idx: cutM.idx, faceLab, used, check: chk, size: [wmm, hmm, zmax], volume: vol / 6, dropped: S.dropped, voxel: v };
   }
+
+  // ---------- themed objects: a drawn cup, tree, balloon... becomes a round object that stands up ----------
+  // The child's outline is spun around a vertical axis (a lathe), so the 3D shape is the one they drew.
+  // Bits that stick out of the round body (a cup handle, a wavy balloon string) become puffy flat parts.
+  // Colours are wrapped around from the front view; the outline crayon is left out, so sides show the fill colour.
+  // opts.theme: { mode: "sym" (axis follows the drawing) | "left" (fixed axis, radius from the left edge: cup with a handle),
+  //               axis (px), hollow (cup / vase), keep (mask of paper that stays a hole) }
+  // The crayon outline makes sense on paper but not on a round object: the outline colour that touches the edge
+  // (the whole connected outline, however thick) is replaced by the nearest colour inside it.
+  // Rows that are too thin to have an inside (a balloon string) keep their colour.
+  function dropOutline(lab, inside, W, H, rowOK) {
+    const dIn = edt(Uint8Array.from(inside, v => 1 - v), W, H), cnt = new Map();
+    for (let p = 0; p < W * H; p++) if (inside[p] && dIn[p] <= 1.5) cnt.set(lab[p], (cnt.get(lab[p]) || 0) + 1);
+    let lo = 0, best = 0; for (const [l, n] of cnt) if (n > best) { best = n; lo = l; }
+    const out = Uint8Array.from(lab, (l, p) => (inside[p] ? l : 0));
+    if (!lo) return out;
+    const band = new Uint8Array(W * H), st = new Int32Array(W * H); let top = 0, n = 0, all = 0;
+    for (let p = 0; p < W * H; p++) { if (inside[p]) all++; if (inside[p] && dIn[p] <= 1.5 && lab[p] === lo) { band[p] = 1; st[top++] = p; } }
+    while (top) { const p = st[--top], x = p % W; n++;
+      for (const q of [x > 0 ? p - 1 : -1, x < W - 1 ? p + 1 : -1, p - W, p + W]) if (q >= 0 && q < W * H && !band[q] && inside[q] && lab[q] === lo) { band[q] = 1; st[top++] = q; } }
+    if (n > 0.6 * all) for (let p = 0; p < W * H; p++) band[p] = band[p] && dIn[p] <= 16 ? 1 : 0;   // the child coloured the whole thing with the outline crayon
+    const C = Uint8Array.from(out); let left = 0;
+    for (let p = 0; p < W * H; p++) { if (band[p] && rowOK[(p / W) | 0]) C[p] = 0; else if (C[p]) left++; }
+    if (!left) return out;
+    const near = edtNearest(C, W, H);
+    for (let p = 0; p < W * H; p++) out[p] = inside[p] ? (C[p] || near[p]) : 0;
+    return out;
+  }
+  function blur1(a, r) { const n = a.length, o = new Float32Array(n);
+    for (let i = 0; i < n; i++) { let s = 0, w = 0; for (let k = -r; k <= r; k++) { const j = i + k; if (j < 0 || j >= n || !(a[j] === a[j])) continue; s += a[j]; w++; } o[i] = w ? s / w : NaN; } return o; }
+  function themeMatch(lab0, W, H, guide, keep, fillLabel) {
+    const S = shape(lab0, new Float32Array(W * H), W, H, { fillLabel: fillLabel || 10, sizeMM: 80, keep });
+    if (!S) return 0;
+    let both = 0, any = 0; for (let p = 0; p < W * H; p++) { const a = S.inside[p], b = guide[p]; if (a && b) both++; if (a || b) any++; }
+    return any ? both / any : 0;
+  }
+  function buildTheme(lab0, bump0, W, H, opts) {
+    opts = Object.assign({ sizeMM: 80, fillLabel: 10, quality: 95 }, opts);
+    const th = opts.theme, S = shape(lab0, bump0, W, H, { fillLabel: opts.fillLabel, sizeMM: opts.sizeMM, keep: th.keep });
+    if (!S) return null;
+    const { lab, inside, pxmm, x0, x1, y0, y1 } = S;
+    // ---- profile: per row, the centre and radius of the round body (in px) ----
+    const cx = new Float32Array(H).fill(NaN), rr = new Float32Array(H);
+    let prevC = th.axis;
+    for (let y = y0; y <= y1; y++) {
+      const o = W * y, a = Math.round(th.mode === "left" ? th.axis : prevC);
+      let seed = -1;
+      for (let d = 0; d < 90 && seed < 0; d++) { if (a - d >= 0 && inside[o + a - d]) seed = a - d; else if (a + d < W && inside[o + a + d]) seed = a + d; }
+      if (seed < 0) continue;
+      let L = seed, R = seed; while (L > 0 && inside[o + L - 1]) L--; while (R < W - 1 && inside[o + R + 1]) R++;
+      if (th.mode === "left") { if (L > th.axis) continue; cx[y] = th.axis; rr[y] = th.axis - L + 0.5; }
+      else { cx[y] = (L + R) / 2; rr[y] = (R - L + 1) / 2; prevC = cx[y]; }
+    }
+    const sm = Math.max(1, Math.round(1.0 / pxmm)), cxs = th.mode === "left" ? cx : blur1(cx, Math.max(2, Math.round(3 / pxmm)));
+    const rrs = blur1(Float32Array.from(rr, (v, y) => (y < y0 || y > y1 ? NaN : v)), sm);
+    for (let y = 0; y < H; y++) { if (!(rr[y] > 0)) { rrs[y] = 0; cxs[y] = NaN; } }
+    let rmax = 0; for (let y = y0; y <= y1; y++) rmax = Math.max(rmax, rrs[y]);
+    // ---- parts outside the round body: extruded and puffy ----
+    const extra = new Uint8Array(W * H); let nExtra = 0;
+    for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) { const p = x + W * y; if (!inside[p]) continue;
+      const c = cxs[y], r = rrs[y]; if (!(c === c) || Math.abs(x - c) > r + 1.5) { extra[p] = 1; nExtra++; } }
+    let sdE = null;
+    if (nExtra > 30) {
+      const grow = edt(extra, W, H), reach = 4.5 / pxmm;
+      for (let p = 0; p < W * H; p++) if (inside[p] && grow[p] <= reach) extra[p] = 1;
+      const dIn = edt(Uint8Array.from(extra, v => 1 - v), W, H), dOut = edt(extra, W, H);
+      sdE = new Float32Array(W * H); for (let p = 0; p < W * H; p++) sdE[p] = (extra[p] ? dIn[p] - 0.5 : -(dOut[p] - 0.5)) * pxmm;
+    }
+    // ---- geometry in mm: z up, the drawing's bottom row stands on the bed ----
+    const Htop = (y1 + 1 - y0) * pxmm, yb = y1 + 1;
+    let rb = 0, nb = 0; for (let y = y1; y > y1 - 4 / pxmm && y >= y0; y--) { rb += rrs[y]; nb++; } rb /= Math.max(1, nb);
+    const disc = rb < 0.42 * rmax ? { R: Math.max(0.6 * rmax * pxmm, 11), h: 3 } : null;
+    const lift = disc ? disc.h - 0.8 : 0;
+    const wall = 2.2, floor = 3;
+    const row = zl => yb - zl / pxmm;                       // fractional row for a height above the object's bottom
+    const at = (arr, y) => { y = Math.min(Math.max(y, y0), y1); const i = Math.floor(y), u = y - i, a = arr[i], b = arr[Math.min(i + 1, y1)];
+      if (!(a === a)) return b; if (!(b === b)) return a; return a * (1 - u) + b * u; };
+    const axisMM = (th.mode === "left" ? th.axis : (() => { let s = 0, n = 0; for (let y = y0; y <= y1; y++) if (cxs[y] === cxs[y]) { s += cxs[y]; n++; } return s / n; })());
+    const X0 = x => (x - axisMM) * pxmm, Xpx = X => axisMM + X / pxmm;
+    const cBot = X0(at(cxs, y1 - 0.5));
+    const minR = 2.0;
+    const rAt = zl => { if (zl < 0 || zl > Htop) return 0; const y = row(zl); const r = at(rrs, y - 0.5); return r > 0 ? Math.max(r * pxmm, minR) : 0; };
+    const cAt = zl => { const y = Math.min(Math.max(row(zl) - 0.5, y0), y1); const c = at(cxs, y); return c === c ? X0(c) : 0; };
+    const riAt = zl => (zl < floor ? 0 : rAt(Math.min(zl, Htop - 0.4 * pxmm)) - wall);
+    // grid bounds
+    let xmin = Infinity, xmax = -Infinity;
+    for (let y = y0; y <= y1; y++) { if (rrs[y] > 0) { xmin = Math.min(xmin, X0(cxs[y] - rrs[y])); xmax = Math.max(xmax, X0(cxs[y] + rrs[y])); } }
+    if (sdE) { xmin = Math.min(xmin, X0(x0)); xmax = Math.max(xmax, X0(x1 + 1)); }
+    if (disc) { xmin = Math.min(xmin, cBot - disc.R); xmax = Math.max(xmax, cBot + disc.R); }
+    const ymax = Math.max(rmax * pxmm, disc ? disc.R : 0, sdE ? 4 : 0) + 0.5;
+    const zmax = Htop + lift;
+    const v = Math.min(0.9, Math.max(0.3, Math.max(xmax - xmin, 2 * ymax, zmax) / opts.quality));
+    const NX = Math.ceil((xmax - xmin) / v) + 5, NY = Math.ceil(2 * ymax / v) + 5, NZ = Math.ceil(zmax / v) + 5;
+    const org = [xmin - 2 * v, -(NY - 1) * v / 2, -2 * v];
+    const field = new Float32Array(NX * NY * NZ), sE = new Float32Array(NX);
+    for (let k = 0; k < NZ; k++) {
+      const z = org[2] + k * v, zl = z - lift, r = rAt(zl), c = cAt(zl), ri = th.hollow ? riAt(zl) : 0;
+      if (sdE) for (let i = 0; i < NX; i++) sE[i] = zl < 0 || zl > Htop ? -10 : bilinear(sdE, W, H, Xpx(org[0] + i * v), row(zl) - 0.5);
+      for (let j = 0; j < NY; j++) for (let i = 0; i < NX; i++) {
+        const X = org[0] + i * v, Y = org[1] + j * v, rho = Math.hypot(X - c, Y);
+        let f = r > 0 ? Math.max(rho - r, -zl, zl - Htop) : v * 3;
+        if (sdE) { const s = sE[i], t = Math.min(3.6, 1.4 + 0.7 * Math.max(s, 0)); f = Math.min(f, Math.max(-s, Math.abs(Y) - t, -zl, zl - Htop)); }
+        if (disc) f = Math.min(f, Math.max(Math.hypot(X - cBot, Y) - disc.R, z - disc.h));
+        if (ri > 1.2) f = Math.max(f, Math.min(ri - rho, zl - floor));
+        f = Math.max(f, -z);
+        if (i === 0 || j === 0 || k === 0 || i === NX - 1 || j === NY - 1 || k === NZ - 1) f = Math.max(f, v);
+        field[i + NX * (j + NY * k)] = f;
+      }
+    }
+    const m = meshTet(field, NX, NY, NZ, org, v);
+    const nbr = neighbours(m.idx, m.pos.length / 3);
+    taubin(m.pos, nbr, 4);
+    // ---- colours ----
+    let yWide = y0; for (let y = y0; y <= y1; y++) if (rrs[y] > rrs[yWide]) yWide = y;
+    // thin bits hanging below the widest part (a balloon string) keep their crayon colour; a pointy top does not
+    const C = dropOutline(lab, inside, W, H, Uint8Array.from(rrs, (r, y) => (r > 4 / pxmm || y < yWide ? 1 : 0)));
+    const discLab = C[Math.round(at(cxs, y1)) + W * y1] || opts.fillLabel;
+    const used = [...new Set(Array.from(C).filter(l => l > 0).concat(th.hollow ? [opts.fillLabel] : []).concat(disc ? [discLab] : []))].sort((a, b) => a - b), L = used.length;
+    const insideBl = boxBlur(Float32Array.from(inside), W, H, 1, 3);
+    const shareR = used.map(l => { const r = boxBlur(Float32Array.from(C, x => (x === l ? 1 : 0)), W, H, 1, 3); for (let p = 0; p < W * H; p++) r[p] = insideBl[p] > 1e-4 ? r[p] / insideBl[p] : 0; return r; });
+    const nearest = edtNearest(C, W, H);
+    const nvert = m.pos.length / 3, sh = new Float32Array(nvert * L);
+    for (let q = 0; q < nvert; q++) {
+      const X = m.pos[3 * q], Y = m.pos[3 * q + 1], z = m.pos[3 * q + 2], zl = z - lift;
+      const r = rAt(Math.min(Math.max(zl, 0), Htop)), c = cAt(Math.min(Math.max(zl, 0), Htop)), rho = Math.hypot(X - c, Y);
+      let force = -1;
+      if (disc && z < disc.h + 0.25 && rho > r + 0.4) force = discLab;
+      else if (th.hollow && zl > floor - 0.3 && rho < r - wall * 0.5) force = opts.fillLabel;
+      if (force >= 0) { sh[q * L + used.indexOf(force)] = 1; continue; }
+      const py = row(Math.min(Math.max(zl, 0), Htop)) - 0.5;
+      let px;
+      if (rho > r + 0.35 || r <= 0) px = Xpx(X);
+      else { const sn = rho > 1e-6 ? (X - c) / rho : 0, rpx = at(rrs, py); px = Xpx(c) + sn * rpx * 0.97; }
+      let tot = 0; for (let l = 0; l < L; l++) { const s = bilinear(shareR[l], W, H, px, py); sh[q * L + l] = s; tot += s; }
+      if (tot < 0.2) { const xi = Math.round(Math.min(W - 1, Math.max(0, px))), yi = Math.round(Math.min(H - 1, Math.max(0, py))); const l = used.indexOf(nearest[xi + W * yi]); if (l >= 0) sh[q * L + l] += 1; }
+    }
+    const cutM = cutColours(m.pos, m.idx, sh, L);
+    const faceLab = Uint8Array.from(cutM.lab, l => used[l]);
+    const chk = check(cutM.idx);
+    let vol = 0; const P = cutM.pos, I = cutM.idx, lo = [Infinity, Infinity, Infinity], hi = [-Infinity, -Infinity, -Infinity];
+    for (let t = 0; t < I.length; t += 3) { const a = 3 * I[t], b = 3 * I[t + 1], cc = 3 * I[t + 2];
+      vol += P[a] * (P[b + 1] * P[cc + 2] - P[b + 2] * P[cc + 1]) - P[a + 1] * (P[b] * P[cc + 2] - P[b + 2] * P[cc]) + P[a + 2] * (P[b] * P[cc + 1] - P[b + 1] * P[cc]); }
+    for (let q = 0; q < P.length; q += 3) for (let e = 0; e < 3; e++) { lo[e] = Math.min(lo[e], P[q + e]); hi[e] = Math.max(hi[e], P[q + e]); }
+    return { pos: cutM.pos, idx: cutM.idx, faceLab, used: [...new Set(faceLab)].sort((a, b) => a - b), check: chk, size: [0, 1, 2].map(e => hi[e] - lo[e]), volume: vol / 6,
+             dropped: S.dropped, voxel: v, upright: true, base: !!disc };
+  }
   // label of the nearest coloured pixel, for every pixel (multi-source breadth-first fill)
   function edtNearest(lab, W, H) {
     const out = Uint8Array.from(lab), q = new Int32Array(W * H); let h = 0, t = 0;
@@ -314,7 +464,7 @@
     return `<?xml version="1.0" encoding="UTF-8"?><model unit="millimeter" xml:lang="en-US" xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02" xmlns:m="http://schemas.microsoft.com/3dmanufacturing/material/2015/02" xmlns:slic3rpe="http://schemas.slic3r.org/3mf/2017/06"><metadata name="Title">${title}</metadata><resources><m:colorgroup id="1">${cols}</m:colorgroup><object id="2" name="${title}" type="model" pid="1" pindex="0"><mesh><vertices>${vs.join("")}</vertices><triangles>${ts.join("")}</triangles></mesh></object></resources><build><item objectid="2"/></build></model>`;
   }
 
-  const Doodle = { build, shape, edt, stl, obj, model3mf, check };
+  const Doodle = { build, buildTheme, themeMatch, shape, edt, stl, obj, model3mf, check };
   root.Doodle = Doodle;
   if (typeof module !== "undefined") module.exports = Doodle;
 })(typeof window !== "undefined" ? window : globalThis);

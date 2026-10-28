@@ -110,7 +110,13 @@ details.safe ul{margin:4px 0 0;padding-left:18px}
 .cardrow{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
 
 /* ---------- crayon box ---------- */
-.paper canvas#fx,.paper canvas#under{pointer-events:none}
+.paper canvas#fx,.paper canvas#under,.paper canvas#guide{pointer-events:none}
+.themechip{position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:4;display:flex;align-items:center;gap:8px;background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:999px;padding:4px 4px 4px 14px;font-weight:800;font-size:14px;box-shadow:0 4px 14px rgba(0,0,0,.12);white-space:nowrap}
+.themechip i{width:10px;height:10px;border-radius:50%;background:var(--tint,#4FA8E8)}
+.themechip button{width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:inherit;font-weight:900;cursor:pointer;display:grid;place-items:center;padding:0}
+.card h3{margin:2px 0 -4px;font-size:16px;font-weight:800}
+.card .sub{margin:-6px 0 0;color:var(--muted);font-size:13.5px}
+.tpl.theme canvas{background:color-mix(in srgb,var(--tint) 10%,var(--paper))}
 .paper.wobble{animation:wobble .45s ease}
 @keyframes wobble{20%{transform:rotate(-1.6deg)}45%{transform:rotate(1.3deg)}70%{transform:rotate(-.7deg)}}
 .hint.warn{color:var(--warn)}
@@ -168,10 +174,12 @@ details.safe ul{margin:4px 0 0;padding-left:18px}
 
   <main class="stage" id="stage">
     <div class="paper" id="paper">
+      <canvas id="guide" width="1024" height="1024" aria-hidden="true"></canvas>
       <canvas id="under" width="1024" height="1024" aria-hidden="true"></canvas>
       <canvas id="draw" width="1024" height="1024" aria-label="Drawing paper"></canvas>
       <canvas id="fx" aria-hidden="true"></canvas>
     </div>
+    <div class="themechip" id="themeChip" hidden><i id="themeDot"></i><span id="themeName"></span><button id="themeOff" type="button">✕</button></div>
     <div class="view3d" id="view3d" hidden><canvas id="c3d"></canvas></div>
     <div class="hint" id="hint"></div>
     <div class="busy" id="busy" hidden><div><div class="blob"></div><span id="busyMsg"></span></div></div>
@@ -205,8 +213,11 @@ details.safe ul{margin:4px 0 0;padding-left:18px}
 <div class="pickfx" id="pickfx" aria-hidden="true"></div>
 <div class="sheet" id="tplSheet" hidden role="dialog" aria-modal="true" aria-labelledby="tplTitle">
   <div class="card">
-    <h2 id="tplTitle">Pick a picture to colour</h2>
-    <p id="tplText">It replaces what is on the paper. You can undo.</p>
+    <h2 id="themesTitle">Draw an object, get it in 3D</h2>
+    <p class="sub" id="themesText"></p>
+    <div class="tpls" id="themes"></div>
+    <h3 id="tplTitle">Pick a picture to colour</h3>
+    <p class="sub" id="tplText">It replaces what is on the paper. You can undo.</p>
     <div class="tpls" id="tpls"></div>
     <div class="cardrow"><button class="pill ghost" id="tplClose">Close</button></div>
   </div>
@@ -296,6 +307,10 @@ details.safe ul{margin:4px 0 0;padding-left:18px}
     while (top) { const p = st[--top], x = p % W, y = (p - x) / W;
       if (x > 0) push(p - 1); if (x < W - 1) push(p + 1); if (y > 0) push(p - W); if (y < H - 1) push(p + W); }
     let filled = 0;
+    // paper the theme marks as a hole (inside a cup handle) stays empty, together with all paper connected to it
+    if (opts.keep) { for (let p = 0; p < W * H; p++) if (opts.keep[p]) push(p);
+      while (top) { const p = st[--top], x = p % W, y = (p - x) / W;
+        if (x > 0) push(p - 1); if (x < W - 1) push(p + 1); if (y > 0) push(p - W); if (y < H - 1) push(p + W); } }
     for (let p = 0; p < W * H; p++) if (lab[p] === 0 && !seen[p]) { lab[p] = opts.fillLabel; filled++; }
     // one solid piece: keep the biggest connected drawing, report the rest
     let inside = new Uint8Array(W * H); for (let p = 0; p < W * H; p++) inside[p] = lab[p] > 0 ? 1 : 0;
@@ -488,6 +503,152 @@ details.safe ul{margin:4px 0 0;padding-left:18px}
       vol += p[a] * (p[b + 1] * p[c + 2] - p[b + 2] * p[c + 1]) - p[a + 1] * (p[b] * p[c + 2] - p[b + 2] * p[c]) + p[a + 2] * (p[b] * p[c + 1] - p[b + 1] * p[c]); }
     return { pos: cutM.pos, idx: cutM.idx, faceLab, used, check: chk, size: [wmm, hmm, zmax], volume: vol / 6, dropped: S.dropped, voxel: v };
   }
+
+  // ---------- themed objects: a drawn cup, tree, balloon... becomes a round object that stands up ----------
+  // The child's outline is spun around a vertical axis (a lathe), so the 3D shape is the one they drew.
+  // Bits that stick out of the round body (a cup handle, a wavy balloon string) become puffy flat parts.
+  // Colours are wrapped around from the front view; the outline crayon is left out, so sides show the fill colour.
+  // opts.theme: { mode: "sym" (axis follows the drawing) | "left" (fixed axis, radius from the left edge: cup with a handle),
+  //               axis (px), hollow (cup / vase), keep (mask of paper that stays a hole) }
+  // The crayon outline makes sense on paper but not on a round object: the outline colour that touches the edge
+  // (the whole connected outline, however thick) is replaced by the nearest colour inside it.
+  // Rows that are too thin to have an inside (a balloon string) keep their colour.
+  function dropOutline(lab, inside, W, H, rowOK) {
+    const dIn = edt(Uint8Array.from(inside, v => 1 - v), W, H), cnt = new Map();
+    for (let p = 0; p < W * H; p++) if (inside[p] && dIn[p] <= 1.5) cnt.set(lab[p], (cnt.get(lab[p]) || 0) + 1);
+    let lo = 0, best = 0; for (const [l, n] of cnt) if (n > best) { best = n; lo = l; }
+    const out = Uint8Array.from(lab, (l, p) => (inside[p] ? l : 0));
+    if (!lo) return out;
+    const band = new Uint8Array(W * H), st = new Int32Array(W * H); let top = 0, n = 0, all = 0;
+    for (let p = 0; p < W * H; p++) { if (inside[p]) all++; if (inside[p] && dIn[p] <= 1.5 && lab[p] === lo) { band[p] = 1; st[top++] = p; } }
+    while (top) { const p = st[--top], x = p % W; n++;
+      for (const q of [x > 0 ? p - 1 : -1, x < W - 1 ? p + 1 : -1, p - W, p + W]) if (q >= 0 && q < W * H && !band[q] && inside[q] && lab[q] === lo) { band[q] = 1; st[top++] = q; } }
+    if (n > 0.6 * all) for (let p = 0; p < W * H; p++) band[p] = band[p] && dIn[p] <= 16 ? 1 : 0;   // the child coloured the whole thing with the outline crayon
+    const C = Uint8Array.from(out); let left = 0;
+    for (let p = 0; p < W * H; p++) { if (band[p] && rowOK[(p / W) | 0]) C[p] = 0; else if (C[p]) left++; }
+    if (!left) return out;
+    const near = edtNearest(C, W, H);
+    for (let p = 0; p < W * H; p++) out[p] = inside[p] ? (C[p] || near[p]) : 0;
+    return out;
+  }
+  function blur1(a, r) { const n = a.length, o = new Float32Array(n);
+    for (let i = 0; i < n; i++) { let s = 0, w = 0; for (let k = -r; k <= r; k++) { const j = i + k; if (j < 0 || j >= n || !(a[j] === a[j])) continue; s += a[j]; w++; } o[i] = w ? s / w : NaN; } return o; }
+  function themeMatch(lab0, W, H, guide, keep, fillLabel) {
+    const S = shape(lab0, new Float32Array(W * H), W, H, { fillLabel: fillLabel || 10, sizeMM: 80, keep });
+    if (!S) return 0;
+    let both = 0, any = 0; for (let p = 0; p < W * H; p++) { const a = S.inside[p], b = guide[p]; if (a && b) both++; if (a || b) any++; }
+    return any ? both / any : 0;
+  }
+  function buildTheme(lab0, bump0, W, H, opts) {
+    opts = Object.assign({ sizeMM: 80, fillLabel: 10, quality: 95 }, opts);
+    const th = opts.theme, S = shape(lab0, bump0, W, H, { fillLabel: opts.fillLabel, sizeMM: opts.sizeMM, keep: th.keep });
+    if (!S) return null;
+    const { lab, inside, pxmm, x0, x1, y0, y1 } = S;
+    // ---- profile: per row, the centre and radius of the round body (in px) ----
+    const cx = new Float32Array(H).fill(NaN), rr = new Float32Array(H);
+    let prevC = th.axis;
+    for (let y = y0; y <= y1; y++) {
+      const o = W * y, a = Math.round(th.mode === "left" ? th.axis : prevC);
+      let seed = -1;
+      for (let d = 0; d < 90 && seed < 0; d++) { if (a - d >= 0 && inside[o + a - d]) seed = a - d; else if (a + d < W && inside[o + a + d]) seed = a + d; }
+      if (seed < 0) continue;
+      let L = seed, R = seed; while (L > 0 && inside[o + L - 1]) L--; while (R < W - 1 && inside[o + R + 1]) R++;
+      if (th.mode === "left") { if (L > th.axis) continue; cx[y] = th.axis; rr[y] = th.axis - L + 0.5; }
+      else { cx[y] = (L + R) / 2; rr[y] = (R - L + 1) / 2; prevC = cx[y]; }
+    }
+    const sm = Math.max(1, Math.round(1.0 / pxmm)), cxs = th.mode === "left" ? cx : blur1(cx, Math.max(2, Math.round(3 / pxmm)));
+    const rrs = blur1(Float32Array.from(rr, (v, y) => (y < y0 || y > y1 ? NaN : v)), sm);
+    for (let y = 0; y < H; y++) { if (!(rr[y] > 0)) { rrs[y] = 0; cxs[y] = NaN; } }
+    let rmax = 0; for (let y = y0; y <= y1; y++) rmax = Math.max(rmax, rrs[y]);
+    // ---- parts outside the round body: extruded and puffy ----
+    const extra = new Uint8Array(W * H); let nExtra = 0;
+    for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) { const p = x + W * y; if (!inside[p]) continue;
+      const c = cxs[y], r = rrs[y]; if (!(c === c) || Math.abs(x - c) > r + 1.5) { extra[p] = 1; nExtra++; } }
+    let sdE = null;
+    if (nExtra > 30) {
+      const grow = edt(extra, W, H), reach = 4.5 / pxmm;
+      for (let p = 0; p < W * H; p++) if (inside[p] && grow[p] <= reach) extra[p] = 1;
+      const dIn = edt(Uint8Array.from(extra, v => 1 - v), W, H), dOut = edt(extra, W, H);
+      sdE = new Float32Array(W * H); for (let p = 0; p < W * H; p++) sdE[p] = (extra[p] ? dIn[p] - 0.5 : -(dOut[p] - 0.5)) * pxmm;
+    }
+    // ---- geometry in mm: z up, the drawing's bottom row stands on the bed ----
+    const Htop = (y1 + 1 - y0) * pxmm, yb = y1 + 1;
+    let rb = 0, nb = 0; for (let y = y1; y > y1 - 4 / pxmm && y >= y0; y--) { rb += rrs[y]; nb++; } rb /= Math.max(1, nb);
+    const disc = rb < 0.42 * rmax ? { R: Math.max(0.6 * rmax * pxmm, 11), h: 3 } : null;
+    const lift = disc ? disc.h - 0.8 : 0;
+    const wall = 2.2, floor = 3;
+    const row = zl => yb - zl / pxmm;                       // fractional row for a height above the object's bottom
+    const at = (arr, y) => { y = Math.min(Math.max(y, y0), y1); const i = Math.floor(y), u = y - i, a = arr[i], b = arr[Math.min(i + 1, y1)];
+      if (!(a === a)) return b; if (!(b === b)) return a; return a * (1 - u) + b * u; };
+    const axisMM = (th.mode === "left" ? th.axis : (() => { let s = 0, n = 0; for (let y = y0; y <= y1; y++) if (cxs[y] === cxs[y]) { s += cxs[y]; n++; } return s / n; })());
+    const X0 = x => (x - axisMM) * pxmm, Xpx = X => axisMM + X / pxmm;
+    const cBot = X0(at(cxs, y1 - 0.5));
+    const minR = 2.0;
+    const rAt = zl => { if (zl < 0 || zl > Htop) return 0; const y = row(zl); const r = at(rrs, y - 0.5); return r > 0 ? Math.max(r * pxmm, minR) : 0; };
+    const cAt = zl => { const y = Math.min(Math.max(row(zl) - 0.5, y0), y1); const c = at(cxs, y); return c === c ? X0(c) : 0; };
+    const riAt = zl => (zl < floor ? 0 : rAt(Math.min(zl, Htop - 0.4 * pxmm)) - wall);
+    // grid bounds
+    let xmin = Infinity, xmax = -Infinity;
+    for (let y = y0; y <= y1; y++) { if (rrs[y] > 0) { xmin = Math.min(xmin, X0(cxs[y] - rrs[y])); xmax = Math.max(xmax, X0(cxs[y] + rrs[y])); } }
+    if (sdE) { xmin = Math.min(xmin, X0(x0)); xmax = Math.max(xmax, X0(x1 + 1)); }
+    if (disc) { xmin = Math.min(xmin, cBot - disc.R); xmax = Math.max(xmax, cBot + disc.R); }
+    const ymax = Math.max(rmax * pxmm, disc ? disc.R : 0, sdE ? 4 : 0) + 0.5;
+    const zmax = Htop + lift;
+    const v = Math.min(0.9, Math.max(0.3, Math.max(xmax - xmin, 2 * ymax, zmax) / opts.quality));
+    const NX = Math.ceil((xmax - xmin) / v) + 5, NY = Math.ceil(2 * ymax / v) + 5, NZ = Math.ceil(zmax / v) + 5;
+    const org = [xmin - 2 * v, -(NY - 1) * v / 2, -2 * v];
+    const field = new Float32Array(NX * NY * NZ), sE = new Float32Array(NX);
+    for (let k = 0; k < NZ; k++) {
+      const z = org[2] + k * v, zl = z - lift, r = rAt(zl), c = cAt(zl), ri = th.hollow ? riAt(zl) : 0;
+      if (sdE) for (let i = 0; i < NX; i++) sE[i] = zl < 0 || zl > Htop ? -10 : bilinear(sdE, W, H, Xpx(org[0] + i * v), row(zl) - 0.5);
+      for (let j = 0; j < NY; j++) for (let i = 0; i < NX; i++) {
+        const X = org[0] + i * v, Y = org[1] + j * v, rho = Math.hypot(X - c, Y);
+        let f = r > 0 ? Math.max(rho - r, -zl, zl - Htop) : v * 3;
+        if (sdE) { const s = sE[i], t = Math.min(3.6, 1.4 + 0.7 * Math.max(s, 0)); f = Math.min(f, Math.max(-s, Math.abs(Y) - t, -zl, zl - Htop)); }
+        if (disc) f = Math.min(f, Math.max(Math.hypot(X - cBot, Y) - disc.R, z - disc.h));
+        if (ri > 1.2) f = Math.max(f, Math.min(ri - rho, zl - floor));
+        f = Math.max(f, -z);
+        if (i === 0 || j === 0 || k === 0 || i === NX - 1 || j === NY - 1 || k === NZ - 1) f = Math.max(f, v);
+        field[i + NX * (j + NY * k)] = f;
+      }
+    }
+    const m = meshTet(field, NX, NY, NZ, org, v);
+    const nbr = neighbours(m.idx, m.pos.length / 3);
+    taubin(m.pos, nbr, 4);
+    // ---- colours ----
+    let yWide = y0; for (let y = y0; y <= y1; y++) if (rrs[y] > rrs[yWide]) yWide = y;
+    // thin bits hanging below the widest part (a balloon string) keep their crayon colour; a pointy top does not
+    const C = dropOutline(lab, inside, W, H, Uint8Array.from(rrs, (r, y) => (r > 4 / pxmm || y < yWide ? 1 : 0)));
+    const discLab = C[Math.round(at(cxs, y1)) + W * y1] || opts.fillLabel;
+    const used = [...new Set(Array.from(C).filter(l => l > 0).concat(th.hollow ? [opts.fillLabel] : []).concat(disc ? [discLab] : []))].sort((a, b) => a - b), L = used.length;
+    const insideBl = boxBlur(Float32Array.from(inside), W, H, 1, 3);
+    const shareR = used.map(l => { const r = boxBlur(Float32Array.from(C, x => (x === l ? 1 : 0)), W, H, 1, 3); for (let p = 0; p < W * H; p++) r[p] = insideBl[p] > 1e-4 ? r[p] / insideBl[p] : 0; return r; });
+    const nearest = edtNearest(C, W, H);
+    const nvert = m.pos.length / 3, sh = new Float32Array(nvert * L);
+    for (let q = 0; q < nvert; q++) {
+      const X = m.pos[3 * q], Y = m.pos[3 * q + 1], z = m.pos[3 * q + 2], zl = z - lift;
+      const r = rAt(Math.min(Math.max(zl, 0), Htop)), c = cAt(Math.min(Math.max(zl, 0), Htop)), rho = Math.hypot(X - c, Y);
+      let force = -1;
+      if (disc && z < disc.h + 0.25 && rho > r + 0.4) force = discLab;
+      else if (th.hollow && zl > floor - 0.3 && rho < r - wall * 0.5) force = opts.fillLabel;
+      if (force >= 0) { sh[q * L + used.indexOf(force)] = 1; continue; }
+      const py = row(Math.min(Math.max(zl, 0), Htop)) - 0.5;
+      let px;
+      if (rho > r + 0.35 || r <= 0) px = Xpx(X);
+      else { const sn = rho > 1e-6 ? (X - c) / rho : 0, rpx = at(rrs, py); px = Xpx(c) + sn * rpx * 0.97; }
+      let tot = 0; for (let l = 0; l < L; l++) { const s = bilinear(shareR[l], W, H, px, py); sh[q * L + l] = s; tot += s; }
+      if (tot < 0.2) { const xi = Math.round(Math.min(W - 1, Math.max(0, px))), yi = Math.round(Math.min(H - 1, Math.max(0, py))); const l = used.indexOf(nearest[xi + W * yi]); if (l >= 0) sh[q * L + l] += 1; }
+    }
+    const cutM = cutColours(m.pos, m.idx, sh, L);
+    const faceLab = Uint8Array.from(cutM.lab, l => used[l]);
+    const chk = check(cutM.idx);
+    let vol = 0; const P = cutM.pos, I = cutM.idx, lo = [Infinity, Infinity, Infinity], hi = [-Infinity, -Infinity, -Infinity];
+    for (let t = 0; t < I.length; t += 3) { const a = 3 * I[t], b = 3 * I[t + 1], cc = 3 * I[t + 2];
+      vol += P[a] * (P[b + 1] * P[cc + 2] - P[b + 2] * P[cc + 1]) - P[a + 1] * (P[b] * P[cc + 2] - P[b + 2] * P[cc]) + P[a + 2] * (P[b] * P[cc + 1] - P[b + 1] * P[cc]); }
+    for (let q = 0; q < P.length; q += 3) for (let e = 0; e < 3; e++) { lo[e] = Math.min(lo[e], P[q + e]); hi[e] = Math.max(hi[e], P[q + e]); }
+    return { pos: cutM.pos, idx: cutM.idx, faceLab, used: [...new Set(faceLab)].sort((a, b) => a - b), check: chk, size: [0, 1, 2].map(e => hi[e] - lo[e]), volume: vol / 6,
+             dropped: S.dropped, voxel: v, upright: true, base: !!disc };
+  }
   // label of the nearest coloured pixel, for every pixel (multi-source breadth-first fill)
   function edtNearest(lab, W, H) {
     const out = Uint8Array.from(lab), q = new Int32Array(W * H); let h = 0, t = 0;
@@ -535,9 +696,72 @@ details.safe ul{margin:4px 0 0;padding-left:18px}
     return `<?xml version="1.0" encoding="UTF-8"?><model unit="millimeter" xml:lang="en-US" xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02" xmlns:m="http://schemas.microsoft.com/3dmanufacturing/material/2015/02" xmlns:slic3rpe="http://schemas.slic3r.org/3mf/2017/06"><metadata name="Title">${title}</metadata><resources><m:colorgroup id="1">${cols}</m:colorgroup><object id="2" name="${title}" type="model" pid="1" pindex="0"><mesh><vertices>${vs.join("")}</vertices><triangles>${ts.join("")}</triangles></mesh></object></resources><build><item objectid="2"/></build></model>`;
   }
 
-  const Doodle = { build, shape, edt, stl, obj, model3mf, check };
+  const Doodle = { build, buildTheme, themeMatch, shape, edt, stl, obj, model3mf, check };
   root.Doodle = Doodle;
   if (typeof module !== "undefined") module.exports = Doodle;
+})(typeof window !== "undefined" ? window : globalThis);
+</script>
+<script id="doodle-themes">// Doodle Puff themes: objects a child draws by tracing a dotted outline, then gets back as a round 3D object.
+// Each theme is a side-view profile: r(y) = half width at row y (paper is 512 px), around a vertical axis.
+// Runs in the browser (window.DoodleThemes) and in node (tests).
+(function (root) {
+  "use strict";
+  const sq = v => Math.sqrt(Math.max(0, v));
+  const circ = (y, cy, R) => sq(R * R - (y - cy) * (y - cy));
+  const THEMES = [
+    { id: "cup", vi: "Cái cốc", en: "Cup", tint: "#4FA8E8", mode: "left", axis: 228, hollow: true, y0: 150, y1: 440,
+      r: y => 116 - (y - 150) * 0.04 - (y > 424 ? (y - 424) * (y - 424) * 0.09 : 0),
+      // the handle: a C-shaped band on the right, with paper inside it that stays a hole
+      parts: [() => { const p = [], cx = 340, cy = 292; for (let a = -1.25; a <= 1.2501; a += 0.05) p.push([cx + 96 * Math.cos(a), cy + 100 * Math.sin(a)]);
+        p.push([326, cy + 100 * Math.sin(1.25)], [326, cy + 64 * Math.sin(1.2)]);
+        for (let a = 1.2; a >= -1.2001; a -= 0.05) p.push([cx + 58 * Math.cos(a), cy + 64 * Math.sin(a)]);
+        p.push([326, cy - 64 * Math.sin(1.2)], [326, cy - 100 * Math.sin(1.25)]); return p; }],
+      keep: () => { const p = []; for (let a = -1.2; a <= 1.2001; a += 0.1) p.push([340 + 50 * Math.cos(a), 292 + 56 * Math.sin(a)]); p.push([346, 292 + 56 * Math.sin(1.2)], [346, 292 - 56 * Math.sin(1.2)]); return p; } },
+    { id: "balloon", vi: "Bóng bay", en: "Balloon", tint: "#E8483B", mode: "sym", axis: 256, y0: 44, y1: 440,
+      r: y => y <= 340 ? 122 * sq(1 - ((y - 195) / 150) ** 2) : y <= 358 ? Math.max(4.5, 15 - Math.abs(y - 348) * 0.8) : 4.5,
+      c: y => y > 358 ? 256 + 13 * Math.sin((y - 358) / 15) : 256 },
+    { id: "tree", vi: "Cái cây", en: "Tree", tint: "#5CBF6A", mode: "sym", axis: 256, y0: 48, y1: 440,
+      r: y => Math.max(y <= 332 ? circ(y, 190, 142) * (1 + 0.07 * Math.sin((y - 48) / 284 * Math.PI * 6) ** 2) : 0, y >= 300 ? 30 + (y > 414 ? (y - 414) * 0.9 : 0) : 0) },
+    { id: "pine", vi: "Cây thông", en: "Pine tree", tint: "#3F9C5A", mode: "sym", axis: 256, y0: 40, y1: 440,
+      r: y => { let r = y >= 330 ? 28 : 0; [[40, 82], [118, 118], [205, 152]].forEach(([t, R]) => { if (y >= t && y <= t + 125) r = Math.max(r, 6 + (y - t) / 125 * (R - 6)); }); return r; } },
+    { id: "icecream", vi: "Kem ốc quế", en: "Ice cream", tint: "#F7A1B5", mode: "sym", axis: 256, y0: 62, y1: 440,
+      r: y => Math.max(y <= 285 ? circ(y, 178, 116) : 0, y >= 250 ? 104 * (440 - y) / 190 + 3 : 0) },
+    { id: "mushroom", vi: "Cây nấm", en: "Mushroom", tint: "#E8483B", mode: "sym", axis: 256, y0: 92, y1: 440,
+      r: y => Math.max(y <= 250 ? 176 * sq(1 - ((250 - y) / 158) ** 2) : y <= 266 ? 176 - (y - 250) * 7 : 0, y >= 250 ? 58 + (y > 404 ? (y - 404) * 0.5 : 0) : 0) },
+    { id: "snowman", vi: "Người tuyết", en: "Snowman", tint: "#4FA8E8", mode: "sym", axis: 256, y0: 40, y1: 440,
+      r: y => Math.max(circ(y, 92, 52), circ(y, 204, 74), y <= 440 ? circ(y, 350, 96) : 0, y >= 420 ? 64 : 0) },
+    { id: "rocket", vi: "Tên lửa", en: "Rocket", tint: "#9B6BD6", mode: "sym", axis: 256, y0: 46, y1: 440,
+      r: y => Math.max(y <= 175 ? 72 * sq(1 - ((175 - y) / 129) ** 2) : y <= 395 ? 72 : 72 - (y - 395) * 0.5, y >= 300 ? 72 + (y - 300) * 0.55 : 0) },
+    { id: "vase", vi: "Lọ hoa", en: "Vase", tint: "#FF9B3D", mode: "sym", axis: 256, hollow: true, y0: 100, y1: 440,
+      r: y => y <= 136 ? 78 - (y - 100) * 0.35 : 58 + 66 * Math.sin(Math.PI * Math.min(1, (y - 136) / 330)) ** 1.3 - (y > 428 ? (y - 428) * (y - 428) * 0.12 : 0) }
+  ];
+  // closed outline of the body (right side going down, left side coming back up)
+  function body(t) {
+    const R = [], Lf = [], c = t.c || (() => t.axis);
+    for (let y = t.y0; y <= t.y1 + 0.001; y += 2) { const r = Math.max(t.r(y), 0.5), x = c(y); R.push([x + r, y]); Lf.push([x - r, y]); }
+    return R.concat(Lf.reverse());
+  }
+  function outlines(t) { return [body(t)].concat((t.parts || []).map(f => f())); }
+  // fill polygons into a W x W mask (even-odd per polygon, union over polygons)
+  function rasterize(polys, W) {
+    const m = new Uint8Array(W * W);
+    for (const poly of polys) for (let y = 0; y < W; y++) {
+      const yc = y + 0.5, xs = [];
+      for (let i = 0; i < poly.length; i++) { const [ax, ay] = poly[i], [bx, by] = poly[(i + 1) % poly.length];
+        if ((ay <= yc) !== (by <= yc)) xs.push(ax + (yc - ay) / (by - ay) * (bx - ax)); }
+      xs.sort((a, b) => a - b);
+      for (let k = 0; k + 1 < xs.length; k += 2) for (let x = Math.max(0, Math.ceil(xs[k] - 0.5)); x <= Math.min(W - 1, Math.floor(xs[k + 1] - 0.5)); x++) m[x + W * y] = 1;
+    }
+    return m;
+  }
+  function masks(t, W) {
+    const s = W / 512, sc = ps => ps.map(([x, y]) => [x * s, y * s]);
+    return { guide: rasterize(outlines(t).map(sc), W), keep: t.keep ? rasterize([sc(t.keep())], W) : null };
+  }
+  function spec(t, W) { const m = masks(t, W); return { id: t.id, mode: t.mode, axis: t.axis * W / 512, hollow: !!t.hollow, keep: m.keep }; }
+  const api = { THEMES, outlines, rasterize, masks, spec, byId: id => THEMES.find(t => t.id === id) };
+  root.DoodleThemes = api;
+  if (typeof module !== "undefined") module.exports = api;
 })(typeof window !== "undefined" ? window : globalThis);
 </script>
 <script>
@@ -549,7 +773,7 @@ const T = {
   vi: { go: "Thành 3D", busy: "Đang thổi phồng tranh…", redraw: "Vẽ tiếp", dl: "Tải file in", puff: "Độ phồng", size: "Kích thước", body: "Màu phần trống",
         loop: "Móc khoá", fine: "Mịn hơn", safeTitle: "An toàn cho bé",
         safe: ["Dành cho bé từ 3 tuổi, có người lớn giám sát.", "Tranh in thành một miếng liền, không có chi tiết rời.", "Không gắn nam châm nhỏ: bé có thể nuốt.", "Không cho bé ngậm hay cắn. Chà nhẹ chỗ sắc sau khi in."],
-        tools: { pen: "Bút sáp", fill: "Xô màu", eye: "Mắt", eraser: "Tẩy", tpl: "Tranh mẫu", clear: "Giấy mới" },
+        tools: { pen: "Bút sáp", fill: "Xô màu", eye: "Mắt", eraser: "Tẩy", tpl: "Mẫu và đồ vật 3D", clear: "Giấy mới" },
         hints: { pen: "Vẽ con vật hoặc hình bé thích · nét vẽ sẽ nổi lên", fill: "Chạm vào bên trong hình để tô màu", eye: "Chạm để dán mắt tròn xoe",
                  eraser: "Kéo để tẩy", rainbow: "Bút cầu vồng: vẽ một nét là ra đủ 7 màu! Thử vẽ một vòng cung nhé", view: "Kéo để xoay · chụm 2 ngón để phóng to" },
         leak: "Hình còn hở nên màu sẽ tràn ra ngoài. Nối kín nét vẽ rồi tô lại nhé!", empty: "Giấy còn trống. Bé vẽ gì đó trước đã!",
@@ -558,13 +782,17 @@ const T = {
         many: n => `${n} màu: máy có 1 AMS (4 khe) cần gộp bớt màu khi nhập vào Bambu Studio.`,
         preparing: "Đang chuẩn bị file…", saved: "Đã lưu. Kéo file .obj vào Bambu Studio, máy tự gán màu cho từng cuộn nhựa.", declined: "Đã huỷ tải.", noSave: "Trình xem này không lưu được file.",
         no3d: "Không tải được trình xem 3D, nhưng vẫn tải được file in.",
-        tplTitle: "Chọn tranh để tô", tplText: "Tranh mẫu sẽ thay cho giấy hiện tại. Có thể hoàn tác.", close: "Đóng",
+        tplTitle: "Tranh để tô (in dẹt)", tplText: "Tranh mẫu sẽ thay cho giấy hiện tại. Có thể hoàn tác.", close: "Đóng",
+        themesTitle: "Vẽ đồ vật thành 3D", themesText: "Bé vẽ theo nét chấm rồi trang trí hoa văn. Bấm Thành 3D là ra đồ vật tròn thật sự!",
+        themeHint: n => `Vẽ theo nét chấm hình ${n.toLowerCase()}, rồi tô hoa văn thật đẹp!`, notLike: n => `Hình chưa giống ${n.toLowerCase()} lắm. Bé vẽ theo nét chấm nhé!`,
+        like: s => s >= 0.75 ? "Giống y như thật! ★★★" : s >= 0.55 ? "Giống lắm! ★★" : "Đúng hình rồi! ★", busy3d: "Đang nặn đồ vật 3D…", freeDraw: "Vẽ tự do",
+        upright: "Đồ vật đứng thẳng trên bàn in. Bật support dạng cây (tree) cho phần nhô ra.", notFood: "Cốc, lọ in nhựa chỉ để chơi hoặc cắm bút, không đựng đồ ăn, nước uống.",
         clearTitle: "Bắt đầu tranh mới?", clearText: "Giấy sẽ được xoá sạch. Có thể hoàn tác.", cancel: "Huỷ", wipe: "Xoá giấy",
         tpls: ["Cá", "Ngôi sao", "Mèo"], cols: ["Mực", "Đỏ", "Cam", "Vàng", "Lá", "Trời", "Tím", "Hồng", "Nâu", "Trắng", "Chàm"], rainbow: "Bút cầu vồng", sizeLbl: "Cỡ nét", sizeNames: ["Nét nhỏ", "Nét vừa", "Nét to"] },
   en: { go: "Make it 3D", busy: "Puffing up the drawing…", redraw: "Keep drawing", dl: "Download print files", puff: "Puffiness", size: "Size", body: "Empty areas",
         loop: "Keyring loop", fine: "Extra smooth", safeTitle: "Safety for kids",
         safe: ["For ages 3 and up, with an adult nearby.", "The drawing prints as one solid piece with no loose parts.", "Don't glue small magnets on: children can swallow them.", "Not for mouthing or chewing. Sand any sharp spots after printing."],
-        tools: { pen: "Crayon", fill: "Paint pot", eye: "Eyes", eraser: "Eraser", tpl: "Pictures", clear: "New paper" },
+        tools: { pen: "Crayon", fill: "Paint pot", eye: "Eyes", eraser: "Eraser", tpl: "Pictures and 3D objects", clear: "New paper" },
         hints: { pen: "Draw an animal or any shape · crayon lines come out raised", fill: "Tap inside a shape to colour it", eye: "Tap to stick on googly eyes",
                  eraser: "Drag to erase", rainbow: "Rainbow crayon: one line, all seven colours! Try drawing an arch", view: "Drag to turn · pinch to zoom" },
         leak: "The shape has a gap, so the colour would spill out. Close the line and try again!", empty: "The paper is empty. Draw something first!",
@@ -573,7 +801,11 @@ const T = {
         many: n => `${n} colours: with one AMS (4 slots), merge some colours when importing into Bambu Studio.`,
         preparing: "Preparing files…", saved: "Saved. Drag the .obj into Bambu Studio and it matches each colour to a filament.", declined: "Download cancelled.", noSave: "This viewer can't save files.",
         no3d: "The 3D viewer didn't load, but the print files still download.",
-        tplTitle: "Pick a picture to colour", tplText: "It replaces what is on the paper. You can undo.", close: "Close",
+        tplTitle: "Pictures to colour (flat print)", tplText: "It replaces what is on the paper. You can undo.", close: "Close",
+        themesTitle: "Draw an object, get it in 3D", themesText: "Trace the dotted outline, then decorate it. Tap Make it 3D and it comes out round and real!",
+        themeHint: n => `Trace the dotted ${n.toLowerCase()}, then decorate it!`, notLike: n => `That doesn't look like a ${n.toLowerCase()} yet. Follow the dotted line!`,
+        like: s => s >= 0.75 ? "Just like the real thing! ★★★" : s >= 0.55 ? "Looks great! ★★" : "That's the shape! ★", busy3d: "Shaping your object…", freeDraw: "Free drawing",
+        upright: "Stands upright on the bed. Turn on tree supports for parts that stick out.", notFood: "Printed cups and vases are for play or pens only, not for food or drinks.",
         clearTitle: "Start a new drawing?", clearText: "The paper will be wiped clean. You can undo.", cancel: "Cancel", wipe: "Wipe the paper",
         tpls: ["Fish", "Star", "Cat"], cols: ["Ink", "Red", "Orange", "Sun", "Leaf", "Sky", "Lilac", "Pink", "Brown", "White", "Indigo"], rainbow: "Rainbow crayon", sizeLbl: "Line size", sizeNames: ["Thin", "Medium", "Thick"] }
 };
@@ -781,7 +1013,7 @@ function fill(x, y) {
 let flashTimer = 0;
 function flash(m) { const h = $("#hint"); h.textContent = m; h.classList.add("warn"); clearTimeout(flashTimer); flashTimer = setTimeout(() => { h.classList.remove("warn"); setHint(); }, 3200); }
 function wobble() { const p = $("#paper"); p.classList.remove("wobble"); void p.offsetWidth; p.classList.add("wobble"); }
-function setHint() { $("#hint").textContent = $("#view3d").hidden ? (tool === "pen" && colour === "R" ? T[LANG].hints.rainbow : T[LANG].hints[tool]) || "" : T[LANG].hints.view; }
+function setHint() { $("#hint").textContent = $("#view3d").hidden ? (tool === "pen" && colour === "R" ? T[LANG].hints.rainbow : tool === "pen" && theme ? T[LANG].themeHint(themeName()) : T[LANG].hints[tool]) || "" : T[LANG].hints.view; }
 
 /* pointer drawing: points are smoothed into quadratic curves through the midpoints, so lines come out taut */
 let drawing = false, pts = [], travelled = 0, rb = { base: null, samples: [] };
@@ -967,24 +1199,66 @@ function openTpl() {
     for (let y = 0; y < 128; y++) for (let x = 0; x < 128; x++) { const l = lab[x * 4 + W * y * 4], o = 4 * (x + 128 * y); if (l) { im.data[o] = RGB[l][0]; im.data[o + 1] = RGB[l][1]; im.data[o + 2] = RGB[l][2]; im.data[o + 3] = 255; } }
     g.putImageData(im, 0, 0); lab = keepL; bump = keepB; under = keepU;
     b.appendChild(c); b.append(T[LANG].tpls[i]);
-    b.onclick = () => { pushUndo(); lab = new Uint8Array(W * H); bump = new Float32Array(W * H); under = new Uint8Array(W * H); ctx.clearRect(0, 0, DS, DS); fn(); paintAll(); saveDraft(); $("#tplSheet").hidden = true; tool = "fill"; colour = [3, 4, 5][i]; syncTools(); sparkle(256, 256, 30, { size: 11, speed: 4.5, jitter: 160 }); };
+    b.onclick = () => { setTheme(null); pushUndo(); lab = new Uint8Array(W * H); bump = new Float32Array(W * H); under = new Uint8Array(W * H); ctx.clearRect(0, 0, DS, DS); fn(); paintAll(); saveDraft(); $("#tplSheet").hidden = true; tool = "fill"; colour = [3, 4, 5][i]; syncTools(); sparkle(256, 256, 30, { size: 11, speed: 4.5, jitter: 160 }); };
     box.appendChild(b);
   });
-  paintAll();
+  paintAll(); buildThemeCards();
   $("#tplSheet").hidden = false;
 }
 $("#tplClose").onclick = () => ($("#tplSheet").hidden = true);
+
+/* ---------- themes: trace a dotted object (cup, tree, balloon...) and get it back as a real round 3D object ---------- */
+const TH = window.DoodleThemes;
+let theme = null, themeMasks = null, lastScore = 0;
+const gv = $("#guide"), gctx = gv.getContext("2d");
+const themeName = (id = theme) => { const t = id && TH.byId(id); return t ? t[LANG] : ""; };
+function polyPath(g, poly, s) { g.beginPath(); poly.forEach(([x, y], i) => (i ? g.lineTo : g.moveTo).call(g, x * s, y * s)); g.closePath(); }
+// faint tint plus a dotted line to trace; the handle's joins inside the body are not drawn
+function drawGuideOn(g, t, s, lw, dash) {
+  const polys = TH.outlines(t), size = Math.round(512 * s);
+  const tint = document.createElement("canvas"); tint.width = tint.height = size; const tg = tint.getContext("2d"); tg.fillStyle = t.tint;
+  for (const p of polys) { polyPath(tg, p, s); tg.fill(); }
+  g.save(); g.globalAlpha = 0.13; g.drawImage(tint, 0, 0); g.restore();
+  g.save(); g.lineWidth = lw; g.setLineDash(dash); g.lineCap = "round"; g.lineJoin = "round"; g.strokeStyle = "rgba(36,40,58,.5)";
+  polyPath(g, polys[0], s); g.stroke();
+  if (polys.length > 1) { g.beginPath(); g.rect(0, 0, size, size); polys[0].slice().reverse().forEach(([x, y], i) => (i ? g.lineTo : g.moveTo).call(g, x * s, y * s)); g.closePath(); g.clip("evenodd");
+    for (const p of polys.slice(1)) { polyPath(g, p, s); g.stroke(); } }
+  g.restore();
+}
+function drawGuide() { gctx.clearRect(0, 0, DS, DS); if (theme) drawGuideOn(gctx, TH.byId(theme), K, 2.2 * K, [7 * K, 7 * K]); }
+function setTheme(id) {
+  theme = id && TH.byId(id) ? id : null; themeMasks = theme ? TH.masks(TH.byId(theme), W) : null;
+  try { localStorage.setItem("doodle-theme", theme || ""); } catch (e) {}
+  drawGuide(); $("#themeChip").hidden = !theme;
+  if (theme) { $("#themeName").textContent = themeName(); $("#themeChip").style.setProperty("--tint", TH.byId(theme).tint); }
+  setHint();
+}
+function pickTheme(id) {
+  pushUndo(); lab = new Uint8Array(W * H); bump = new Float32Array(W * H); under = new Uint8Array(W * H); ctx.clearRect(0, 0, DS, DS); paintAll(); saveDraft();
+  setTheme(id); $("#tplSheet").hidden = true; tool = "pen"; colour = 1; syncTools(); sparkle(256, 256, 30, { size: 11, speed: 4.5, jitter: 160 });
+}
+function buildThemeCards() {
+  const box = $("#themes"); box.innerHTML = "";
+  for (const t of TH.THEMES) {
+    const b = document.createElement("button"); b.className = "tpl theme"; b.id = "theme-" + t.id; b.style.setProperty("--tint", t.tint);
+    const c = document.createElement("canvas"); c.width = c.height = 128; drawGuideOn(c.getContext("2d"), t, 0.25, 2.2, [5, 4]);
+    b.appendChild(c); b.append(t[LANG]); b.onclick = () => pickTheme(t.id); box.appendChild(b);
+  }
+}
+$("#themeOff").onclick = () => setTheme(null);
 
 /* ---------- 3D: build in a worker so the page stays responsive ---------- */
 let worker = null, jobId = 0, result = null;
 try {
   const src = document.getElementById("doodle-core").textContent +
-    "\nonmessage = e => { const d = e.data; let r = null; try { r = Doodle.build(d.lab, d.bump, d.W, d.H, d.opts); } catch (err) { postMessage({ id: d.id, error: String(err) }); return; }" +
+    "\nonmessage = e => { const d = e.data; let r = null; try { r = (d.opts.theme ? Doodle.buildTheme : Doodle.build)(d.lab, d.bump, d.W, d.H, d.opts); } catch (err) { postMessage({ id: d.id, error: String(err) }); return; }" +
     " postMessage({ id: d.id, r }, r ? [r.pos.buffer, r.idx.buffer, r.faceLab.buffer] : []); };";
   worker = new Worker(URL.createObjectURL(new Blob([src], { type: "text/javascript" })));
 } catch (e) { worker = null; }
-function opts() { return { sizeMM: +$("#size").value, puff: +$("#puff").value, fillLabel: bodyLabel, loop: $("#loop").getAttribute("aria-pressed") === "true",
-                           quality: $("#fine").getAttribute("aria-pressed") === "true" ? 240 : 170 }; }
+function opts() { const fine = $("#fine").getAttribute("aria-pressed") === "true";
+  if (theme) return { sizeMM: +$("#size").value, fillLabel: bodyLabel, quality: fine ? 130 : 95, theme: TH.spec(TH.byId(theme), W) };
+  return { sizeMM: +$("#size").value, puff: +$("#puff").value, fillLabel: bodyLabel, loop: $("#loop").getAttribute("aria-pressed") === "true", quality: fine ? 240 : 170 }; }
+const localBuild = o => (o.theme ? window.Doodle.buildTheme : window.Doodle.build)(lab, bump, W, H, o);
 function buildModel() {
   const id = ++jobId, o = opts();
   return new Promise(res => {
@@ -992,14 +1266,14 @@ function buildModel() {
     if (worker) {
       const h = e => { if (e.data.id !== id) return; worker.removeEventListener("message", h); done(e.data.r || null); };
       worker.addEventListener("message", h);
-      worker.onerror = () => { worker = null; setTimeout(() => done(window.Doodle.build(lab, bump, W, H, o)), 20); };
+      worker.onerror = () => { worker = null; setTimeout(() => done(localBuild(o)), 20); };
       worker.postMessage({ id, lab: lab.slice(), bump: bump.slice(), W, H, opts: o });
-    } else setTimeout(() => done(window.Doodle.build(lab, bump, W, H, o)), 30);
+    } else setTimeout(() => done(localBuild(o)), 30);
   });
 }
 async function rebuild() {
   if ($("#view3d").hidden) return;
-  $("#busyMsg").textContent = t("busy"); $("#busy").hidden = false; $("#download").disabled = true; $("#msg").textContent = "";
+  $("#busyMsg").textContent = theme ? t("busy3d") : t("busy"); $("#busy").hidden = false; $("#download").disabled = true; $("#msg").textContent = "";
   const r = await buildModel();
   $("#busy").hidden = true;
   if (!r) { $("#stats").textContent = ""; $("#note").textContent = t("empty"); $("#note").className = "note warn"; return; }
@@ -1010,18 +1284,22 @@ async function rebuild() {
   if (r.dropped) notes.push(T[LANG].dropped(r.dropped));
   if (cols > 4) notes.push(T[LANG].many(cols));
   notes.unshift(r.check.watertight ? t("ok") : t("notOk"));
+  if (r.upright) { notes.unshift(T[LANG].like(lastScore)); notes.push(t("upright")); if (TH.byId(theme)?.hollow) notes.push(t("notFood")); }
   $("#note").textContent = notes.join(" "); $("#note").className = "note " + (r.check.watertight && !r.dropped && cols <= 4 ? "ok" : "warn");
   $("#download").disabled = !r.check.watertight;
   if (window.Viewer3D) window.Viewer3D.show(r, PAL); else $("#msg").textContent = t("no3d");
 }
 $("#go").onclick = async () => {
   if (!lab.some(v => v)) { flash(t("empty")); return; }
+  if (theme) { lastScore = window.Doodle.themeMatch(lab, W, H, themeMasks.guide, themeMasks.keep, bodyLabel);
+    if (lastScore < 0.3) { flash(T[LANG].notLike(themeName())); wobble(); return; } }
+  $("#puff").closest(".slider").hidden = !!theme; $("#loop").hidden = !!theme; $("#themeChip").hidden = true;
   $("#paper").hidden = true; $("#view3d").hidden = false; $("#drawDock").hidden = true; $("#printDock").hidden = false;
   $("#go").hidden = true; $("#undo").hidden = true; $("#redo").hidden = true; setHint();
   window.Viewer3D?.resize?.();
   rebuild();
 };
-$("#redraw").onclick = () => { $("#paper").hidden = false; $("#view3d").hidden = true; $("#drawDock").hidden = false; $("#printDock").hidden = true; $("#go").hidden = false; $("#undo").hidden = false; $("#redo").hidden = false; setHint(); };
+$("#redraw").onclick = () => { $("#themeChip").hidden = !theme; $("#paper").hidden = false; $("#view3d").hidden = true; $("#drawDock").hidden = false; $("#printDock").hidden = true; $("#go").hidden = false; $("#undo").hidden = false; $("#redo").hidden = false; setHint(); };
 let rbTimer = 0; const later = () => { clearTimeout(rbTimer); rbTimer = setTimeout(rebuild, 350); };
 $("#puff").oninput = () => { $("#puffVal").textContent = $("#puff").value + " mm"; later(); };
 $("#size").oninput = () => { $("#sizeVal").textContent = $("#size").value + " mm"; later(); };
@@ -1065,12 +1343,13 @@ $("#download").onclick = async () => {
   $("#download").disabled = true; $("#msg").textContent = t("preparing");
   await new Promise(res => setTimeout(res, 30));
   const o = D.obj(r.pos, r.idx, r.faceLab, PAL, NAMES, base);
-  const m3 = await zip(package3mf(D.model3mf(r.pos, r.idx, r.faceLab, PAL, NAMES, "Doodle Puff")));
+  const m3 = await zip(package3mf(D.model3mf(r.pos, r.idx, r.faceLab, PAL, NAMES, theme ? "Doodle Puff " + TH.byId(theme).en : "Doodle Puff")));
   const readme = ["Doodle Puff by Daily Layer", "",
     base + "_painted.obj (+ .mtl): one solid piece with the drawing's colours. Bambu Studio: drag the .obj in; the import window matches each colour to a filament. Keep the .mtl next to it.",
     base + "_painted.3mf: the same coloured piece as a 3MF (colour per triangle). Bambu Studio 2.5+ offers to import its colours.",
     base + ".stl: single colour; the crayon lines and eyes are raised, so the drawing still shows.", "",
-    "Size " + r.size.map(v => v.toFixed(1)).join(" x ") + " mm. Lies flat on the bed, no supports. 0.16-0.2 mm layers, 3 walls, 15% infill.", "",
+    "Size " + r.size.map(v => v.toFixed(1)).join(" x ") + " mm. " + (r.upright ? "Stands upright on the bed. Turn on tree supports for parts that stick out (balloon, mushroom cap, ice cream scoop)." : "Lies flat on the bed, no supports.") + " 0.16-0.2 mm layers, 3 walls, 15% infill.", "",
+    ...(r.upright && TH.byId(theme)?.hollow ? ["Printed cups and vases are toys or pen pots only. PLA prints are not food safe: no food, drinks or hot water.", ""] : []),
     "Safety: for ages 3+, adult supervision. One solid piece, no loose parts. Don't glue on small magnets. Not for mouthing or chewing."].join("\n");
   const blob = await zip([
     { name: base + "_painted.obj", data: o.obj }, { name: base + ".mtl", data: o.mtl },
@@ -1094,6 +1373,7 @@ function applyWords() {
   $("#lPuff").textContent = t("puff"); $("#lSize").textContent = t("size"); $("#lBody").textContent = t("body");
   $("#loop").textContent = t("loop"); $("#fine").textContent = t("fine"); $("#safeTitle").textContent = t("safeTitle");
   $("#safeList").innerHTML = T[LANG].safe.map(s => `<li>${s}</li>`).join("");
+  $("#themesTitle").textContent = t("themesTitle"); $("#themesText").textContent = t("themesText"); $("#themeOff").setAttribute("aria-label", t("freeDraw")); $("#themeOff").title = t("freeDraw");
   $("#tplTitle").textContent = t("tplTitle"); $("#tplText").textContent = t("tplText"); $("#tplClose").textContent = t("close");
   $("#clearTitle").textContent = t("clearTitle"); $("#clearText").textContent = t("clearText"); $("#clearNo").textContent = t("cancel"); $("#clearYes").textContent = t("wipe");
 }
@@ -1102,7 +1382,9 @@ function applyWords() {
 $("#back").href = window.SHOP_URL || "/";
 applyWords(); buildTray();
 fxOn = false;
-loadDraft().then(ok => { if (!ok) { ctx.clearRect(0, 0, DS, DS); TPL[0](); colour = 3; tool = "fill"; } fxOn = true; paintAll(); syncTools(); syncUndo(); });
+loadDraft().then(ok => { if (!ok) { ctx.clearRect(0, 0, DS, DS); TPL[0](); colour = 3; tool = "fill"; }
+  else { let id = ""; try { id = localStorage.getItem("doodle-theme") || ""; } catch (e) {} if (id) setTheme(id); }
+  fxOn = true; paintAll(); syncTools(); syncUndo(); });
 </script>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 <script type="module">
@@ -1131,13 +1413,15 @@ window.Viewer3D = {
     ng.setAttribute("color", new THREE.BufferAttribute(col, 3)); g.dispose();
     if (mesh) { scene.remove(mesh); mesh.geometry.dispose(); }
     mesh = new THREE.Mesh(ng, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.55, metalness: 0 }));
-    ng.computeBoundingBox(); const bb = ng.boundingBox, ctr = bb.getCenter(new THREE.Vector3()), s = bb.getSize(new THREE.Vector3());
+    if (r.upright) mesh.rotation.x = -Math.PI / 2;    // print space is z up; the viewer is y up
+    mesh.updateMatrixWorld(true); const bb = new THREE.Box3().setFromObject(mesh), ctr = bb.getCenter(new THREE.Vector3()), s = bb.getSize(new THREE.Vector3());
     mesh.position.set(-ctr.x, -ctr.y, -ctr.z); scene.add(mesh);
     resize();
+    const kind = r.upright ? "up" : "flat"; if (framed !== kind) framed = false;
     if (!framed) {   // fit the whole piece with a margin, whatever the screen shape
       const tn = Math.tan(THREE.MathUtils.degToRad(cam.fov / 2)), d = Math.max(s.y / (2 * tn), s.x / (2 * tn * cam.aspect)) * 1.35 + s.z;
-      const dir = new THREE.Vector3(-0.3, -0.2, 0.93).normalize();
-      cam.position.copy(dir.multiplyScalar(d)); cam.near = d / 100; cam.far = d * 20; cam.updateProjectionMatrix(); controls.target.set(0, 0, 0); framed = true;
+      const dir = (r.upright ? new THREE.Vector3(0.45, 0.42, 0.9) : new THREE.Vector3(-0.3, -0.2, 0.93)).normalize();
+      cam.position.copy(dir.multiplyScalar(d)); cam.near = d / 100; cam.far = d * 20; cam.updateProjectionMatrix(); controls.target.set(0, 0, 0); framed = kind;
     }
   }
 };

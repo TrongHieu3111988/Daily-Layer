@@ -1,6 +1,6 @@
-s=open("doodle_app.html").read(); core=open("doodle_core.js").read()
+s=open("doodle_app.html").read(); core=open("doodle_core.js").read(); themes=open("doodle_themes.js").read()
 for name,url in [("doodle_artifact.html","https://claude.ai/artifact/NWvKP3j5tXF8mCmxkDrE4A"),("doodle_standalone.html","/")]:
-    body=s.replace("/*DOODLE*/",core).replace('<script>\n"use strict";','<script>\nwindow.SHOP_URL = "'+url+'";\n"use strict";',1)
+    body=s.replace("/*DOODLE*/",core).replace("/*THEMES*/",themes).replace('<script>\n"use strict";','<script>\nwindow.SHOP_URL = "'+url+'";\n"use strict";',1)
     if name=="doodle_standalone.html":
         title,rest=body.split("\n",1)
         body=("<!doctype html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<meta name=\"viewport\" content=\"width=device-width,initial-scale=1,viewport-fit=cover\">\n"
