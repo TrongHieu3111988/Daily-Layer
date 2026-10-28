@@ -4,7 +4,7 @@ repo/public/index.html   -> the public website on Cloudflare (real files, instal
 usage: python3 site_src/build_shop.py  (run from /home/claude)"""
 import os
 src = open("site_src/shop.html").read()
-ART = '<script>window.HOST = "artifact"; window.TOOLS = { doodle: "https://claude.ai/artifact/KE3s6dFJQW2m9saZy9Gam3", sculpt: "https://claude.ai/artifact/AuyWaB1MFswxLQc6Uzyces" };</script>\n'
+ART = '<script>window.HOST = "artifact"; window.TOOLS = { doodle: "https://claude.ai/artifact/KE3s6dFJQW2m9saZy9Gam3", sculpt: "https://claude.ai/artifact/AuyWaB1MFswxLQc6Uzyces", stack: "https://claude.ai/artifact/5ELRqRw3UhEdrhw7jZgH1z", spot: "https://claude.ai/artifact/JbcssAnpkXChMTvtktXmkv", shelf: "https://claude.ai/artifact/HBKDhzdkkK5bUefDzYffwf" };</script>\n'
 art = src.replace("<!--HEAD-->\n", "").replace("<!--TAIL-->\n", "").replace("<script>\n/* ---------- words ---------- */", ART + "<script>\n/* ---------- words ---------- */", 1)
 open("site/index.html", "w").write(art)
 

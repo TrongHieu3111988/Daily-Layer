@@ -1,0 +1,228 @@
+<title>Stack the Drop</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<!--HEAD-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@500;600;700;800&display=swap">
+<style>
+/*KITCSS*/
+/* Stack the Drop: a crane swings a toy friend over a little table; tap to drop it and build the tallest tower. */
+.stage{background:linear-gradient(#BFE6FF,#E8F6FF)}
+:root[data-theme="dark"] .stage{background:linear-gradient(#0B1330,#1B2A5C)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .stage{background:linear-gradient(#0B1330,#1B2A5C)}}
+#game{display:block;width:100%;height:100%;touch-action:none;cursor:pointer}
+.hearts{position:absolute;left:12px;top:12px;display:flex;gap:4px;z-index:3}
+.hearts svg{width:30px;height:30px;transition:transform .3s}
+.hearts svg.lost{transform:scale(.7);opacity:.35}
+.next{position:absolute;right:12px;top:12px;z-index:3;background:var(--paper);border:2.5px solid var(--outline);border-radius:16px;padding:4px 8px 6px;box-shadow:var(--pop-sm);text-align:center;font-family:var(--f-display);font-weight:800;font-size:13px}
+.next canvas{display:block;width:54px;height:46px}
+.tap{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);z-index:3;background:color-mix(in srgb,var(--paper) 88%,transparent);border-radius:999px;padding:5px 14px;font-weight:800;font-size:14px;color:var(--muted);pointer-events:none;white-space:nowrap}
+</style>
+
+<div class="app">
+  <header class="bar">
+    <a class="ibtn" id="back" href="/" data-t-label="back" aria-label="Back"></a>
+    <h1 data-t="title">Stack the Drop</h1>
+    <span class="score" aria-live="polite"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="14" width="14" height="7" rx="2" fill="#FF6B57" stroke="#1B2547" stroke-width="2"/><rect x="7" y="7" width="10" height="7" rx="2" fill="#3FBF7F" stroke="#1B2547" stroke-width="2"/><circle cx="12" cy="4.5" r="2.6" fill="#5DB8FF" stroke="#1B2547" stroke-width="1.8"/></svg><span id="count">0</span></span>
+    <button class="ibtn" id="soundBtn" type="button" data-t-label="sound" aria-label="Sound"></button>
+    <button class="ibtn" id="langBtn" type="button" aria-label="Language">VI</button>
+  </header>
+  <main class="stage" id="stage">
+    <canvas id="game" aria-label="Stacking game"></canvas>
+    <div class="hearts" id="hearts" aria-label="Lives"></div>
+    <div class="next"><canvas id="nextC" width="108" height="92"></canvas><span data-t="next">Next</span></div>
+    <div class="tap" id="tapHint" data-t="tap">Tap to drop!</div>
+    <div class="toast" id="toast" hidden></div>
+  </main>
+</div>
+
+<div class="overlay" id="intro">
+  <div class="card">
+    <canvas class="hero" id="introArt" width="400" height="280"></canvas>
+    <h2 data-t="introH">How high can you stack?</h2>
+    <p data-t="introP">The crane swings a toy friend over the table. Tap to drop it. Build a tall tower without letting friends fall off!</p>
+    <p id="bestLine"></p>
+    <button class="btn coral" type="button" id="startBtn"><span data-t="start">Let's stack!</span></button>
+  </div>
+</div>
+<div class="overlay" id="over" hidden>
+  <div class="card">
+    <div class="stars" id="stars"></div>
+    <h2 id="overH">Great tower!</h2>
+    <p id="overP"></p>
+    <div class="row"><button class="btn coral" type="button" id="againBtn"><span data-t="again">Play again</span></button><a class="btn" id="homeBtn" href="/" data-t="home">More games</a></div>
+  </div>
+</div>
+
+<script>/*KITJS*/</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+<script>
+"use strict";
+K.words.en = { title: "Stack the Drop", back: "Back", sound: "Sound on or off", next: "Next", tap: "Tap to drop!", introH: "How high can you stack?",
+  introP: "The crane swings a toy friend over the table. Tap to drop it. Build a tall tower without letting friends fall off!", start: "Let's stack!", again: "Play again", home: "More games",
+  best: n => "Your best: " + n + " toys", oops: "Oops! Catch the next one", milestone: n => n + " toys tall!", overH: n => n >= 15 ? "Super tower!" : n >= 8 ? "Great tower!" : n >= 3 ? "Nice stacking!" : "Good try!",
+  overP: (n, cm, best) => n + " toys, " + cm + " cm tall." + (n >= best && n > 0 ? " New best!" : " Best: " + best + " toys."), noPhysics: "The game engine didn't load. Check the connection and reload." };
+K.words.vi = { title: "Xếp Tháp", back: "Quay lại", sound: "Bật hoặc tắt âm thanh", next: "Tiếp", tap: "Chạm để thả!", introH: "Bé xếp được tháp cao bao nhiêu?",
+  introP: "Cần cẩu đưa bạn đồ chơi qua lại trên bàn. Chạm để thả xuống. Xếp tháp thật cao, đừng để bạn nào rơi nhé!", start: "Xếp thôi!", again: "Chơi lại", home: "Trò khác",
+  best: n => "Kỷ lục của bé: " + n + " bạn", oops: "Ối! Bắt bạn tiếp theo nhé", milestone: n => "Cao " + n + " bạn rồi!", overH: n => n >= 15 ? "Tháp siêu cao!" : n >= 8 ? "Tháp tuyệt vời!" : n >= 3 ? "Xếp giỏi lắm!" : "Cố lên nào!",
+  overP: (n, cm, best) => n + " bạn đồ chơi, cao " + cm + " cm." + (n >= best && n > 0 ? " Kỷ lục mới!" : " Kỷ lục: " + best + " bạn."), noPhysics: "Chưa tải được bộ máy trò chơi. Kiểm tra mạng rồi tải lại trang." };
+
+const M = window.Matter;
+const VW = 360;                       // virtual width; everything is laid out in these units
+const TABLE_W = 190, FLOOR_Y = 150, CRANE_Y = 78, MAXH = 5;   // five hearts: kind to small hands   // table top is y = 0, grass floor below it
+const COLS = ["#FF6B57", "#FFC93C", "#3FBF7F", "#5DB8FF", "#8C6BF2", "#FF8FB8", "#FF9B3D"];
+const KINDS = [
+  { shape: "square", w: 54, h: 54 }, { shape: "square", w: 96, h: 38 }, { shape: "square", w: 40, h: 70 },
+  { shape: "tri", w: 66, h: 56 }, { shape: "dome", w: 64, h: 50 }, { shape: "square", w: 70, h: 46 }
+];
+const cv = document.getElementById("game"), g = cv.getContext("2d");
+let scale = 1, viewH = 600, dpr = 1;
+K.fit(cv, (w, h, d) => { dpr = d; scale = cv.width / VW; viewH = cv.height / scale; if (!running) { if (!engine) camTop = -(viewH - 120); draw(); } });
+
+let engine = null, table = null, floor = null, pieces = [], hearts = 3, count = 0, best = K.store.get("stack-best", 0);
+let held = null, nextKind = null, t0 = 0, camTop = 0, running = false, lastDrop = 0, swing = 0, milestone = 0;
+
+function pick() { let k; do { k = KINDS[(Math.random() * KINDS.length) | 0]; } while (k.shape === "tri" && Math.random() < 0.7); return { ...k, colour: COLS[(Math.random() * COLS.length) | 0] }; }
+function makeBody(k, x, y) {
+  const opts = { friction: 0.9, frictionStatic: 1.4, restitution: 0.02, density: 0.0016, sleepThreshold: 50, chamfer: k.shape === "square" ? { radius: Math.min(k.w, k.h) * 0.2 } : undefined };
+  let b, off = { x: 0, y: 0 };
+  if (k.shape === "square") b = M.Bodies.rectangle(x, y, k.w, k.h, opts);
+  else {
+    let v;
+    if (k.shape === "tri") v = [{ x: 0, y: -k.h / 2 }, { x: k.w / 2, y: k.h / 2 }, { x: -k.w / 2, y: k.h / 2 }];
+    else { v = [{ x: -k.w / 2, y: k.h / 2 }, { x: k.w / 2, y: k.h / 2 }]; for (let i = 0; i <= 12; i++) { const a = i / 12 * Math.PI; v.push({ x: Math.cos(a) * k.w / 2, y: -Math.sin(a) * k.h / 2 }); } v = [v[0], v[1], ...v.slice(2)]; }
+    off = M.Vertices.centre(v);
+    b = M.Bodies.fromVertices(x + off.x, y + off.y, [v], opts);
+  }
+  b.kind = k; b.off = off; b.born = performance.now(); b.state = "fall";
+  return b;
+}
+function hearts$() { document.getElementById("hearts").innerHTML = Array.from({ length: MAXH }, (_, i) => i).map(i => `<svg viewBox="0 0 24 24" class="${i < hearts ? "" : "lost"}" aria-hidden="true"><path d="M12 21s-8-5-8-11a4.5 4.5 0 018-2.8A4.5 4.5 0 0120 10c0 6-8 11-8 11z" fill="#FF6B57" stroke="#1B2547" stroke-width="2.2" stroke-linejoin="round"/></svg>`).join(""); }
+function drawNext() {
+  const c = document.getElementById("nextC"), x = c.getContext("2d"); x.clearRect(0, 0, c.width, c.height);
+  if (!nextKind) return; const s = Math.min(80 / nextKind.w, 70 / nextKind.h, 1.2);
+  x.save(); x.translate(c.width / 2, c.height / 2); x.scale(s, s); K.friend(x, { ...nextKind, mood: "happy" }); x.restore();
+}
+let toastT = 0;
+function toast(m) { const e = document.getElementById("toast"); e.textContent = m; e.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => (e.hidden = true), 1600); }
+
+function start() {
+  if (!M) { toast(K.t("noPhysics")); return; }
+  engine = M.Engine.create({ enableSleeping: true, positionIterations: 10, velocityIterations: 8 });
+  engine.gravity.y = 1;
+  table = M.Bodies.rectangle(VW / 2, 14, TABLE_W, 28, { isStatic: true, friction: 1, chamfer: { radius: 8 } });
+  floor = M.Bodies.rectangle(VW / 2, FLOOR_Y + 40, VW * 6, 80, { isStatic: true, friction: 1 });
+  M.Composite.add(engine.world, [table, floor]);
+  pieces = []; hearts = MAXH; count = 0; milestone = 0; camTop = -(viewH - 120); swing = 0;
+  held = pick(); nextKind = pick(); drawNext(); hearts$(); document.getElementById("count").textContent = "0";
+  document.getElementById("intro").hidden = true; document.getElementById("over").hidden = true;
+  running = true; t0 = performance.now(); last = t0; requestAnimationFrame(frame);
+}
+function craneX() { const sp = 0.0011 + Math.min(count, 25) * 0.00004; return VW / 2 + Math.sin(swing) * (TABLE_W * 0.5 + 6); }
+function drop() {
+  if (!running || !held || performance.now() - lastDrop < 450) return;
+  const x = craneX(), y = camTop + CRANE_Y + 62 + held.h / 2 + 2;
+  const b = makeBody(held, x, y);
+  M.Body.setVelocity(b, { x: Math.cos(swing) * 0.6, y: 0.5 });
+  M.Composite.add(engine.world, b); pieces.push(b);
+  held = null; lastDrop = performance.now(); K.sfx.pop();
+  document.getElementById("tapHint").hidden = true;
+  setTimeout(() => { if (!running) return; held = nextKind; nextKind = pick(); drawNext(); }, 520);
+}
+cv.addEventListener("pointerdown", e => { e.preventDefault(); drop(); });
+addEventListener("keydown", e => { if ((e.key === " " || e.key === "Enter") && running) { e.preventDefault(); drop(); } });
+
+let last = 0;
+function frame(now) {
+  if (!running) return;
+  const dt = Math.min(33, now - last); last = now;
+  swing += dt * (0.0012 + Math.min(count, 25) * 0.00005);
+  M.Engine.update(engine, dt);
+  // which friends are on the tower, which fell
+  let top = 0, onTower = 0;
+  for (const b of pieces) {
+    if (b.state === "gone") continue;
+    if (b.state !== "fallen" && b.position.y > 60) { b.state = "fallen"; b.fellAt = now; hearts--; hearts$(); K.sfx.boing(); toast(K.t("oops")); if (navigator.vibrate) try { navigator.vibrate(60); } catch (e) {} }
+    if (b.state === "fallen") { if (now - b.fellAt > 900) { M.Composite.remove(engine.world, b); b.state = "gone"; } continue; }
+    const settled = b.speed < 0.25 && now - b.born > 600;
+    if (settled && b.state === "fall") { b.state = "rest"; K.sfx.thud(); }
+    if (b.state === "rest") { onTower++; top = Math.min(top, b.bounds.min.y); }
+  }
+  pieces = pieces.filter(b => b.state !== "gone");
+  if (onTower !== count) {
+    count = onTower; document.getElementById("count").textContent = count;
+    if (count >= milestone + 5) { milestone = Math.floor(count / 5) * 5; K.sfx.tada(); K.confetti(); toast(K.t("milestone", milestone)); }
+  }
+  // camera follows the tower top
+  const want = Math.min(-(viewH - 120), top - viewH * 0.52);
+  camTop += (want - camTop) * Math.min(1, dt / 400);
+  draw(now);
+  if (hearts <= 0) return gameOver();
+  requestAnimationFrame(frame);
+}
+function gameOver() {
+  running = false;
+  let top = 0; for (const b of pieces) if (b.state === "rest") top = Math.min(top, b.bounds.min.y);
+  const cm = Math.round(-top / 10), newBest = count > best; if (newBest) { best = count; K.store.set("stack-best", best); }
+  const stars = count >= 15 ? 3 : count >= 8 ? 2 : count >= 3 ? 1 : 0;
+  document.getElementById("stars").innerHTML = [0, 1, 2].map(i => K.starSVG(i < stars)).join("");
+  document.getElementById("overH").textContent = K.t("overH", count);
+  document.getElementById("overP").textContent = K.t("overP", count, cm, best);
+  setTimeout(() => { document.getElementById("over").hidden = false; if (stars) { K.sfx.tada(); K.confetti(); } document.getElementById("againBtn").focus(); }, 700);
+}
+
+/* ---------- drawing ---------- */
+function draw(now = performance.now()) {
+  const W = cv.width, H = cv.height; g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, W, H);
+  g.setTransform(scale, 0, 0, scale, 0, -camTop * scale);
+  const top = camTop, bot = camTop + viewH;
+  // clouds drift by slowly (parallax)
+  g.fillStyle = "rgba(255,255,255,.75)";
+  for (let i = 0; i < 6; i++) { const cy = Math.floor((top - 200) / 260) * 260 + i * 260 * 0.5 + 40, cx = ((i * 137 + now * 0.004) % (VW + 160)) - 80;
+    if (cy < top - 60 || cy > bot + 60) continue; g.beginPath(); g.ellipse(cx, cy, 46, 14, 0, 0, 7); g.ellipse(cx - 18, cy - 10, 18, 14, 0, 0, 7); g.ellipse(cx + 12, cy - 14, 22, 18, 0, 0, 7); g.fill(); }
+  // height marks every 10 cm
+  g.font = "800 11px Nunito, sans-serif"; g.textAlign = "left";
+  for (let y = 0; y > top - 100; y -= 100) { if (y > bot) continue; g.strokeStyle = "rgba(27,37,71,.18)"; g.lineWidth = 2; g.setLineDash([6, 6]); g.beginPath(); g.moveTo(0, y); g.lineTo(28, y); g.stroke(); g.setLineDash([]);
+    if (y < 0) { g.fillStyle = "rgba(27,37,71,.45)"; g.fillText(Math.round(-y / 10) + " cm", 4, y - 4); } }
+  // grass and table
+  g.fillStyle = "#7ED69A"; g.fillRect(-10, FLOOR_Y, VW + 20, 400);
+  g.fillStyle = "#5CC27F"; for (let x = -10; x < VW + 20; x += 18) { g.beginPath(); g.ellipse(x, FLOOR_Y, 12, 7, 0, Math.PI, 0); g.fill(); }
+  g.fillStyle = "#C98E4F"; g.strokeStyle = K.INK; g.lineWidth = 3;
+  for (const lx of [VW / 2 - TABLE_W / 2 + 16, VW / 2 + TABLE_W / 2 - 30]) { g.beginPath(); g.roundRect(lx, 20, 14, FLOOR_Y - 20, 4); g.fill(); g.stroke(); }
+  g.fillStyle = "#E9B97A"; g.beginPath(); g.roundRect(VW / 2 - TABLE_W / 2, 0, TABLE_W, 28, 8); g.fill(); g.stroke();
+  g.fillStyle = "rgba(255,255,255,.35)"; g.fillRect(VW / 2 - TABLE_W / 2 + 10, 5, TABLE_W - 20, 5);
+  // friends
+  for (const b of pieces) {
+    if (b.state === "gone") continue;
+    const alpha = b.state === "fallen" ? Math.max(0, 1 - (now - b.fellAt) / 900) : 1;
+    const mood = b.state === "fallen" ? "sad" : b.state === "fall" ? "wow" : (b.isSleeping && ((b.id * 7 + (now / 2400 | 0)) % 9 === 0) ? "sleepy" : "happy");
+    g.save(); g.globalAlpha = alpha; g.translate(b.position.x, b.position.y); g.rotate(b.angle); g.translate(-b.off.x, -b.off.y);
+    K.friend(g, { ...b.kind, mood, lw: 3 }); g.restore();
+  }
+  // crane
+  if (running || held) {
+    const cx = craneX(), cy = camTop + CRANE_Y;
+    g.strokeStyle = K.INK; g.lineWidth = 4; g.fillStyle = "#FFC93C";
+    g.beginPath(); g.roundRect(-10, cy - 14, VW + 20, 12, 6); g.fill(); g.stroke();
+    g.beginPath(); g.roundRect(cx - 22, cy - 22, 44, 26, 8); g.fillStyle = "#FF6B57"; g.fill(); g.stroke();
+    g.beginPath(); g.moveTo(cx, cy + 4); g.lineTo(cx, cy + 50); g.stroke();
+    g.beginPath(); g.moveTo(cx - 14, cy + 62); g.quadraticCurveTo(cx, cy + 44, cx + 14, cy + 62); g.stroke();
+    if (held) { g.save(); g.translate(cx, cy + 62 + held.h / 2 + 2); g.rotate(Math.cos(swing) * 0.06); K.friend(g, { ...held, mood: "happy", lw: 3 }); g.restore(); }
+  }
+}
+
+/* ---------- boot ---------- */
+K.initBar();
+K.onLang = () => { document.getElementById("bestLine").textContent = best ? K.t("best", best) : ""; };
+K.applyWords();
+(function introArt() {
+  const c = document.getElementById("introArt"), x = c.getContext("2d");
+  const items = [[200, 230, { shape: "square", w: 150, h: 46, colour: "#5DB8FF" }], [190, 175, { shape: "square", w: 70, h: 66, colour: "#FFC93C" }], [205, 112, { shape: "tri", w: 76, h: 60, colour: "#FF6B57" }], [300, 210, { shape: "dome", w: 66, h: 54, colour: "#3FBF7F" }]];
+  for (const [px, py, k] of items) { x.save(); x.translate(px, py); K.friend(x, { ...k, lw: 4 }); x.restore(); }
+  K.star(x, 92, 80, 20); K.star(x, 320, 70, 14, "#FF8FB8");
+})();
+document.getElementById("homeBtn").href = window.SHOP_URL ? window.SHOP_URL + (window.SHOP_URL.includes("#") ? "" : "#play") : "/#play";
+document.getElementById("startBtn").onclick = () => { K.sfx.pop(); start(); };
+document.getElementById("againBtn").onclick = () => { K.sfx.pop(); start(); };
+draw();
+</script>
+<!--TAIL-->

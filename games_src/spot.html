@@ -1,0 +1,257 @@
+<title>Spot the Oops</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<!--HEAD-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@500;600;700;800&display=swap">
+<style>
+/*KITCSS*/
+/* Spot the Oops: a row of prints fresh off the printer; one has a real 3D-printing defect. Tap it, then learn its name. */
+.stage{display:flex;flex-direction:column;background:var(--paper)}
+.ask{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 16px 6px}
+.ask h2{font-family:var(--f-display);font-weight:800;font-size:clamp(22px,4.6vw,30px);margin:0;line-height:1.1}
+.round{flex:none;font-family:var(--f-display);font-weight:800;font-size:16px;color:var(--muted);font-variant-numeric:tabular-nums}
+.cards{flex:1;min-height:0;display:grid;gap:12px;padding:8px 14px 16px;align-content:center;justify-content:center}
+.cards.n2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.cards.n3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.cards.n4{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media (min-width:760px){.cards.n4{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media (max-width:520px){.cards.n2{grid-template-columns:minmax(0,1fr)}.cards.n2 .pc{aspect-ratio:4/3}.cards.n3{grid-template-columns:repeat(2,minmax(0,1fr))}.cards.n3 .pc:last-child{grid-column:1 / -1;justify-self:center;width:calc(50% - 6px)}}
+.pc{position:relative;aspect-ratio:3/4;max-height:100%;border:3px solid var(--outline);border-radius:22px;background:#F3F6FB;box-shadow:0 5px 0 var(--outline);padding:0;overflow:hidden;transition:transform .15s cubic-bezier(.34,1.56,.64,1)}
+.pc:hover{transform:translateY(-3px)}
+.pc canvas{display:block;width:100%;height:100%}
+.pc.right{border-color:var(--good);box-shadow:0 5px 0 var(--good),0 0 0 4px color-mix(in srgb,var(--good) 35%,transparent)}
+.pc.wrong{animation:shake .4s}
+.pc.dim{opacity:.45}
+@keyframes shake{20%{transform:translateX(-8px) rotate(-2deg)}40%{transform:translateX(7px) rotate(2deg)}60%{transform:translateX(-5px)}80%{transform:translateX(3px)}}
+.learn{position:absolute;left:12px;right:12px;bottom:12px;z-index:6;background:var(--paper);border:3px solid var(--outline);border-radius:24px;box-shadow:0 6px 0 var(--outline);padding:14px 16px;display:grid;grid-template-columns:64px 1fr;gap:4px 14px;align-items:start;animation:up .35s cubic-bezier(.34,1.56,.64,1)}
+.learn svg.layo{width:64px;height:70px;grid-row:span 3}
+.learn h3{margin:0;font-family:var(--f-display);font-weight:800;font-size:24px;line-height:1.1}
+.learn h3 small{display:block;font-size:14px;color:var(--muted);font-weight:700}
+.learn p{margin:0;font-weight:700;line-height:1.4}
+.learn .tip{font-size:14px;color:var(--muted);font-weight:700}
+.learn .tip b{color:var(--ink)}
+.learn .btn{grid-column:1 / -1;justify-self:end;margin-top:6px;font-size:18px;padding:10px 18px}
+@keyframes up{0%{transform:translateY(30px);opacity:0}100%{transform:none;opacity:1}}
+.pc:focus-visible{outline-offset:4px}
+@media (prefers-reduced-motion:reduce){.pc,.learn{animation:none!important;transition:none}}
+</style>
+
+<div class="app">
+  <header class="bar">
+    <a class="ibtn" id="back" href="/" data-t-label="back" aria-label="Back"></a>
+    <h1 data-t="title">Spot the Oops</h1>
+    <span class="score" aria-live="polite"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z" fill="#fff" stroke="#1B2547" stroke-width="2" stroke-linejoin="round"/></svg><span id="starCount">0</span></span>
+    <button class="ibtn" id="soundBtn" type="button" data-t-label="sound" aria-label="Sound"></button>
+    <button class="ibtn" id="langBtn" type="button" aria-label="Language">VI</button>
+  </header>
+  <main class="stage" id="stage">
+    <div class="ask"><h2 id="ask" data-t="ask">Which print has an oops?</h2><span class="round" id="round">1 / 10</span></div>
+    <div class="cards n2" id="cards" role="group" aria-labelledby="ask"></div>
+    <div class="learn" id="learn" hidden aria-live="polite">
+      <svg class="layo" viewBox="0 0 120 130" aria-hidden="true"><path d="M60 4v14" stroke="#1B2547" stroke-width="4" stroke-linecap="round"/><path d="M52 18h16l-4 10h-8z" fill="#FF6B57" stroke="#1B2547" stroke-width="3.5" stroke-linejoin="round"/><rect x="16" y="28" width="88" height="78" rx="24" fill="#FFC93C" stroke="#1B2547" stroke-width="4"/><rect x="28" y="40" width="64" height="40" rx="14" fill="#1B2547"/><ellipse cx="46" cy="58" rx="7" ry="9" fill="#fff"/><ellipse cx="74" cy="58" rx="7" ry="9" fill="#fff"/><circle cx="48" cy="60" r="3.5" fill="#1B2547"/><circle cx="76" cy="60" r="3.5" fill="#1B2547"/><path d="M50 70q10 8 20 0" fill="none" stroke="#FF8FB8" stroke-width="3.5" stroke-linecap="round"/><rect x="30" y="106" width="16" height="14" rx="5" fill="#8C6BF2" stroke="#1B2547" stroke-width="3"/><rect x="74" y="106" width="16" height="14" rx="5" fill="#8C6BF2" stroke="#1B2547" stroke-width="3"/></svg>
+      <h3 id="lName">Layer shift<small id="lCheer">You found it!</small></h3>
+      <p id="lWhat"></p>
+      <p class="tip" id="lTip"></p>
+      <button class="btn coral" type="button" id="nextBtn"><span data-t="next">Next</span></button>
+    </div>
+    <div class="toast" id="toast" hidden></div>
+  </main>
+</div>
+
+<div class="overlay" id="intro">
+  <div class="card">
+    <canvas class="hero" id="introArt" width="400" height="280"></canvas>
+    <h2 data-t="introH">Be a print detective!</h2>
+    <p data-t="introP">3D printers make toys one thin layer at a time. Sometimes something goes wrong. Find the print with the oops, and learn what happened.</p>
+    <button class="btn coral" type="button" id="startBtn"><span data-t="start">Start</span></button>
+  </div>
+</div>
+<div class="overlay" id="over" hidden>
+  <div class="card">
+    <div class="stars" id="stars"></div>
+    <h2 id="overH"></h2>
+    <p id="overP"></p>
+    <div class="row"><button class="btn coral" type="button" id="againBtn"><span data-t="again">Play again</span></button><a class="btn" id="homeBtn" href="/" data-t="home">More games</a></div>
+  </div>
+</div>
+
+<script>/*KITJS*/</script>
+<script>
+"use strict";
+const D = {
+  en: { shift: ["Layer shift", "The top half slid sideways. The printer got bumped, or a belt is loose.", "Tighten the belts and keep the printer still while it works."],
+        gap: ["Missing layers", "A thin gap where plastic didn't come out for a moment.", "Check the filament isn't tangled or stuck on the spool."],
+        warp: ["Warping", "The bottom corners shrank as they cooled and lifted off the bed.", "Clean the bed, use glue stick or add a brim."],
+        foot: ["Elephant foot", "The first layers squished out wider, like an elephant's foot.", "Lower the bed temperature or raise the first layer a little."],
+        blobs: ["Blobs and zits", "Little bumps of extra plastic dotted on the surface.", "Lower the nozzle temperature and turn on retraction or wipe."],
+        string: ["Stringing", "Thin hairs of plastic stretched between two parts, like a spider web.", "Dry the filament and increase retraction."],
+        spaghetti: ["Spaghetti", "The print came loose from the bed, so the printer drew noodles in the air.", "Watch the first layers and make sure they stick well."],
+        under: ["Under-extrusion", "Walls came out thin with tiny holes: not enough plastic.", "Check for a clogged nozzle and slightly raise the temperature."] },
+  vi: { shift: ["Lệch lớp", "Nửa trên bị trượt sang một bên. Máy bị va hoặc dây curoa bị lỏng.", "Siết lại dây curoa và đừng chạm vào máy khi đang in."],
+        gap: ["Thiếu lớp", "Có một khe hở vì nhựa ngừng ra trong chốc lát.", "Kiểm tra cuộn nhựa có bị rối hay vướng không."],
+        warp: ["Cong vênh đáy", "Góc đáy co lại khi nguội và nhấc lên khỏi bàn in.", "Lau sạch bàn in, bôi keo hoặc thêm vành phụ (brim)."],
+        foot: ["Chân voi", "Mấy lớp đầu bị bè ra, trông như chân voi.", "Giảm nhiệt bàn in hoặc nâng lớp đầu lên một chút."],
+        blobs: ["Mụn nhựa", "Những cục nhựa nhỏ lấm tấm trên bề mặt.", "Giảm nhiệt độ vòi phun, bật rút nhựa (retraction)."],
+        string: ["Tơ nhện", "Sợi nhựa mảnh giăng giữa hai phần, như mạng nhện.", "Sấy khô nhựa và tăng rút nhựa (retraction)."],
+        spaghetti: ["Mì sợi", "Bản in bung khỏi bàn nên máy vẽ ra một đống sợi mì trong không khí.", "Theo dõi vài lớp đầu và đảm bảo lớp đầu bám chắc."],
+        under: ["Thiếu nhựa", "Thành in mỏng, có lỗ li ti vì ra không đủ nhựa.", "Kiểm tra vòi phun có bị tắc, tăng nhiệt độ một chút."] }
+};
+K.words.en = { title: "Spot the Oops", back: "Back", sound: "Sound on or off", ask: "Which print has an oops?", next: "Next", start: "Start", again: "Play again", home: "More games",
+  introH: "Be a print detective!", introP: "3D printers make toys one thin layer at a time. Sometimes something goes wrong. Find the print with the oops, and learn what happened.",
+  cheer: ["You found it!", "Sharp eyes!", "Detective work!", "Spot on!"], tryAgain: "That one is fine. Look again!", tip: "For grown-ups: ", round: (a, b) => a + " / " + b,
+  overH: s => s >= 9 ? "Master detective!" : s >= 6 ? "Great detective!" : "Good detective!", overP: (s, n) => "You found " + s + " of " + n + " oops on the first try.", aria: (i, n) => "Print " + i + " of " + n };
+K.words.vi = { title: "Tìm Lỗi In", back: "Quay lại", sound: "Bật hoặc tắt âm thanh", ask: "Bản in nào bị lỗi?", next: "Tiếp", start: "Bắt đầu", again: "Chơi lại", home: "Trò khác",
+  introH: "Làm thám tử máy in!", introP: "Máy in 3D làm đồ chơi từng lớp mỏng một. Đôi khi có trục trặc. Bé hãy tìm bản in bị lỗi và học xem chuyện gì đã xảy ra nhé.",
+  cheer: ["Bé tìm ra rồi!", "Mắt tinh quá!", "Thám tử giỏi!", "Chính xác!"], tryAgain: "Bản này không sao. Nhìn kỹ lại nhé!", tip: "Mẹo cho bố mẹ: ", round: (a, b) => a + " / " + b,
+  overH: s => s >= 9 ? "Thám tử bậc thầy!" : s >= 6 ? "Thám tử tuyệt vời!" : "Thám tử chăm chỉ!", overP: (s, n) => "Bé tìm đúng " + s + "/" + n + " lỗi ngay lần đầu.", aria: (i, n) => "Bản in " + i + " trên " + n };
+
+/* ---------- prints: objects are stacks of layers; each layer has one or more spans (x from -0.5 to 0.5) ---------- */
+const OBJ = {
+  vase: t => { const w = 0.26 + 0.12 * Math.sin(Math.PI * t * 1.15) - (t > 0.9 ? 0.04 : 0); return [[-w, w]]; },
+  cat: t => { if (t < 0.78) { const u = (t - 0.4) / 0.4, w = 0.42 * Math.sqrt(Math.max(0, 1 - u * u * 0.85)); return [[-w, w]]; } const e = (1 - t) / 0.22 * 0.13; return [[-0.36, -0.36 + e * 2], [0.36 - e * 2, 0.36]]; },
+  castle: t => { if (t < 0.6) return [[-0.42, 0.42]]; if (t < 0.9) return [[-0.42, -0.16], [0.16, 0.42]]; return [[-0.42, -0.34], [-0.25, -0.16], [0.16, 0.25], [0.34, 0.42]]; },
+  rocket: t => { if (t < 0.22) return [[-0.36, -0.2], [-0.15, 0.15], [0.2, 0.36]].map((s, i) => i === 1 ? s : [s[0] + (i ? 0 : t * 0.4), s[1] - (i ? t * 0.4 : 0)]); if (t < 0.72) return [[-0.15, 0.15]]; const w = 0.15 * (1 - (t - 0.72) / 0.28); return [[-w, w]]; },
+  bunny: t => { if (t < 0.6) { const u = (t - 0.3) / 0.3, w = 0.36 * Math.sqrt(Math.max(0, 1 - u * u * 0.9)); return [[-w, w]]; } const s = 0.09 + 0.02 * Math.sin((t - 0.6) / 0.4 * Math.PI); return [[-0.2 - s / 2, -0.2 + s / 2], [0.2 - s / 2, 0.2 + s / 2]]; },
+  tree: t => { const tier = Math.min(2, Math.floor(t * 3)), u = t * 3 - tier, w = (0.44 - tier * 0.1) * (1 - u * 0.75); return t < 0.08 ? [[-0.07, 0.07]] : [[-w, w]]; }
+};
+const TWO_TOWER = ["cat", "castle", "bunny"];
+const FIL = ["#FF6B57", "#FFC93C", "#3FBF7F", "#5DB8FF", "#8C6BF2", "#FF8FB8", "#FF9B3D", "#E9EEF7"];
+function rng(seed) { let s = seed >>> 0; return () => ((s = Math.imul(s ^ (s >>> 15), 2246822507) + 0x9E3779B9 >>> 0) / 4294967296); }
+function shade(hex, f) { const n = parseInt(hex.slice(1), 16), c = [n >> 16, (n >> 8) & 255, n & 255].map(v => Math.max(0, Math.min(255, Math.round(f > 0 ? v + (255 - v) * f : v * (1 + f))))); return `rgb(${c})`; }
+
+// draws a print on a canvas; returns the area to circle when the defect is found
+function renderPrint(cv, p) {
+  const d = Math.min(devicePixelRatio || 1, 2.5), r = cv.getBoundingClientRect(); cv.width = Math.round(r.width * d); cv.height = Math.round(r.height * d);
+  const g = cv.getContext("2d"), W = cv.width, H = cv.height, R = rng(p.seed);
+  g.clearRect(0, 0, W, H);
+  // bed plate
+  const bedY = H * 0.86;
+  g.fillStyle = "#2E3550"; g.fillRect(0, bedY, W, H - bedY); g.fillStyle = "#3A4263"; for (let x = 0; x < W; x += W / 14) g.fillRect(x, bedY, W / 28, H - bedY);
+  g.fillStyle = "rgba(0,0,0,.18)"; g.beginPath(); g.ellipse(W / 2, bedY + 2, W * 0.36, H * 0.02, 0, 0, Math.PI * 2); g.fill();
+  const objW = W * 0.82, objH = H * 0.66, L = 46, lh = objH / L, cx = W / 2, top = bedY - objH;
+  const prof = OBJ[p.obj], dfx = p.defect, sev = p.sev;
+  const k = Math.floor(L * (0.42 + R() * 0.2));                 // layer where shift / gap / spaghetti starts
+  const shiftDx = (sev > 1 ? 0.07 : 0.13) * objW * (R() < 0.5 ? -1 : 1);
+  const gapN = sev > 1 ? 1 : 3;
+  let hint = { x: W / 2, y: bedY - objH / 2, r: W * 0.3 };
+  const holey = new Set(); if (dfx === "under") for (let i = 0; i < L; i++) if (R() < 0.45) holey.add(i);
+  for (let i = 0; i < L; i++) {
+    const t = (i + 0.5) / L, y = bedY - (i + 1) * lh;
+    if (dfx === "spaghetti" && i >= k) break;
+    if (dfx === "gap" && i >= k && i < k + gapN) continue;
+    let dx = dfx === "shift" && i >= k ? shiftDx : 0;
+    for (let [a, b] of prof(t)) {
+      let x0 = cx + a * objW + dx, x1 = cx + b * objW + dx;
+      if (dfx === "foot" && i < 4) { const e = (4 - i) * W * (sev > 1 ? 0.006 : 0.011); x0 -= e; x1 += e; }
+      if (x1 - x0 < 1) continue;
+      const gr = g.createLinearGradient(x0, 0, x1, 0); gr.addColorStop(0, shade(p.colour, 0.28)); gr.addColorStop(0.45, p.colour); gr.addColorStop(1, shade(p.colour, -0.28));
+      g.fillStyle = gr;
+      if (holey.has(i)) { g.globalAlpha = 0.8; for (let x = x0; x < x1; x += 7) g.fillRect(x, y, Math.min(4 + R() * 3, x1 - x), lh + 0.6); g.globalAlpha = 1; }
+      else g.fillRect(x0, y, x1 - x0, lh + 0.6);
+      g.fillStyle = "rgba(0,0,0,.13)"; g.fillRect(x0, y, x1 - x0, Math.max(1, lh * 0.18));   // the layer line
+    }
+  }
+  if (dfx === "shift") hint = { x: cx + shiftDx * 0.5, y: bedY - (k + 0.5) * lh, r: W * 0.26 };
+  if (dfx === "gap") hint = { x: cx, y: bedY - (k + gapN / 2) * lh, r: W * 0.22 };
+  if (dfx === "foot") hint = { x: cx, y: bedY - 2 * lh, r: W * 0.28 };
+  if (dfx === "under") hint = { x: cx, y: bedY - objH * 0.5, r: W * 0.3 };
+  if (dfx === "spaghetti") {
+    g.lineWidth = Math.max(1.5, W * 0.008); g.lineCap = "round"; const yk = bedY - k * lh;
+    for (let n = 0; n < 34; n++) { g.strokeStyle = shade(p.colour, (R() - 0.5) * 0.5); g.beginPath(); let x = cx + (R() - 0.5) * objW * 0.7, y = yk - R() * objH * 0.35; g.moveTo(x, y);
+      for (let s = 0; s < 3; s++) { g.bezierCurveTo(x + (R() - .5) * W * .4, y - R() * H * .15, x + (R() - .5) * W * .4, y + R() * H * .1, (x = cx + (R() - .5) * objW * .8), (y = yk - R() * objH * .4)); } g.stroke(); }
+    hint = { x: cx, y: yk - objH * 0.18, r: W * 0.34 };
+  }
+  if (dfx === "warp") {                                         // corners lifted off the bed
+    const spans = prof(0.5 / L), x0 = cx + spans[0][0] * objW, x1 = cx + spans[spans.length - 1][1] * objW, lift = H * (sev > 1 ? 0.022 : 0.035), run = objW * 0.22;
+    g.fillStyle = "#F3F6FB";
+    for (const [xa, dir] of [[x0, 1], [x1, -1]]) { g.beginPath(); g.moveTo(xa - dir * 2, bedY + 1); g.lineTo(xa - dir * 2, bedY - lift); g.quadraticCurveTo(xa + dir * run * 0.4, bedY - lift * 0.15, xa + dir * run, bedY + 1); g.closePath(); g.fill();
+      g.strokeStyle = shade(p.colour, -0.35); g.lineWidth = 2; g.beginPath(); g.moveTo(xa, bedY - lift); g.quadraticCurveTo(xa + dir * run * 0.4, bedY - lift * 0.15, xa + dir * run, bedY); g.stroke(); }
+    g.fillStyle = "#2E3550"; g.fillRect(0, bedY, W, 3);
+    hint = { x: x0 + objW * 0.06, y: bedY - lift, r: W * 0.2 };
+  }
+  if (dfx === "blobs") {
+    const n = sev > 1 ? 6 : 10;
+    for (let b = 0; b < n; b++) { const i = 3 + Math.floor(R() * (L - 8)), sp = prof((i + .5) / L), [a, c] = sp[Math.floor(R() * sp.length)], side = R() < 0.6;
+      const x = side ? cx + (R() < 0.5 ? a : c) * objW : cx + (a + (c - a) * R()) * objW, y = bedY - (i + .5) * lh, rr = W * (sev > 1 ? 0.016 : 0.022) * (0.7 + R() * 0.6);
+      g.fillStyle = shade(p.colour, -0.18); g.beginPath(); g.arc(x, y, rr, 0, Math.PI * 2); g.fill(); g.fillStyle = "rgba(255,255,255,.55)"; g.beginPath(); g.arc(x - rr * 0.3, y - rr * 0.3, rr * 0.35, 0, Math.PI * 2); g.fill(); }
+  }
+  if (dfx === "string") {
+    const iTop = L - 3, sp = prof((iTop + 0.5) / L), aR = cx + sp[0][1] * objW, bL = cx + sp[sp.length - 1][0] * objW;
+    g.strokeStyle = shade(p.colour, -0.1); g.lineWidth = Math.max(1, W * (sev > 1 ? 0.0035 : 0.005));
+    for (let s = 0; s < (sev > 1 ? 5 : 9); s++) { const y0 = bedY - (L * (0.68 + R() * 0.28)) * lh, y1 = y0 + (R() - 0.3) * lh * 6;
+      g.beginPath(); g.moveTo(aR, y0); g.quadraticCurveTo((aR + bL) / 2, Math.max(y0, y1) + lh * (2 + R() * 4), bL, y1); g.stroke(); }
+    hint = { x: (aR + bL) / 2, y: bedY - objH * 0.82, r: W * 0.24 };
+  }
+  // shine across the print
+  g.fillStyle = "rgba(255,255,255,.08)"; g.fillRect(cx - objW * 0.2, top, objW * 0.06, objH);
+  return { ...hint, d };
+}
+
+/* ---------- rounds ---------- */
+const ROUNDS = 10, EASY = ["spaghetti", "shift", "gap"], MID = ["warp", "string", "shift", "gap"], HARD = ["foot", "blobs", "under", "string", "warp"];
+let round = 0, stars = 0, firstTry = true, answer = -1, specs = [], hints = [], used = [];
+function setup() {
+  const n = round < 3 ? 2 : round < 7 ? 3 : 4, pool = round < 3 ? EASY : round < 7 ? MID : HARD;
+  let defect; do { defect = pool[(Math.random() * pool.length) | 0]; } while (used.slice(-2).includes(defect) && pool.length > 2);
+  used.push(defect);
+  const objs = Object.keys(OBJ), obj = defect === "string" ? TWO_TOWER[(Math.random() * 3) | 0] : objs[(Math.random() * objs.length) | 0];
+  const colour = FIL[(Math.random() * FIL.length) | 0], seed = (Math.random() * 1e9) | 0, sev = round < 3 ? 0 : round < 7 ? 1 : 2;
+  answer = (Math.random() * n) | 0; firstTry = true;
+  specs = Array.from({ length: n }, (_, i) => ({ obj, colour, seed: seed + i * 7, defect: i === answer ? defect : null, sev }));
+  const box = document.getElementById("cards"); box.className = "cards n" + n; box.innerHTML = "";
+  specs.forEach((s, i) => { const b = document.createElement("button"); b.className = "pc"; b.type = "button"; b.setAttribute("aria-label", K.t("aria", i + 1, n)); b.innerHTML = "<canvas></canvas>"; b.onclick = () => choose(i, b); box.appendChild(b); });
+  document.getElementById("round").textContent = K.t("round", round + 1, ROUNDS);
+  document.getElementById("learn").hidden = true;
+  requestAnimationFrame(drawAll);
+}
+function drawAll() { hints = [...document.querySelectorAll(".pc canvas")].map((c, i) => renderPrint(c, specs[i])); }
+let ro = new ResizeObserver(() => { if (specs.length) drawAll(); }); ro.observe(document.getElementById("cards"));
+function ring(i) {
+  const c = document.querySelectorAll(".pc canvas")[i], g = c.getContext("2d"), h = hints[i]; let t = 0;
+  (function anim() { if (t > 18) return; t++; renderPrint(c, specs[i]); g.strokeStyle = "#1C9A5E"; g.lineWidth = 5 * h.d; g.setLineDash([12 * h.d, 8 * h.d]);
+    g.beginPath(); g.arc(h.x, h.y, h.r * (1.25 - t * 0.014), 0, Math.PI * 2); g.stroke(); g.setLineDash([]); if (!K.CALM) requestAnimationFrame(anim); else { t = 99; } })();
+}
+function choose(i, el) {
+  if (!document.getElementById("learn").hidden) return;
+  if (i !== answer) { firstTry = false; el.classList.remove("wrong"); void el.offsetWidth; el.classList.add("wrong"); K.sfx.boing(); toast(K.t("tryAgain")); return; }
+  el.classList.add("right"); document.querySelectorAll(".pc").forEach((b, j) => { if (j !== i) b.classList.add("dim"); });
+  if (firstTry) { stars++; document.getElementById("starCount").textContent = stars; }
+  K.sfx.chime(); const r = el.getBoundingClientRect(); K.confetti(r.left + r.width / 2, r.top + r.height / 3, 40);
+  ring(i);
+  const [name, what, tip] = D[K.lang][specs[i].defect], ch = K.t("cheer");
+  document.getElementById("lName").firstChild.textContent = name;
+  document.getElementById("lCheer").textContent = ch[(Math.random() * ch.length) | 0];
+  document.getElementById("lWhat").textContent = what;
+  document.getElementById("lTip").innerHTML = "<b>" + K.t("tip") + "</b>" + tip.replace(/[<>&]/g, "");
+  document.getElementById("learn").hidden = false; document.getElementById("nextBtn").focus();
+}
+document.getElementById("nextBtn").onclick = () => { K.sfx.pop(); round++; if (round >= ROUNDS) return finish(); setup(); };
+function finish() {
+  const s = stars >= 9 ? 3 : stars >= 6 ? 2 : stars >= 3 ? 1 : 0;
+  document.getElementById("stars").innerHTML = [0, 1, 2].map(i => K.starSVG(i < s)).join("");
+  document.getElementById("overH").textContent = K.t("overH", stars); document.getElementById("overP").textContent = K.t("overP", stars, ROUNDS);
+  document.getElementById("over").hidden = false; K.sfx.tada(); K.confetti(); document.getElementById("againBtn").focus();
+  K.store.set("spot-best", Math.max(stars, K.store.get("spot-best", 0)));
+}
+function start() { round = 0; stars = 0; used = []; document.getElementById("starCount").textContent = "0"; document.getElementById("intro").hidden = true; document.getElementById("over").hidden = true; setup(); }
+let toastT = 0;
+function toast(m) { const e = document.getElementById("toast"); e.textContent = m; e.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => (e.hidden = true), 1600); }
+
+/* ---------- boot ---------- */
+K.initBar();
+K.onLang = () => { if (specs.length) document.getElementById("round").textContent = K.t("round", round + 1, ROUNDS); };
+K.applyWords();
+(function introArt() {
+  const c = document.getElementById("introArt");
+  const tmp = document.createElement("canvas"); tmp.style.cssText = "position:absolute;left:-9999px;width:120px;height:160px"; document.body.appendChild(tmp);
+  const x = c.getContext("2d");
+  const items = [["cat", "#FF8FB8", null, 30], ["castle", "#5DB8FF", "shift", 140], ["rocket", "#FFC93C", null, 250]];
+  for (const [obj, col, dfx, px] of items) { renderPrint(tmp, { obj, colour: col, seed: 7, defect: dfx, sev: 0 }); x.drawImage(tmp, px, 40, 120, 160); }
+  tmp.remove();
+  x.strokeStyle = "#1B2547"; x.lineWidth = 7; x.beginPath(); x.arc(212, 120, 44, 0, Math.PI * 2); x.stroke(); x.lineWidth = 10; x.lineCap = "round"; x.beginPath(); x.moveTo(244, 152); x.lineTo(272, 182); x.stroke();
+})();
+document.getElementById("homeBtn").href = window.SHOP_URL ? window.SHOP_URL : "/#play";
+document.getElementById("startBtn").onclick = () => { K.sfx.pop(); start(); };
+document.getElementById("againBtn").onclick = () => { K.sfx.pop(); start(); };
+</script>
+<!--TAIL-->

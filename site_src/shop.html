@@ -371,7 +371,7 @@ window.T = {
     day: n => "Day " + n, bubble: t => "Today's toy: " + t + "!", play: "Play now", soon: "Coming soon", newTag: "New",
     games: { doodle: ["Doodle Puff", "Draw anything and watch it puff up into a squishy 3D toy."], sculpt: ["Sculpt Studio", "Squish, pinch and paint clay, then print your own figure."],
       stack: ["Stack the Drop", "Pile today's toys into a tower before it wobbles over."], spot: ["Spot the Oops", "Find what went wrong with each print, as fast as you can."],
-      shelf: ["Shelf Life", "Arrange a toy shelf so every friend gets a spot."], kits: ["Little Hands Kits", "Sorting, stacking and counting sets to print and play with."] },
+      shelf: ["Shelf Life", "Spot the pattern on the toy shelf and find who comes next."], kits: ["Little Hands Kits", "Sorting, stacking and counting sets to print and play with."] },
     lines: { all: "All", figure: "Cute figures", "print-in-place": "Moving toys", functional: "Handy things", decor: "Decor" },
     free: "Free", todayTag: "Today", parts: n => n === 1 ? "1 piece" : n + " pieces", revenue: "Revenue", orders: "Paid orders", members: "Members", costs: "Running costs", net: "Net", listed: "Models listed", passed: "Print checks passed",
     updated: t => "Updated " + t + " (UTC+7)", dropped: d => "added " + d, size: "Size", piecesL: "Pieces", filament: "Filament", files: "Files", tips: "Print tips",
@@ -404,7 +404,7 @@ window.T = {
     day: n => "Ngày " + n, bubble: t => "Đồ chơi hôm nay: " + t + "!", play: "Chơi ngay", soon: "Sắp ra mắt", newTag: "Mới",
     games: { doodle: ["Tranh Phồng", "Vẽ gì cũng được, tranh sẽ phồng lên thành đồ chơi 3D mềm mại."], sculpt: ["Xưởng Nặn", "Nặn, vuốt, tô màu đất sét rồi in ra tượng của riêng bé."],
       stack: ["Xếp Tháp", "Chồng đồ chơi hôm nay thành tháp trước khi nó lắc lư đổ."], spot: ["Tìm Lỗi In", "Tìm xem bản in nào bị lỗi gì, càng nhanh càng giỏi."],
-      shelf: ["Kệ Đồ Chơi", "Sắp xếp kệ sao cho bạn nào cũng có chỗ ngồi."], kits: ["Bộ Đồ Chơi Montessori", "Bộ phân loại, xếp chồng, tập đếm để in về chơi cùng bé."] },
+      shelf: ["Kệ Đồ Chơi", "Tìm quy luật trên kệ và chọn bạn đồ chơi tiếp theo."], kits: ["Bộ Đồ Chơi Montessori", "Bộ phân loại, xếp chồng, tập đếm để in về chơi cùng bé."] },
     lines: { all: "Tất cả", figure: "Thú dễ thương", "print-in-place": "Đồ chơi cử động", functional: "Đồ tiện ích", decor: "Trang trí" },
     free: "Miễn phí", todayTag: "Hôm nay", parts: n => n + " mảnh", revenue: "Doanh thu", orders: "Đơn đã trả", members: "Thành viên", costs: "Chi phí vận hành", net: "Lãi ròng", listed: "Số mẫu", passed: "Đạt kiểm tra in",
     updated: t => "Cập nhật " + t + " (giờ VN)", dropped: d => "đăng " + d, size: "Kích thước", piecesL: "Số mảnh", filament: "Nhựa", files: "File", tips: "Mẹo in",
@@ -421,7 +421,7 @@ window.T = {
 <script type="module">
 const $ = (s, el = document) => el.querySelector(s);
 const HOST = window.HOST || "artifact";
-const TOOLS = window.TOOLS || { doodle: "/doodle/", sculpt: "/sculpt/" };
+const TOOLS = window.TOOLS || { doodle: "/doodle/", sculpt: "/sculpt/", stack: "/games/stack/", spot: "/games/spot/", shelf: "/games/shelf/" };
 let LANG = "en";
 try { LANG = localStorage.getItem("dl-lang") || (/^vi/i.test(navigator.language || "") ? "vi" : "en"); } catch (e) { LANG = /^vi/i.test(navigator.language || "") ? "vi" : "en"; }
 const t = k => T[LANG][k];
@@ -441,8 +441,8 @@ const ART = {
   kits: `<svg viewBox="0 0 200 125" aria-hidden="true"><rect x="96" y="20" width="8" height="90" rx="4" fill="#A86B45" stroke="#1B2547" stroke-width="4"/><ellipse cx="100" cy="100" rx="46" ry="11" fill="#FF6B57" stroke="#1B2547" stroke-width="4.5"/><ellipse cx="100" cy="82" rx="38" ry="10" fill="#FFC93C" stroke="#1B2547" stroke-width="4.5"/><ellipse cx="100" cy="64" rx="30" ry="9" fill="#3FBF7F" stroke="#1B2547" stroke-width="4.5"/><ellipse cx="100" cy="47" rx="22" ry="8" fill="#5DB8FF" stroke="#1B2547" stroke-width="4.5"/><circle cx="100" cy="24" r="9" fill="#8C6BF2" stroke="#1B2547" stroke-width="4"/></svg>`
 };
 const GAMES = [
-  { id: "doodle", ready: true, bg: "#FFE3DE", isNew: true }, { id: "sculpt", ready: true, bg: "#DDF7EA" },
-  { id: "stack", bg: "#DCF0FF" }, { id: "spot", bg: "#ECE5FF" }, { id: "shelf", bg: "#FFF1C9" }, { id: "kits", bg: "#FFE6F0" }
+  { id: "doodle", ready: true, bg: "#FFE3DE" }, { id: "sculpt", ready: true, bg: "#DDF7EA" },
+  { id: "stack", ready: true, bg: "#DCF0FF", isNew: true }, { id: "spot", ready: true, bg: "#ECE5FF", isNew: true }, { id: "shelf", ready: true, bg: "#FFF1C9", isNew: true }, { id: "kits", bg: "#FFE6F0" }
 ];
 function toolLink(el, id) { el.href = TOOLS[id]; if (HOST === "artifact") { el.target = "_blank"; el.rel = "noopener"; } }
 function renderGames() {

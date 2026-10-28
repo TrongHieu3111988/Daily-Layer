@@ -15,6 +15,7 @@
   ],
   "shortcuts": [
     { "name": "Doodle Puff", "url": "/doodle/" },
-    { "name": "Sculpt Studio", "url": "/sculpt/" }
+    { "name": "Sculpt Studio", "url": "/sculpt/" },
+    { "name": "Stack the Drop", "url": "/games/stack/" }
   ]
 }
