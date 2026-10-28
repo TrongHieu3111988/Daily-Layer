@@ -76,27 +76,101 @@
     else { g.roundRect ? g.roundRect(-w / 2, -h / 2, w, h, r) : g.rect(-w / 2, -h / 2, w, h); }
   }
   K.shapePath = shapePath;
-  // draw a friend centred at (0,0); opts: shape, colour, w, h, mood ("happy" | "wow" | "sleepy" | "sad"), lw
+  /* Each block colour belongs to one of the shop's animals, so a colour still means the same friend in every puzzle.
+     The block keeps its shape (the physics and the puzzles use it); the animal is painted on: ears, patches, nose, beak. */
+  K.ANIMALS = {
+    fox: { ears: "point", tip: "#1B2547", inner: "#FFE3D6", muzzle: "#FFFFFF", nose: true },
+    chick: { tuft: true, belly: "#FFE58A", beak: "#FF9B3D" },
+    frog: { bumps: true, belly: "#BFF0C9", wide: true },
+    whale: { spout: true, belly: "#D6EEFF", lines: true },
+    penguin: { mask: "#FFFFFF", beak: "#FFB13D" },
+    axolotl: { gills: "#E0457B", spots: "#FF6FA0" },
+    kitten: { ears: "point", inner: "#FFC4D6", stripes: "rgba(27,37,71,.32)", nose: "#FF8FB8", whiskers: true },
+    bear: { ears: "round", inner: "#E8C9A0", muzzle: "#E8C9A0", nose: true },
+    bunny: { ears: "long", inner: "#FFC4D6", nose: "#FF8FB8", whiskers: true }
+  };
+  K.ANIMAL_OF = { "#ff6b57": "fox", "#ffc93c": "chick", "#3fbf7f": "frog", "#5db8ff": "whale", "#8c6bf2": "penguin", "#ff8fb8": "axolotl",
+    "#ff9b3d": "kitten", "#b8834f": "bear", "#f4effa": "bunny", "#7fe0c2": "frog" };
+  // y of the top edge of a shape at x (for ears and bumps); null where there is no flat-ish top
+  function topAt(shape, w, h, x) {
+    const u = Math.min(1, Math.abs(x) / (w / 2));
+    if (shape === "ball" || shape === "dome") return -(h / 2) * Math.sqrt(1 - u * u);
+    if (shape === "tri") return -h / 2 + h * u;
+    if (shape === "star" || shape === "heart") return null;
+    return -h / 2;
+  }
+  function blob(g, x, y, rx, ry, rot, fill, lw) { g.beginPath(); g.ellipse(x, y, rx, ry, rot || 0, 0, Math.PI * 2); g.fillStyle = fill; g.fill(); if (lw) { g.lineWidth = lw; g.strokeStyle = K.INK; g.stroke(); } }
+  // behind the body: ears, gills, bumps, tuft, spout
+  function animalBack(g, a, o, w, h, s, lw, colour) {
+    const sh = o.shape, tri = sh === "tri", ex = tri ? w * 0.15 : Math.min(w * 0.3, w / 2 - s * 0.14), ear = s * (tri ? 0.18 : 0.22);
+    const T = x => topAt(sh, w, h, x);
+    if (a.ears && T(ex) !== null) for (const sx of [-1, 1]) {
+      const x = sx * ex, y = T(x) + ear * 0.25;
+      g.save(); g.translate(x, y); g.rotate(sx * (tri ? 0.75 : a.ears === "long" ? 0.12 : 0.28));
+      if (a.ears === "point") {
+        g.beginPath(); g.moveTo(-ear * 0.62, ear * 0.3); g.lineTo(0, -ear * 1.05); g.lineTo(ear * 0.62, ear * 0.3); g.closePath(); g.fillStyle = colour; g.fill(); g.lineWidth = lw; g.strokeStyle = K.INK; g.lineJoin = "round"; g.stroke();
+        g.beginPath(); g.moveTo(-ear * 0.3, ear * 0.15); g.lineTo(0, -ear * 0.6); g.lineTo(ear * 0.3, ear * 0.15); g.closePath(); g.fillStyle = a.inner; g.fill();
+        if (a.tip) { g.save(); g.beginPath(); g.moveTo(-ear * 0.62, ear * 0.3); g.lineTo(0, -ear * 1.05); g.lineTo(ear * 0.62, ear * 0.3); g.closePath(); g.clip(); g.fillStyle = a.tip; g.fillRect(-ear, -ear * 1.2, ear * 2, ear * 0.55); g.restore(); }
+      } else if (a.ears === "round") { blob(g, 0, -ear * 0.2, ear * 0.55, ear * 0.55, 0, colour, lw); blob(g, 0, -ear * 0.2, ear * 0.28, ear * 0.28, 0, a.inner); }
+      else { blob(g, 0, -ear * 1.0, ear * 0.42, ear * 1.25, 0, colour, lw); blob(g, 0, -ear * 0.95, ear * 0.2, ear * 0.85, 0, a.inner); }
+      g.restore();
+    }
+    if (a.gills) for (const sx of [-1, 1]) {
+      const bx = sx * (sh === "tri" ? w * 0.3 : w / 2), by = sh === "tri" ? h * 0.12 : -h * 0.12;
+      for (let k = -1; k <= 1; k++) { g.save(); g.translate(bx, by + k * s * 0.13); g.rotate(sx * (Math.PI / 2 + k * 0.5) - Math.PI / 2 * sx + sx * 0.0); blob(g, sx * s * 0.11, 0, s * 0.13, s * 0.055, k * 0.45 * sx, a.gills, lw * 0.8); g.restore(); }
+    }
+    if (a.tuft && T(0) !== null) { g.lineWidth = lw; g.strokeStyle = K.INK; g.lineCap = "round"; const y = T(0);
+      for (const k of [-1, 0, 1]) { g.beginPath(); g.moveTo(k * s * 0.05, y + 1); g.quadraticCurveTo(k * s * 0.12, y - s * 0.12, k * s * 0.09 + s * 0.04, y - s * 0.17); g.stroke(); } }
+    if (a.spout && T(0) !== null) { const y = T(0) - s * 0.05; g.lineWidth = lw * 0.9; g.strokeStyle = K.INK; g.fillStyle = "#BDE6FF";
+      for (const sx of [-1, 1]) { g.beginPath(); g.moveTo(0, y); g.quadraticCurveTo(sx * s * 0.05, y - s * 0.2, sx * s * 0.17, y - s * 0.17); g.stroke(); }
+      for (const sx of [-1, 0, 1]) blob(g, sx * s * 0.19, y - s * (sx ? 0.15 : 0.26), s * 0.045, s * 0.055, 0, "#BDE6FF", lw * 0.6); }
+  }
+  // inside the body (clipped): patches, belly, stripes
+  function animalPatches(g, a, o, w, h, s, fy, ey, ex) {
+    if (a.belly) blob(g, 0, h / 2, w * (a.wide ? 0.42 : 0.34), h * 0.4, 0, a.belly);
+    if (a.lines) { g.strokeStyle = "rgba(27,37,71,.18)"; g.lineWidth = Math.max(1, s * 0.025); for (const k of [-1, 0, 1]) { g.beginPath(); g.moveTo(k * w * 0.12, h * 0.2); g.lineTo(k * w * 0.12, h / 2); g.stroke(); } }
+    if (a.mask) { blob(g, -ex * 0.95, ey + s * 0.02, s * 0.2, s * 0.22, 0, a.mask); blob(g, ex * 0.95, ey + s * 0.02, s * 0.2, s * 0.22, 0, a.mask); blob(g, 0, ey + s * 0.16, s * 0.24, s * 0.16, 0, a.mask); blob(g, 0, h / 2, w * 0.32, h * 0.36, 0, a.mask); }
+    if (a.muzzle) blob(g, 0, ey + s * 0.13, s * 0.21, s * 0.13, 0, a.muzzle);
+    if (a.stripes) { g.strokeStyle = a.stripes; g.lineWidth = Math.max(1.5, s * 0.05); g.lineCap = "round"; const y = ey - s * 0.2;
+      for (const k of [-1, 0, 1]) { g.beginPath(); g.moveTo(k * s * 0.1, y - s * 0.06 + Math.abs(k) * s * 0.03); g.lineTo(k * s * 0.1, y + s * 0.04); g.stroke(); }
+      for (const sx of [-1, 1]) for (const k of [0, 1]) { g.beginPath(); g.moveTo(sx * w / 2, ey + k * s * 0.12); g.lineTo(sx * (w / 2 - s * 0.12), ey + k * s * 0.12 + s * 0.02); g.stroke(); } }
+    if (a.spots) for (const [x, y, r] of [[-0.3, -0.25, 0.05], [0.32, -0.18, 0.04], [0.25, 0.3, 0.05], [-0.28, 0.28, 0.035]]) blob(g, x * w, y * h + fy, s * r, s * r, 0, a.spots);
+  }
+  // draw a friend centred at (0,0); opts: shape, colour, w, h, mood ("happy" | "wow" | "sleepy" | "sad"), lw, animal (defaults from the colour)
   K.friend = (g, o) => {
     const { shape = "square", colour = "#FFC93C", w = 60, h = 60, mood = "happy" } = o, lw = o.lw ?? Math.max(2, Math.min(w, h) * 0.07);
+    const name = o.animal === undefined ? K.ANIMAL_OF[String(colour).toLowerCase()] : o.animal, a = name ? K.ANIMALS[name] : null;
+    const s = Math.min(w, h), fy = shape === "tri" ? h * 0.18 : shape === "dome" ? h * 0.08 : 0, ex = s * 0.17, ey = fy - s * 0.04, er = Math.max(1.6, s * 0.065);
     g.save();
+    if (a) animalBack(g, a, o, w, h, s, lw, colour);
     shapePath(g, shape, w, h); g.fillStyle = colour; g.fill();
-    // soft highlight
-    g.save(); shapePath(g, shape, w, h); g.clip(); g.fillStyle = "rgba(255,255,255,.28)"; g.beginPath(); g.ellipse(-w * 0.22, -h * 0.28, w * 0.28, h * 0.16, -0.5, 0, Math.PI * 2); g.fill();
+    // soft highlight, animal patches and a little shade, all inside the shape
+    g.save(); shapePath(g, shape, w, h); g.clip();
+    if (a) animalPatches(g, a, o, w, h, s, fy, ey, ex);
+    g.fillStyle = "rgba(255,255,255,.28)"; g.beginPath(); g.ellipse(-w * 0.22, -h * 0.28, w * 0.28, h * 0.16, -0.5, 0, Math.PI * 2); g.fill();
     g.fillStyle = "rgba(0,0,0,.08)"; g.fillRect(-w, h * 0.22, w * 2, h); g.restore();
     shapePath(g, shape, w, h); g.lineWidth = lw; g.strokeStyle = K.INK; g.lineJoin = "round"; g.stroke();
+    // frog eyes sit on bumps on top of the head
+    let eY = ey; const T0 = topAt(shape, w, h, ex);
+    if (a && a.bumps && T0 !== null && shape !== "tri") { eY = T0 + s * 0.02; for (const sx of [-1, 1]) blob(g, sx * ex, eY, s * 0.15, s * 0.14, 0, colour, lw);
+      g.save(); g.beginPath(); g.rect(-w, T0 + lw / 2, w * 2, h); g.clip(); for (const sx of [-1, 1]) blob(g, sx * ex, eY, s * 0.15 - lw / 2, s * 0.14 - lw / 2, 0, colour); g.restore();
+      for (const sx of [-1, 1]) blob(g, sx * ex, eY - s * 0.01, s * 0.1, s * 0.1, 0, "#FFFFFF"); }
     // face
-    const s = Math.min(w, h), fy = shape === "tri" ? h * 0.18 : shape === "dome" ? h * 0.08 : 0, ex = s * 0.17, ey = fy - s * 0.04, er = Math.max(1.6, s * 0.065);
     g.fillStyle = K.INK; g.strokeStyle = K.INK; g.lineCap = "round"; g.lineWidth = Math.max(1.5, s * 0.05);
-    if (mood === "sleepy") { for (const sx of [-1, 1]) { g.beginPath(); g.arc(sx * ex, ey, er, 0.1 * Math.PI, 0.9 * Math.PI); g.stroke(); } }
-    else for (const sx of [-1, 1]) { g.beginPath(); g.ellipse(sx * ex, ey, er, er * (mood === "wow" ? 1.35 : 1.15), 0, 0, Math.PI * 2); g.fill();
-      g.fillStyle = "#fff"; g.beginPath(); g.arc(sx * ex - er * 0.3, ey - er * 0.35, er * 0.38, 0, Math.PI * 2); g.fill(); g.fillStyle = K.INK; }
+    if (mood === "sleepy") { for (const sx of [-1, 1]) { g.beginPath(); g.arc(sx * ex, eY, er, 0.1 * Math.PI, 0.9 * Math.PI); g.stroke(); } }
+    else for (const sx of [-1, 1]) { g.beginPath(); g.ellipse(sx * ex, eY, er, er * (mood === "wow" ? 1.35 : 1.15), 0, 0, Math.PI * 2); g.fill();
+      g.fillStyle = "#fff"; g.beginPath(); g.arc(sx * ex - er * 0.3, eY - er * 0.35, er * 0.38, 0, Math.PI * 2); g.fill(); g.fillStyle = K.INK; }
     g.fillStyle = "rgba(255,120,150,.55)";
     for (const sx of [-1, 1]) { g.beginPath(); g.ellipse(sx * ex * 1.75, ey + s * 0.1, s * 0.07, s * 0.045, 0, 0, Math.PI * 2); g.fill(); }
-    g.beginPath();
-    if (mood === "wow") { g.fillStyle = K.INK; g.ellipse(0, ey + s * 0.15, s * 0.05, s * 0.065, 0, 0, Math.PI * 2); g.fill(); }
-    else if (mood === "sad") { g.arc(0, ey + s * 0.22, s * 0.08, 1.15 * Math.PI, 1.85 * Math.PI); g.stroke(); }
-    else { g.arc(0, ey + s * 0.07, s * 0.09, 0.15 * Math.PI, 0.85 * Math.PI); g.stroke(); }
+    let my = ey + s * 0.07;
+    if (a && a.beak) { my = ey + s * 0.16; g.beginPath(); g.moveTo(-s * 0.075, ey + s * 0.05); g.lineTo(s * 0.075, ey + s * 0.05); g.lineTo(0, ey + s * 0.14); g.closePath(); g.fillStyle = a.beak; g.fill(); g.lineWidth = Math.max(1.2, s * 0.03); g.stroke(); g.lineWidth = Math.max(1.5, s * 0.05); }
+    if (a && a.nose) { my = ey + s * 0.1; blob(g, 0, ey + s * 0.065, s * 0.045, s * 0.032, 0, a.nose === true ? K.INK : a.nose); }
+    if (a && a.whiskers) { g.lineWidth = Math.max(1, s * 0.022); for (const sx of [-1, 1]) for (const k of [-1, 1]) { g.beginPath(); g.moveTo(sx * s * 0.13, ey + s * 0.11); g.lineTo(sx * s * 0.3, ey + s * 0.11 + k * s * 0.04); g.stroke(); } g.lineWidth = Math.max(1.5, s * 0.05); }
+    g.fillStyle = K.INK; g.beginPath();
+    const mr = a && a.wide ? s * 0.15 : s * 0.09;
+    if (mood === "wow") { g.ellipse(0, my + s * 0.08, s * 0.05, s * 0.065, 0, 0, Math.PI * 2); g.fill(); }
+    else if (mood === "sad") { g.arc(0, my + s * 0.15, s * 0.08, 1.15 * Math.PI, 1.85 * Math.PI); g.stroke(); }
+    else { g.arc(0, my - (a && a.wide ? s * 0.06 : 0), mr, 0.15 * Math.PI, 0.85 * Math.PI); g.stroke(); }
     g.restore();
   };
   K.star = (g, x, y, r, fill = "#FFC93C") => {
