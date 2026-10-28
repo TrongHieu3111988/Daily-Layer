@@ -9,7 +9,7 @@
   function Sculpt2(N) { this.alloc(N); this.undo = []; this.redo = []; this.rec = null; }
   const P = Sculpt2.prototype;
   // borrow exporters and helpers from v1
-  for (const k of ["printField", "meshTet", "colourParts", "previewMesh", "toPrint", "printable", "idx", "pos"]) P[k] = Base.prototype[k];
+  for (const k of ["printField", "meshTet", "colourParts", "previewMesh", "colourField", "sampleShares", "toPrint", "printable", "idx", "pos"]) P[k] = Base.prototype[k];
 
   P.alloc = function (N) {
     this.N = N; this.h = 2 / (N - 1); this.clamp = 0.25;

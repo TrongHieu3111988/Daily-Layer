@@ -94,8 +94,10 @@ function exportAnimal(name, outDir, N, heightMM) {
     meta.parts.push({ colour: cname, hex: COL[cname], check: p.check });
   }
   const pal = {}; NAMES.forEach((nm, i) => { pal[i] = COL[nm]; });
-  const pv = s.previewMesh(out.pf, pal), pvp = s.toPrint(pv, out.pf.cut, out.pf.top, heightMM, body.centre);
-  fs.writeFileSync(path.join(dir, "preview.bin"), S.previewBin(pvp.pos, pvp.idx, pv.rgb));
+  const fld = s.colourField(out.pf, pal);
+  const pv = s.previewMesh(out.pf, fld), pvp = s.toPrint(pv, out.pf.cut, out.pf.top, heightMM, body.centre);
+  fs.writeFileSync(path.join(dir, "preview.bin"), S.paintBin(pvp.pos, pvp.idx, pv.shares, fld.cols, fld.L));
+  fs.writeFileSync(path.join(dir, "body_paint.bin"), S.paintBin(body.pos, body.idx, s.sampleShares(fld, out.mesh.pos), fld.cols, fld.L));
   fs.writeFileSync(path.join(dir, "meta.json"), JSON.stringify(meta, null, 1));
   return meta;
 }

@@ -132,7 +132,7 @@ def render(parts, path, size=900, bg=(226, 229, 226), elev=28, azim=-55):
     Rx = np.array([[1, 0, 0], [0, np.cos(e), -np.sin(e)], [0, np.sin(e), np.cos(e)]])
     # camera looks along -y in view space; map world -> view (x right, y depth, z up)
     M = Rx @ Rz
-    proj = [(((v - ctr) @ M.T), f, col) for v, f, col in parts]
+    proj = [(((p[0] - ctr) @ M.T), p[1], p[2], len(p) > 3 and p[3] == "face") for p in parts]
     pts = np.concatenate([p[0] for p in proj])
     span = max(np.ptp(pts[:, 0]), np.ptp(pts[:, 2])) * 1.18
     S = size; ss = 2; W = S * ss
@@ -140,7 +140,7 @@ def render(parts, path, size=900, bg=(226, 229, 226), elev=28, azim=-55):
     mask = np.zeros((W, W), bool)
     L1 = np.array([-0.45, -0.7, 0.55]); L1 /= np.linalg.norm(L1)
     L2 = np.array([0.6, -0.4, 0.2]); L2 /= np.linalg.norm(L2)
-    for v, f, col in proj:
+    for v, f, col, face in proj:
         tri = v[f]
         n = np.cross(tri[:, 1] - tri[:, 0], tri[:, 2] - tri[:, 0])
         # smooth (per-vertex) shading so the render shows the true surface, not the triangulation
@@ -153,10 +153,12 @@ def render(parts, path, size=900, bg=(226, 229, 226), elev=28, azim=-55):
         def shade_of(nn):
             return 0.32 + 0.58 * np.clip(nn @ L1, 0, 1) + 0.18 * np.clip(nn @ L2, 0, 1) + 0.12 * np.clip(1 - np.abs(nn[:, 1]), 0, 1) ** 2
         vshade = shade_of(vn)
-        colarr = np.asarray(col, np.float32) / 255.0      # one rgb for the part, or one per vertex
-        if colarr.ndim == 1: colarr = colarr[None, :]
-        cvert = np.clip(vshade[:, None] * colarr, 0, 1)
-        c = cvert[fk]   # (T, 3 corners, rgb)
+        colarr = np.asarray(col, np.float32) / 255.0      # one rgb for the part, one per vertex, or one per face
+        if face:
+            c = np.clip(vshade[fk][..., None] * colarr[keep][:, None, :], 0, 1)
+        else:
+            if colarr.ndim == 1: colarr = colarr[None, :]
+            c = np.clip(vshade[:, None] * colarr, 0, 1)[fk]   # (T, 3 corners, rgb)
         sx = (tri[..., 0] / span + 0.5) * W
         sy = (0.5 - tri[..., 2] / span) * W
         depth = tri[..., 1].mean(1)

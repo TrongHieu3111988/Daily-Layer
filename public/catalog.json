@@ -157,7 +157,7 @@
     "multicolor"
    ],
    "line": "figure",
-   "print_hint": "Sculpted in Sculpt Studio. Single-colour STL plus colour-split 3MF; 0.12-0.16 mm layers, no supports for most printers.",
+   "print_hint": "Sculpted in Sculpt Studio. Painted OBJ/3MF (Bambu Studio maps the colours to your filaments on import), colour-split 3MF and single-colour STL; 0.12-0.16 mm layers.",
    "parts": [
     {
      "name": "body",
@@ -250,36 +250,37 @@
    "smooth": true,
    "web": [
     {
-     "file": "products/sculpt-penguin/web_black.bin",
+     "file": null,
      "color": "#2E3140",
      "name": "black"
     },
     {
-     "file": "products/sculpt-penguin/web_orange.bin",
+     "file": null,
      "color": "#FF9B3D",
      "name": "orange"
     },
     {
-     "file": "products/sculpt-penguin/web_white.bin",
+     "file": null,
      "color": "#FBFBF8",
      "name": "white"
     },
     {
-     "file": "products/sculpt-penguin/web_pink.bin",
+     "file": null,
      "color": "#F7A1B5",
      "name": "pink"
     },
     {
-     "file": "products/sculpt-penguin/web_ink.bin",
+     "file": null,
      "color": "#24283A",
      "name": "ink"
     }
    ],
-   "preview": "products/sculpt-penguin/preview_vc.bin",
+   "preview": "products/sculpt-penguin/preview_fc.bin",
+   "preview_face": true,
    "download": "",
    "cover": "products/sculpt-penguin/cover.jpg",
    "build_seconds": 0,
-   "download_bytes": 7290949,
+   "download_bytes": 10918958,
    "dropped": "2026-10-28"
   },
   {
@@ -295,7 +296,7 @@
     "multicolor"
    ],
    "line": "figure",
-   "print_hint": "Sculpted in Sculpt Studio. Single-colour STL plus colour-split 3MF; 0.12-0.16 mm layers, no supports for most printers.",
+   "print_hint": "Sculpted in Sculpt Studio. Painted OBJ/3MF (Bambu Studio maps the colours to your filaments on import), colour-split 3MF and single-colour STL; 0.12-0.16 mm layers.",
    "parts": [
     {
      "name": "body",
@@ -388,36 +389,37 @@
    "smooth": true,
    "web": [
     {
-     "file": "products/sculpt-kitten/web_grey.bin",
+     "file": null,
      "color": "#A9AFBF",
      "name": "grey"
     },
     {
-     "file": "products/sculpt-kitten/web_slate.bin",
+     "file": null,
      "color": "#7C8396",
      "name": "slate"
     },
     {
-     "file": "products/sculpt-kitten/web_pink.bin",
+     "file": null,
      "color": "#F7A1B5",
      "name": "pink"
     },
     {
-     "file": "products/sculpt-kitten/web_ink.bin",
+     "file": null,
      "color": "#24283A",
      "name": "ink"
     },
     {
-     "file": "products/sculpt-kitten/web_white.bin",
+     "file": null,
      "color": "#FBFBF8",
      "name": "white"
     }
    ],
-   "preview": "products/sculpt-kitten/preview_vc.bin",
+   "preview": "products/sculpt-kitten/preview_fc.bin",
+   "preview_face": true,
    "download": "",
    "cover": "products/sculpt-kitten/cover.jpg",
    "build_seconds": 0,
-   "download_bytes": 6470398,
+   "download_bytes": 9913788,
    "dropped": "2026-10-28"
   },
   {
@@ -433,7 +435,7 @@
     "multicolor"
    ],
    "line": "figure",
-   "print_hint": "Sculpted in Sculpt Studio. Single-colour STL plus colour-split 3MF; 0.12-0.16 mm layers, no supports for most printers.",
+   "print_hint": "Sculpted in Sculpt Studio. Painted OBJ/3MF (Bambu Studio maps the colours to your filaments on import), colour-split 3MF and single-colour STL; 0.12-0.16 mm layers.",
    "parts": [
     {
      "name": "body",
@@ -526,36 +528,37 @@
    "smooth": true,
    "web": [
     {
-     "file": "products/sculpt-frog/web_green.bin",
+     "file": null,
      "color": "#7CC56B",
      "name": "green"
     },
     {
-     "file": "products/sculpt-frog/web_white.bin",
+     "file": null,
      "color": "#FBFBF8",
      "name": "white"
     },
     {
-     "file": "products/sculpt-frog/web_lime.bin",
+     "file": null,
      "color": "#D9F0B5",
      "name": "lime"
     },
     {
-     "file": "products/sculpt-frog/web_pink.bin",
+     "file": null,
      "color": "#F7A1B5",
      "name": "pink"
     },
     {
-     "file": "products/sculpt-frog/web_ink.bin",
+     "file": null,
      "color": "#24283A",
      "name": "ink"
     }
    ],
-   "preview": "products/sculpt-frog/preview_vc.bin",
+   "preview": "products/sculpt-frog/preview_fc.bin",
+   "preview_face": true,
    "download": "",
    "cover": "products/sculpt-frog/cover.jpg",
    "build_seconds": 0,
-   "download_bytes": 6568375,
+   "download_bytes": 10003254,
    "dropped": "2026-10-28"
   },
   {
@@ -571,7 +574,7 @@
     "multicolor"
    ],
    "line": "figure",
-   "print_hint": "Sculpted in Sculpt Studio. Single-colour STL plus colour-split 3MF; 0.12-0.16 mm layers, no supports for most printers.",
+   "print_hint": "Sculpted in Sculpt Studio. Painted OBJ/3MF (Bambu Studio maps the colours to your filaments on import), colour-split 3MF and single-colour STL; 0.12-0.16 mm layers.",
    "parts": [
     {
      "name": "body",
@@ -650,31 +653,32 @@
    "smooth": true,
    "web": [
     {
-     "file": "products/sculpt-fox/web_orange.bin",
+     "file": null,
      "color": "#F28C3A",
      "name": "orange"
     },
     {
-     "file": "products/sculpt-fox/web_ink.bin",
+     "file": null,
      "color": "#24283A",
      "name": "ink"
     },
     {
-     "file": "products/sculpt-fox/web_white.bin",
+     "file": null,
      "color": "#FBFBF8",
      "name": "white"
     },
     {
-     "file": "products/sculpt-fox/web_brown.bin",
+     "file": null,
      "color": "#7A4E33",
      "name": "brown"
     }
    ],
-   "preview": "products/sculpt-fox/preview_vc.bin",
+   "preview": "products/sculpt-fox/preview_fc.bin",
+   "preview_face": true,
    "download": "",
    "cover": "products/sculpt-fox/cover.jpg",
    "build_seconds": 0,
-   "download_bytes": 7491509,
+   "download_bytes": 11392078,
    "dropped": "2026-10-28"
   },
   {
@@ -690,7 +694,7 @@
     "multicolor"
    ],
    "line": "figure",
-   "print_hint": "Sculpted in Sculpt Studio. Single-colour STL plus colour-split 3MF; 0.12-0.16 mm layers, no supports for most printers.",
+   "print_hint": "Sculpted in Sculpt Studio. Painted OBJ/3MF (Bambu Studio maps the colours to your filaments on import), colour-split 3MF and single-colour STL; 0.12-0.16 mm layers.",
    "parts": [
     {
      "name": "body",
@@ -783,36 +787,37 @@
    "smooth": true,
    "web": [
     {
-     "file": "products/sculpt-chick/web_yellow.bin",
+     "file": null,
      "color": "#FFD24C",
      "name": "yellow"
     },
     {
-     "file": "products/sculpt-chick/web_orange.bin",
+     "file": null,
      "color": "#FF9B3D",
      "name": "orange"
     },
     {
-     "file": "products/sculpt-chick/web_pink.bin",
+     "file": null,
      "color": "#F7A1B5",
      "name": "pink"
     },
     {
-     "file": "products/sculpt-chick/web_ink.bin",
+     "file": null,
      "color": "#24283A",
      "name": "ink"
     },
     {
-     "file": "products/sculpt-chick/web_white.bin",
+     "file": null,
      "color": "#FBFBF8",
      "name": "white"
     }
    ],
-   "preview": "products/sculpt-chick/preview_vc.bin",
+   "preview": "products/sculpt-chick/preview_fc.bin",
+   "preview_face": true,
    "download": "",
    "cover": "products/sculpt-chick/cover.jpg",
    "build_seconds": 0,
-   "download_bytes": 6289832,
+   "download_bytes": 9664364,
    "dropped": "2026-10-28"
   },
   {
@@ -828,7 +833,7 @@
     "multicolor"
    ],
    "line": "figure",
-   "print_hint": "Sculpted in Sculpt Studio. Single-colour STL plus colour-split 3MF; 0.12-0.16 mm layers, no supports for most printers.",
+   "print_hint": "Sculpted in Sculpt Studio. Painted OBJ/3MF (Bambu Studio maps the colours to your filaments on import), colour-split 3MF and single-colour STL; 0.12-0.16 mm layers.",
    "parts": [
     {
      "name": "body",
@@ -907,31 +912,32 @@
    "smooth": true,
    "web": [
     {
-     "file": "products/sculpt-bunny/web_white.bin",
+     "file": null,
      "color": "#FBFBF8",
      "name": "white"
     },
     {
-     "file": "products/sculpt-bunny/web_cream.bin",
+     "file": null,
      "color": "#F4E9D4",
      "name": "cream"
     },
     {
-     "file": "products/sculpt-bunny/web_pink.bin",
+     "file": null,
      "color": "#F7A1B5",
      "name": "pink"
     },
     {
-     "file": "products/sculpt-bunny/web_ink.bin",
+     "file": null,
      "color": "#24283A",
      "name": "ink"
     }
    ],
-   "preview": "products/sculpt-bunny/preview_vc.bin",
+   "preview": "products/sculpt-bunny/preview_fc.bin",
+   "preview_face": true,
    "download": "",
    "cover": "products/sculpt-bunny/cover.jpg",
    "build_seconds": 0,
-   "download_bytes": 6810031,
+   "download_bytes": 10347133,
    "dropped": "2026-10-28"
   },
   {
@@ -947,7 +953,7 @@
     "multicolor"
    ],
    "line": "figure",
-   "print_hint": "Sculpted in Sculpt Studio. Single-colour STL plus colour-split 3MF; 0.12-0.16 mm layers, no supports for most printers.",
+   "print_hint": "Sculpted in Sculpt Studio. Painted OBJ/3MF (Bambu Studio maps the colours to your filaments on import), colour-split 3MF and single-colour STL; 0.12-0.16 mm layers.",
    "parts": [
     {
      "name": "body",
@@ -1026,31 +1032,32 @@
    "smooth": true,
    "web": [
     {
-     "file": "products/sculpt-bear/web_brown.bin",
+     "file": null,
      "color": "#A86B45",
      "name": "brown"
     },
     {
-     "file": "products/sculpt-bear/web_tan.bin",
+     "file": null,
      "color": "#E2C29B",
      "name": "tan"
     },
     {
-     "file": "products/sculpt-bear/web_ink.bin",
+     "file": null,
      "color": "#24283A",
      "name": "ink"
     },
     {
-     "file": "products/sculpt-bear/web_white.bin",
+     "file": null,
      "color": "#FBFBF8",
      "name": "white"
     }
    ],
-   "preview": "products/sculpt-bear/preview_vc.bin",
+   "preview": "products/sculpt-bear/preview_fc.bin",
+   "preview_face": true,
    "download": "",
    "cover": "products/sculpt-bear/cover.jpg",
    "build_seconds": 0,
-   "download_bytes": 7173401,
+   "download_bytes": 10839723,
    "dropped": "2026-10-28"
   },
   {
@@ -1066,7 +1073,7 @@
     "multicolor"
    ],
    "line": "figure",
-   "print_hint": "Sculpted in Sculpt Studio. Single-colour STL plus colour-split 3MF; 0.12-0.16 mm layers, no supports for most printers.",
+   "print_hint": "Sculpted in Sculpt Studio. Painted OBJ/3MF (Bambu Studio maps the colours to your filaments on import), colour-split 3MF and single-colour STL; 0.12-0.16 mm layers.",
    "parts": [
     {
      "name": "body",
@@ -1159,36 +1166,37 @@
    "smooth": true,
    "web": [
     {
-     "file": "products/sculpt-axolotl/web_rose.bin",
+     "file": null,
      "color": "#F7A9C4",
      "name": "rose"
     },
     {
-     "file": "products/sculpt-axolotl/web_magenta.bin",
+     "file": null,
      "color": "#E0609A",
      "name": "magenta"
     },
     {
-     "file": "products/sculpt-axolotl/web_cream.bin",
+     "file": null,
      "color": "#F4E9D4",
      "name": "cream"
     },
     {
-     "file": "products/sculpt-axolotl/web_ink.bin",
+     "file": null,
      "color": "#24283A",
      "name": "ink"
     },
     {
-     "file": "products/sculpt-axolotl/web_white.bin",
+     "file": null,
      "color": "#FBFBF8",
      "name": "white"
     }
    ],
-   "preview": "products/sculpt-axolotl/preview_vc.bin",
+   "preview": "products/sculpt-axolotl/preview_fc.bin",
+   "preview_face": true,
    "download": "",
    "cover": "products/sculpt-axolotl/cover.jpg",
    "build_seconds": 0,
-   "download_bytes": 6379016,
+   "download_bytes": 9727453,
    "dropped": "2026-10-28"
   },
   {
@@ -1769,6 +1777,6 @@
   "members": 0,
   "costs_usd": 0.0
  },
- "updated": "2026-10-28 23:51",
+ "updated": "2026-10-29 00:20",
  "featured": "sculpt-axolotl"
 }

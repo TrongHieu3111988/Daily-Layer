@@ -293,40 +293,29 @@
   };
   // One seamless preview surface (surface nets) with a colour per vertex, taken from whichever
   // smoothed colour region is strongest at that point. No separate colour shells, so no seams or cracks.
-  P.previewMesh = function (pf, palette) {
+  // Smoothed colour field for painting: per colour, its share among nearby solid voxels.
+  P.colourField = function (pf, palette) {
     const N = this.N, n3 = pf.f.length, used = new Set();
     for (let n = 0; n < n3; n++) if (pf.f[n] < 0) used.add(this.c[n]);
-    const labs = [...used], bls = colourShares(this.c, pf.f, labs, N, 3);   // same as the print parts
-    const cols = labs.map(l => { const c = parseInt((palette[l] || "#cccccc").slice(1), 16); return [c >> 16 & 255, c >> 8 & 255, c & 255]; });
+    const labs = [...used].sort((a, b) => a - b), bls = colourShares(this.c, pf.f, labs, N, 3);
+    const cols = new Uint8Array(labs.length * 3);
+    labs.forEach((l, li) => { const c = parseInt((palette[l] || "#cccccc").slice(1), 16); cols[3 * li] = c >> 16 & 255; cols[3 * li + 1] = c >> 8 & 255; cols[3 * li + 2] = c & 255; });
+    return { labs, bls, cols, L: labs.length };
+  };
+  // colour shares sampled at mesh vertices (grid-space positions) -> Float32Array nv*L
+  P.sampleShares = function (fld, pos) {
+    const N = this.N, g = (N - 1) / 2, nv = pos.length / 3, L = fld.L, sh = new Float32Array(nv * L);
+    for (let v = 0; v < nv; v++) {
+      const gx = (pos[3 * v] + 1) * g, gy = (pos[3 * v + 1] + 1) * g, gz = (pos[3 * v + 2] + 1) * g;
+      for (let li = 0; li < L; li++) sh[v * L + li] = triSample(fld.bls[li], N, gx, gy, gz);
+    }
+    return sh;
+  };
+  // seamless preview surface (surface nets) + colour shares per vertex; the colour borders are cut
+  // exactly along the share contours afterwards (gen/import_sculpt.py), so they come out crisp and smooth
+  P.previewMesh = function (pf, fld) {
     const m = Base0.prototype.mesh.call(this, pf.f, this.c);
-    const nv = m.pos.length / 3, rgb = new Uint8Array(nv * 3), g = (N - 1) / 2, L = labs.length;
-    let sh = new Float32Array(nv * L);
-    for (let v = 0; v < nv; v++) {
-      const gx = (m.pos[3 * v] + 1) * g, gy = (m.pos[3 * v + 1] + 1) * g, gz = (m.pos[3 * v + 2] + 1) * g;
-      for (let li = 0; li < L; li++) sh[v * L + li] = triSample(bls[li], N, gx, gy, gz);
-    }
-    // relax the colour shares along the surface: borders follow smooth curves instead of the voxel grid
-    const nb = new Float32Array(nv * L), cnt = new Uint16Array(nv), idx = m.idx;
-    for (let it = 0; it < 4; it++) {
-      nb.fill(0); cnt.fill(0);
-      for (let t = 0; t < idx.length; t += 3) for (let e = 0; e < 3; e++) {
-        const a = idx[t + e], b = idx[t + (e + 1) % 3];
-        for (let li = 0; li < L; li++) { nb[a * L + li] += sh[b * L + li]; nb[b * L + li] += sh[a * L + li]; }
-        cnt[a]++; cnt[b]++;
-      }
-      for (let v = 0; v < nv; v++) if (cnt[v]) for (let li = 0; li < L; li++) sh[v * L + li] = 0.5 * sh[v * L + li] + 0.5 * nb[v * L + li] / cnt[v];
-    }
-    for (let v = 0; v < nv; v++) {
-      // winner colour, softened into the runner-up right at the border (anti-aliased edge, no stair steps)
-      let best = 0, bv = -1, sec = 0, sv = -1;
-      for (let li = 0; li < L; li++) {
-        const val = sh[v * L + li];
-        if (val > bv) { sec = best; sv = bv; best = li; bv = val; } else if (val > sv) { sec = li; sv = val; }
-      }
-      const t = sv < 0 ? 1 : 0.5 + 0.5 * Math.min(1, (bv - sv) / 0.12);
-      for (let k = 0; k < 3; k++) rgb[3 * v + k] = Math.round(cols[best][k] * t + cols[sv < 0 ? best : sec][k] * (1 - t));
-    }
-    return { pos: m.pos, idx: m.idx, rgb };
+    return { pos: m.pos, idx: m.idx, shares: this.sampleShares(fld, m.pos) };
   };
   function triSample(f, N, gx, gy, gz) {
     const i = Math.min(Math.max(Math.floor(gx), 0), N - 2), j = Math.min(Math.max(Math.floor(gy), 0), N - 2), k = Math.min(Math.max(Math.floor(gz), 0), N - 2);
@@ -335,14 +324,19 @@
     const c01 = f[a + s2] * (1 - u) + f[a + s2 + 1] * u, c11 = f[a + s2 + s] * (1 - u) + f[a + s2 + s + 1] * u;
     return (c00 * (1 - v) + c10 * v) * (1 - w) + (c01 * (1 - v) + c11 * v) * w;
   }
-  // raw preview file: u32 nv, u32 nf, f32 pos[nv*3], u32 idx[nf*3], u8 rgb[nv*3]
-  Sculpt.previewBin = function (pos, idx, rgb) {
-    const nv = pos.length / 3, nf = idx.length / 3, buf = new ArrayBuffer(8 + pos.length * 4 + idx.length * 4 + rgb.length);
-    const dv = new DataView(buf); dv.setUint32(0, nv, true); dv.setUint32(4, nf, true);
-    new Float32Array(buf, 8, pos.length).set(pos); new Uint32Array(buf, 8 + pos.length * 4, idx.length).set(idx);
-    new Uint8Array(buf, 8 + pos.length * 4 + idx.length * 4).set(rgb);
+  // paint file: u32 nv, u32 nf, u32 L, f32 pos[nv*3], u32 idx[nf*3], f32 shares[nv*L], u8 rgb[L*3]
+  Sculpt.paintBin = function (pos, idx, shares, cols, L) {
+    const nv = pos.length / 3, nf = idx.length / 3;
+    const buf = new ArrayBuffer(12 + pos.length * 4 + idx.length * 4 + shares.length * 4 + cols.length);
+    const dv = new DataView(buf); dv.setUint32(0, nv, true); dv.setUint32(4, nf, true); dv.setUint32(8, L, true);
+    let o = 12;
+    new Float32Array(buf, o, pos.length).set(pos); o += pos.length * 4;
+    new Uint32Array(buf, o, idx.length).set(idx); o += idx.length * 4;
+    new Float32Array(buf, o, shares.length).set(shares); o += shares.length * 4;
+    new Uint8Array(buf, o, cols.length).set(cols);
     return new Uint8Array(buf);
   };
+
 
   // smoothed share of colour `lab` among the solid voxels near each point (normalised blur:
   // air voxels outside the clay keep the base colour label, so they must not vote).

@@ -12,12 +12,13 @@ shutil.rmtree(os.path.join(repo, "products"), ignore_errors=True)
 cat = json.load(open(os.path.join(site, "catalog.json")))
 for p in cat["products"]:
     for w in p["web"]:
+        if not w.get("file"): continue
         src = os.path.join(site, w["file"]); w["file"] = w["file"][:-4] if w["file"].endswith(".txt") else w["file"]
         dst = os.path.join(repo, w["file"]); os.makedirs(os.path.dirname(dst), exist_ok=True)
         open(dst, "wb").write(base64.b64decode(open(src).read()))
     if p.get("preview"):
         src = os.path.join(site, p["preview"]); p["preview"] = p["preview"][:-4] if p["preview"].endswith(".txt") else p["preview"]
-        open(os.path.join(repo, p["preview"]), "wb").write(base64.b64decode(open(src).read()))
+        os.makedirs(os.path.dirname(os.path.join(repo, p["preview"])), exist_ok=True); open(os.path.join(repo, p["preview"]), "wb").write(base64.b64decode(open(src).read()))
     shutil.copy2(os.path.join(site, p["cover"]), os.path.join(repo, p["cover"]))
     zsrc = os.path.join(site, p["download"]); zname = p["download"][:-4] if p["download"].endswith(".txt") else p["download"]
     data = base64.b64decode(open(zsrc).read())
