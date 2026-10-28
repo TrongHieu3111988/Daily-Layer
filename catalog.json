@@ -1,0 +1,423 @@
+{
+ "shop": "Daily Layer",
+ "started": "2026-10-28",
+ "products": [
+  {
+   "slug": "twist-vase-petal",
+   "title": "Petal Twist Vase",
+   "price": 2.49,
+   "blurb": "Six-petal vase with a slow twist. Prints solid or in spiral vase mode for a seamless finish.",
+   "tags": [
+    "vase",
+    "home",
+    "vase-mode"
+   ],
+   "line": "decor",
+   "print_hint": "Works as solid model or in Vase mode (spiral); PLA silk looks great",
+   "parts": [
+    {
+     "name": "vase",
+     "triangles": 103680,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 87.21,
+     "size_mm": [
+      100.4,
+      99.9,
+      150.0
+     ],
+     "min_z": 0.0
+    }
+   ],
+   "watertight": true,
+   "web": [
+    {
+     "file": "products/twist-vase-petal/web_vase.bin",
+     "color": "#C9B79C",
+     "name": "vase"
+    }
+   ],
+   "download": "",
+   "cover": "products/twist-vase-petal/cover.jpg",
+   "build_seconds": 6.4,
+   "download_bytes": 2470750,
+   "dropped": "2026-10-28"
+  },
+  {
+   "slug": "rib-planter-saucer",
+   "title": "Ribbed Planter + Saucer",
+   "price": 1.99,
+   "blurb": "Soft-ribbed planter with drainage hole and a matching drip saucer.",
+   "tags": [
+    "planter",
+    "garden",
+    "home"
+   ],
+   "line": "decor",
+   "print_hint": "0.2 mm layer, 3 walls; drainage hole included; saucer prints separately",
+   "parts": [
+    {
+     "name": "planter",
+     "triangles": 69696,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 173.62,
+     "size_mm": [
+      120.1,
+      120.1,
+      95.0
+     ],
+     "min_z": 0.0
+    },
+    {
+     "name": "saucer",
+     "triangles": 2880,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 27.18,
+     "size_mm": [
+      122.0,
+      122.0,
+      9.0
+     ],
+     "min_z": 0.0
+    }
+   ],
+   "watertight": true,
+   "web": [
+    {
+     "file": "products/rib-planter-saucer/web_planter.bin",
+     "color": "#D9CBB8",
+     "name": "planter"
+    },
+    {
+     "file": "products/rib-planter-saucer/web_saucer.bin",
+     "color": "#B9A88F",
+     "name": "saucer"
+    }
+   ],
+   "download": "",
+   "cover": "products/rib-planter-saucer/cover.jpg",
+   "build_seconds": 5.2,
+   "download_bytes": 1408966,
+   "dropped": "2026-10-28"
+  },
+  {
+   "slug": "phone-stand-aframe",
+   "title": "A-Frame Phone Stand",
+   "price": 1.49,
+   "blurb": "Stable A-frame stand with a charging-cable slot. Holds phones and small tablets in portrait or landscape.",
+   "tags": [
+    "phone",
+    "desk",
+    "gift"
+   ],
+   "line": "functional",
+   "print_hint": "0.2 mm layer, 4 walls, 15% gyroid, prints flat, no supports",
+   "parts": [
+    {
+     "name": "stand",
+     "triangles": 298996,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 73.49,
+     "size_mm": [
+      76.0,
+      65.9,
+      80.6
+     ],
+     "min_z": 0.0
+    }
+   ],
+   "watertight": true,
+   "web": [
+    {
+     "file": "products/phone-stand-aframe/web_stand.bin",
+     "color": "#2F3A3F",
+     "name": "stand"
+    }
+   ],
+   "download": "",
+   "cover": "products/phone-stand-aframe/cover.jpg",
+   "build_seconds": 14.8,
+   "download_bytes": 5066880,
+   "dropped": "2026-10-28"
+  },
+  {
+   "slug": "gyro-rings-5",
+   "title": "Gyro Rings Fidget",
+   "price": 0.0,
+   "blurb": "Five interlocking rings that print as one piece and spin freely. No assembly, no supports.",
+   "tags": [
+    "fidget",
+    "print-in-place",
+    "toy"
+   ],
+   "line": "print-in-place",
+   "print_hint": "Print as one plate, 0.16 mm layer, no supports, 0.6 mm clearance; twist gently to free rings",
+   "parts": [
+    {
+     "name": "ring1",
+     "triangles": 2304,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 3.25,
+     "size_mm": [
+      25.2,
+      25.2,
+      10.0
+     ],
+     "min_z": 0.0
+    },
+    {
+     "name": "ring2",
+     "triangles": 2304,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 4.68,
+     "size_mm": [
+      36.4,
+      36.4,
+      10.0
+     ],
+     "min_z": 0.0
+    },
+    {
+     "name": "ring3",
+     "triangles": 2304,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 6.44,
+     "size_mm": [
+      47.6,
+      47.6,
+      10.0
+     ],
+     "min_z": 0.0
+    },
+    {
+     "name": "ring4",
+     "triangles": 2304,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 8.2,
+     "size_mm": [
+      58.8,
+      58.8,
+      10.0
+     ],
+     "min_z": 0.0
+    },
+    {
+     "name": "ring5",
+     "triangles": 2304,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 8.25,
+     "size_mm": [
+      66.8,
+      66.8,
+      10.0
+     ],
+     "min_z": 0.0
+    }
+   ],
+   "watertight": true,
+   "web": [
+    {
+     "file": "products/gyro-rings-5/web_ring1.bin",
+     "color": "#F2A65A",
+     "name": "ring1"
+    },
+    {
+     "file": "products/gyro-rings-5/web_ring2.bin",
+     "color": "#EF6F6C",
+     "name": "ring2"
+    },
+    {
+     "file": "products/gyro-rings-5/web_ring3.bin",
+     "color": "#5B8E7D",
+     "name": "ring3"
+    },
+    {
+     "file": "products/gyro-rings-5/web_ring4.bin",
+     "color": "#4A6FA5",
+     "name": "ring4"
+    },
+    {
+     "file": "products/gyro-rings-5/web_ring5.bin",
+     "color": "#2E3047",
+     "name": "ring5"
+    }
+   ],
+   "download": "products/gyro-rings-5/gyro-rings-5_files.zip",
+   "cover": "products/gyro-rings-5/cover.jpg",
+   "build_seconds": 1.1,
+   "download_bytes": 215110,
+   "dropped": "2026-10-28"
+  },
+  {
+   "slug": "desk-bin-3cell",
+   "title": "Tri-Cell Desk Bin",
+   "price": 1.99,
+   "blurb": "Three-compartment organizer with a label notch and a stacking recess. Fits pens, bits, SD cards and clutter.",
+   "tags": [
+    "organizer",
+    "desk",
+    "office"
+   ],
+   "line": "functional",
+   "print_hint": "0.2 mm layer, 3 walls, 10% infill, no supports",
+   "parts": [
+    {
+     "name": "bin",
+     "triangles": 361832,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 46.55,
+     "size_mm": [
+      120.0,
+      62.0,
+      44.0
+     ],
+     "min_z": 0.0
+    }
+   ],
+   "watertight": true,
+   "web": [
+    {
+     "file": "products/desk-bin-3cell/web_bin.bin",
+     "color": "#E9E4D8",
+     "name": "bin"
+    }
+   ],
+   "download": "",
+   "cover": "products/desk-bin-3cell/cover.jpg",
+   "build_seconds": 13.7,
+   "download_bytes": 4149983,
+   "dropped": "2026-10-28"
+  },
+  {
+   "slug": "chibi-whale-4part",
+   "title": "Chibi Whale (multi-colour)",
+   "price": 3.99,
+   "blurb": "Cute whale split by colour into body, belly and button eyes. Press-fit pegs, ready for AMS or manual swaps.",
+   "tags": [
+    "figure",
+    "multicolor",
+    "cute"
+   ],
+   "line": "figure",
+   "print_hint": "3 colours, 4 parts; press-fit pegs (0.25 mm clearance); 0.12 mm layer for the body, no supports with body printed cut-side down",
+   "parts": [
+    {
+     "name": "body",
+     "triangles": 127280,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 47.01,
+     "size_mm": [
+      78.0,
+      49.7,
+      27.0
+     ],
+     "min_z": 0.0
+    },
+    {
+     "name": "belly",
+     "triangles": 55260,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 10.39,
+     "size_mm": [
+      54.7,
+      39.6,
+      13.0
+     ],
+     "min_z": 0.0
+    },
+    {
+     "name": "eye_l",
+     "triangles": 9284,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 0.07,
+     "size_mm": [
+      6.7,
+      6.7,
+      6.0
+     ],
+     "min_z": 0.0
+    },
+    {
+     "name": "eye_r",
+     "triangles": 9284,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 0.07,
+     "size_mm": [
+      6.7,
+      6.7,
+      6.0
+     ],
+     "min_z": 0.0
+    }
+   ],
+   "watertight": true,
+   "web": [
+    {
+     "file": "products/chibi-whale-4part/web_belly.bin",
+     "color": "#F3EAD7",
+     "name": "belly"
+    },
+    {
+     "file": "products/chibi-whale-4part/web_body.bin",
+     "color": "#4F8FC0",
+     "name": "body"
+    },
+    {
+     "file": "products/chibi-whale-4part/web_eye_l.bin",
+     "color": "#1D1F24",
+     "name": "eye_l"
+    },
+    {
+     "file": "products/chibi-whale-4part/web_eye_r.bin",
+     "color": "#1D1F24",
+     "name": "eye_r"
+    }
+   ],
+   "download": "",
+   "cover": "products/chibi-whale-4part/cover.jpg",
+   "build_seconds": 10.1,
+   "download_bytes": 5158213,
+   "dropped": "2026-10-28"
+  }
+ ],
+ "checkout": {
+  "maker": "",
+  "pro": "",
+  "product_base": ""
+ },
+ "ledger": {
+  "revenue_usd": 0.0,
+  "orders": 0,
+  "members": 0,
+  "costs_usd": 0.0
+ },
+ "updated": "2026-10-28 13:38",
+ "featured": "chibi-whale-4part"
+}

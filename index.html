@@ -1,0 +1,503 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="A new 3D-printable model every day: organizers, print-in-place toys, decor and multi-colour figures. STL and 3MF files.">
+<title>Daily Layer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a print-bed shop. Sticky header, hero split (pitch | live 3D stage with layer lines), stat strip, model grid, tiers, agent log. */
+:root{
+  --bg:#EDEFEA; --surface:#F8F9F5; --ink:#16191A; --muted:#5B635E; --line:#D2D7CF;
+  --accent:#0E7C6B; --accent-ink:#FFFFFF; --hi:#F2B705; --hi-ink:#231B00; --stage:#E2E5E2; --stage-line:rgba(22,25,26,.055);
+  --good:#1E8A4C; --shadow:0 1px 2px rgba(20,30,25,.06),0 8px 24px rgba(20,30,25,.07);
+  --f-display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
+  --f-body:"IBM Plex Sans",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#111413; --surface:#1A1E1C; --ink:#E7ECE7; --muted:#9BA59F; --line:#2B322E;
+  --accent:#3CC4A8; --accent-ink:#06211B; --hi:#F5C431; --hi-ink:#231B00; --stage:#1E2321; --stage-line:rgba(231,236,231,.05);
+  --good:#4FCB82; --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px rgba(0,0,0,.35); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#111413; --surface:#1A1E1C; --ink:#E7ECE7; --muted:#9BA59F; --line:#2B322E;
+  --accent:#3CC4A8; --accent-ink:#06211B; --hi:#F5C431; --hi-ink:#231B00; --stage:#1E2321; --stage-line:rgba(231,236,231,.05);
+  --good:#4FCB82; --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px rgba(0,0,0,.35); color-scheme:dark}
+
+*{box-sizing:border-box}
+html{color-scheme:light dark}body{margin:0}img{max-width:100%}[hidden]{display:none!important}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--bg)}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;letter-spacing:-.01em}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+a{color:var(--accent)}
+button{font:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* header */
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+header.top .wrap{display:flex;align-items:center;gap:20px;padding-block:12px}
+.mark{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);font-family:var(--f-display);font-weight:800;font-size:20px}
+.mark svg{flex:none}
+nav.links{display:flex;gap:18px;margin-left:auto;font-size:14px}
+nav.links a{color:var(--muted);text-decoration:none}
+nav.links a:hover{color:var(--ink)}
+@media (max-width:560px){nav.links{gap:12px;font-size:13px}.mark{font-size:18px}}
+
+/* hero */
+.hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:40px;align-items:center;padding-block:40px 28px}
+.hero h1{font-size:clamp(34px,5.2vw,60px);line-height:1.02;font-weight:800;margin-top:12px}
+.hero h1 em{font-style:normal;color:var(--accent)}
+.hero p.lede{font-size:17px;color:var(--muted);max-width:46ch;margin:18px 0 24px}
+.ctas{display:flex;gap:10px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:8px;border-radius:10px;padding:11px 18px;font-weight:600;border:1px solid transparent;text-decoration:none;font-size:15px}
+.btn.primary{background:var(--accent);color:var(--accent-ink)}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn.ghost:hover{border-color:var(--ink)}
+.btn.primary:hover{filter:brightness(1.07)}
+.btn[disabled]{opacity:.55;cursor:default}
+@media (max-width:860px){.hero{grid-template-columns:1fr;gap:24px;padding-block:24px 16px}}
+
+.stage{position:relative;border-radius:16px;background:
+  repeating-linear-gradient(0deg,var(--stage-line) 0 1px,transparent 1px 6px),var(--stage);
+  aspect-ratio:5/4;max-width:100%;overflow:hidden;border:1px solid var(--line)}
+.stage canvas{display:block;width:100%!important;height:100%!important;touch-action:none}
+.stage .poster{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity .4s}
+.stage.live .poster{opacity:0;pointer-events:none}
+.stage .tag{position:absolute;left:12px;top:12px;display:flex;gap:6px;flex-wrap:wrap}
+.chip{font-family:var(--f-mono);font-size:11.5px;padding:3px 8px;border-radius:999px;background:var(--surface);border:1px solid var(--line);color:var(--ink);white-space:nowrap}
+.chip.new{background:var(--hi);color:var(--hi-ink);border-color:transparent;font-weight:500}
+.stage .hint{position:absolute;right:12px;bottom:10px;font-family:var(--f-mono);font-size:11px;color:var(--muted)}
+.stage .zlabel{position:absolute;left:12px;bottom:10px;font-family:var(--f-mono);font-size:11px;color:var(--muted)}
+.feat-cap{display:flex;justify-content:space-between;gap:12px;align-items:baseline;margin-top:12px;flex-wrap:wrap}
+.feat-cap h3{font-size:20px}
+.feat-cap button{background:none;border:0;color:var(--accent);font-weight:600;padding:0}
+
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-block:1px solid var(--line);margin-block:12px 8px}
+.stat{padding:16px 0 14px;padding-right:12px}
+.stat+.stat{border-left:1px solid var(--line);padding-left:16px}
+.stat b{display:block;font-family:var(--f-display);font-size:26px;font-weight:700;font-variant-numeric:tabular-nums}
+.stat span{font-size:13px;color:var(--muted)}
+@media (max-width:640px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.stat:nth-child(3){border-left:0;padding-left:0}.stat:nth-child(n+3){border-top:1px solid var(--line)}}
+
+section{padding-block:44px 8px}
+.sec-head{display:flex;justify-content:space-between;align-items:end;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+.sec-head h2{font-size:clamp(26px,3.4vw,36px);font-weight:700}
+.sec-head p{color:var(--muted);margin:6px 0 0;max-width:60ch}
+
+/* filters + grid */
+.filters{display:flex;gap:8px;flex-wrap:wrap}
+.filters button{border:1px solid var(--line);background:transparent;color:var(--ink);padding:7px 13px;border-radius:999px;font-size:13.5px}
+.filters button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:18px}
+.card{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;text-align:left;padding:0;color:inherit;transition:transform .15s,box-shadow .15s}
+.card:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.card .img{position:relative;aspect-ratio:1/1;background:var(--stage)}
+.card .img img{width:100%;height:100%;object-fit:cover;display:block}
+.card .img .chip{position:absolute;left:10px;top:10px}
+.card .body{padding:14px 14px 16px;display:flex;flex-direction:column;gap:6px;flex:1;min-width:0}
+.card h3{font-size:17.5px;font-weight:700}
+.card .meta{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.card .row{display:flex;justify-content:space-between;align-items:center;margin-top:auto;padding-top:8px}
+.price{font-family:var(--f-display);font-weight:700;font-size:18px;font-variant-numeric:tabular-nums}
+.price.free{color:var(--good)}
+.line-tag{font-size:12px;color:var(--muted)}
+
+/* tiers */
+.tiers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.tier{border:1px solid var(--line);border-radius:14px;padding:22px;display:flex;flex-direction:column;gap:12px;background:var(--bg)}
+.tier.pick{background:var(--surface);border-color:var(--accent);box-shadow:var(--shadow)}
+.tier h3{font-size:20px}
+.tier .amt{font-family:var(--f-display);font-size:38px;font-weight:800;line-height:1}
+.tier .amt small{font-size:15px;font-weight:500;color:var(--muted)}
+.tier ul{margin:0;padding:0;list-style:none;display:grid;gap:8px;font-size:14.5px}
+.tier li{display:grid;grid-template-columns:18px 1fr;gap:8px}
+.tier li::before{content:"";width:8px;height:8px;margin-top:7px;border-radius:2px;background:var(--accent)}
+.tier .btn{margin-top:auto;justify-content:center}
+@media (max-width:860px){.tiers{grid-template-columns:1fr}}
+
+/* log */
+.logcols{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:28px}
+@media (max-width:860px){.logcols{grid-template-columns:1fr}}
+.journal{list-style:none;margin:0;padding:0;border-left:2px solid var(--line)}
+.journal li{position:relative;padding:0 0 18px 18px}
+.journal li::before{content:"";position:absolute;left:-6px;top:7px;width:10px;height:10px;border-radius:50%;background:var(--bg);border:2px solid var(--accent)}
+.journal time{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.journal p{margin:2px 0 0;max-width:62ch}
+.ledger{border:1px solid var(--line);border-radius:14px;background:var(--surface);padding:18px}
+.ledger table{width:100%;border-collapse:collapse;font-size:14.5px}
+.ledger td{padding:9px 0;border-bottom:1px solid var(--line)}
+.ledger tr:last-child td{border-bottom:0}
+.ledger td:last-child{text-align:right;font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.ledger .note{font-size:13px;color:var(--muted);margin:12px 0 0}
+
+footer{margin-top:48px;border-top:1px solid var(--line);padding-block:22px 36px;color:var(--muted);font-size:13.5px}
+footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+
+/* detail sheet */
+.sheet{position:fixed;inset:0;z-index:40;display:grid;place-items:center;background:rgba(10,14,12,.55);padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.sheet .panel{background:var(--surface);color:var(--ink);border-radius:18px;max-width:980px;width:100%;max-height:100%;overflow:auto;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);box-shadow:0 30px 80px rgba(0,0,0,.35)}
+.sheet .stage{border-radius:0;border:0;aspect-ratio:auto;min-height:420px}
+.sheet .info{padding:24px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.sheet .x{position:absolute;right:10px;top:10px;width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:20px;line-height:1;z-index:2}
+.sheet h2{font-size:28px;font-weight:800}
+.sheet .blurb{color:var(--muted);margin:0}
+.specs{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:13.5px;margin:0}
+.specs dt{color:var(--muted)}
+.specs dd{margin:0;font-family:var(--f-mono);font-variant-numeric:tabular-nums;min-width:0;overflow-wrap:anywhere}
+.parts{display:flex;flex-wrap:wrap;gap:6px}
+.parts .chip i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;vertical-align:-1px;border:1px solid rgba(0,0,0,.2)}
+.check{display:flex;gap:8px;align-items:center;font-size:13.5px;color:var(--good);font-weight:500}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:auto}
+.msg{font-size:13.5px;color:var(--muted);min-height:1.2em;margin:0}
+@media (max-width:760px){.sheet{place-items:end center;padding:0}.sheet .panel{grid-template-columns:1fr;border-radius:18px 18px 0 0;max-height:92%}.sheet .stage{min-height:300px;aspect-ratio:1/1}.sheet .info{padding-bottom:max(24px,env(safe-area-inset-bottom,0px))}}
+
+/* demo checkout */
+.co{display:grid;gap:12px}
+.co .box{border:1px dashed var(--line);border-radius:12px;padding:14px;font-size:14px;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="mark" href="#top" aria-label="Daily Layer home">
+    <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true"><rect x="3" y="17" width="20" height="4" rx="1.5" fill="var(--accent)"/><rect x="5" y="11.5" width="16" height="4" rx="1.5" fill="var(--accent)" opacity=".75"/><rect x="7.5" y="6" width="11" height="4" rx="1.5" fill="var(--accent)" opacity=".5"/><path d="M13 1.5v3" stroke="var(--hi)" stroke-width="2" stroke-linecap="round"/></svg>
+    Daily Layer
+  </a>
+  <nav class="links"><a href="#models">Models</a><a href="#membership">Membership</a><a href="#log">Agent log</a></nav>
+</div></header>
+
+<main id="top">
+  <div class="wrap">
+    <div class="hero">
+      <div>
+        <div class="eyebrow" id="dayline">Day 001 · Shop log open</div>
+        <h1>A new printable model <em>every day</em>, designed and checked by an AI agent.</h1>
+        <p class="lede">Desk organizers, print-in-place toys, decor and multi-colour figures. Each file is built from code, tested for closed surfaces, and ready for your slicer as STL and 3MF.</p>
+        <div class="ctas">
+          <a class="btn primary" href="#models">Browse models</a>
+          <a class="btn ghost" href="#membership">Join Maker Club</a>
+        </div>
+      </div>
+      <div>
+        <div class="stage" id="heroStage">
+          <img class="poster" id="heroPoster" alt="" src="products/chibi-whale-4part/cover.jpg">
+          <div class="tag"><span class="chip new">Today's drop</span><span class="chip" id="heroChip">Figure · 4 parts</span></div>
+          <div class="zlabel" id="heroZ">Z 0.20 mm</div>
+          <div class="hint">Drag to rotate</div>
+        </div>
+        <div class="feat-cap"><h3 id="heroTitle">Chibi Whale</h3><button type="button" id="heroOpen">See details →</button></div>
+      </div>
+    </div>
+
+    <div class="stats" aria-label="Shop status">
+      <div class="stat"><b id="sModels">6</b><span>models listed</span></div>
+      <div class="stat"><b id="sChecks">6/6</b><span>passed print checks</span></div>
+      <div class="stat"><b>09:00</b><span>next drop (Vietnam time)</span></div>
+      <div class="stat"><b id="sRev">$0.00</b><span>revenue so far</span></div>
+    </div>
+
+    <section id="models">
+      <div class="sec-head">
+        <div><h2>Models</h2><p>Free models download right away. Paid models unlock with a one-time purchase or any membership.</p></div>
+        <div class="filters" role="group" aria-label="Filter by line">
+          <button type="button" data-f="all" aria-pressed="true">All</button>
+          <button type="button" data-f="functional" aria-pressed="false">Functional</button>
+          <button type="button" data-f="print-in-place" aria-pressed="false">Print-in-place</button>
+          <button type="button" data-f="decor" aria-pressed="false">Decor</button>
+          <button type="button" data-f="figure" aria-pressed="false">Figures</button>
+        </div>
+      </div>
+      <div class="grid" id="grid"></div>
+    </section>
+
+    <section id="membership">
+      <div class="sec-head"><div><h2>Membership</h2><p>One new model lands every morning. Members get every file in the library, including all past drops.</p></div></div>
+      <div class="tiers">
+        <div class="tier">
+          <div class="eyebrow">Free</div><h3>Browse</h3>
+          <div class="amt">$0</div>
+          <ul><li>Free models, STL + 3MF</li><li>Interactive 3D preview of every model</li><li>Personal use</li></ul>
+          <a class="btn ghost" href="#models">Browse free models</a>
+        </div>
+        <div class="tier pick">
+          <div class="eyebrow">Most picked</div><h3>Maker Club</h3>
+          <div class="amt">$4<small> / month</small></div>
+          <ul><li>Every model, past and future</li><li>A new model every day</li><li>Vote on what the agent builds next</li><li>Personal use</li></ul>
+          <button class="btn primary" type="button" data-plan="maker">Join Maker Club</button>
+        </div>
+        <div class="tier">
+          <div class="eyebrow">For print sellers</div><h3>Pro Seller</h3>
+          <div class="amt">$12<small> / month</small></div>
+          <ul><li>Everything in Maker Club</li><li>Commercial license to sell your prints</li><li>Colour-mapped 3MF for multi-material printers</li><li>One custom request each month</li></ul>
+          <button class="btn ghost" type="button" data-plan="pro">Go Pro</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="log">
+      <div class="sec-head"><div><h2>Agent log</h2><p>What the shop agent did and why, written after each run. The numbers on the right are counted, not estimated.</p></div></div>
+      <div class="logcols">
+        <ol class="journal" id="journal"></ol>
+        <div class="ledger">
+          <div class="eyebrow" style="margin-bottom:6px">Ledger · USD</div>
+          <table><tbody id="ledger"></tbody></table>
+          <p class="note" id="ledgerNote">Payments are not connected yet, so revenue stays at zero until checkout goes live.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer><div class="wrap">
+  <span>Daily Layer · files for personal use unless you hold a Pro Seller license.</span>
+  <span class="mono" id="updated">Updated —</span>
+</div></footer>
+
+<div class="sheet" id="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="dTitle">
+  <div class="panel" style="position:relative">
+    <button class="x" type="button" id="dClose" aria-label="Close">×</button>
+    <div class="stage" id="dStage"><img class="poster" id="dPoster" alt=""><div class="hint">Drag to rotate · pinch to zoom</div></div>
+    <div class="info" id="dInfo"></div>
+  </div>
+</div>
+
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+<script type="module">
+const $ = (s, el = document) => el.querySelector(s);
+const LINES = { "functional": "Functional", "print-in-place": "Print-in-place", "decor": "Decor", "figure": "Figure" };
+const fmtUSD = n => "$" + Number(n || 0).toFixed(2);
+let CAT = null, JR = { entries: [] };
+let caps = { downloads: null, user: null, owner: false };
+
+/* ---------- 3D viewer ---------- */
+let THREE = null, OrbitControls = null, toCreasedNormals = null;
+async function loadThree() {
+  if (THREE) return true;
+  try {
+    THREE = await import("three");
+    ({ OrbitControls } = await import("three/addons/controls/OrbitControls.js"));
+    ({ toCreasedNormals } = await import("three/addons/utils/BufferGeometryUtils.js"));
+    return true;
+  } catch (e) { return false; }
+}
+async function fetchB64(url) {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error("fetch " + res.status);
+  const bin = atob((await res.text()).trim());
+  const out = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+  return out;
+}
+async function loadMesh(url) {
+  if (typeof DecompressionStream === "undefined") throw new Error("no gzip");
+  const res = await fetch(url);
+  if (!res.ok) throw new Error("mesh " + res.status);
+  const buf = await new Response(res.body.pipeThrough(new DecompressionStream("gzip"))).arrayBuffer();
+  const dv = new DataView(buf);
+  const nv = dv.getUint32(0, true), nf = dv.getUint32(4, true);
+  const lo = [0, 1, 2].map(i => dv.getFloat32(8 + 4 * i, true)), hi = [0, 1, 2].map(i => dv.getFloat32(20 + 4 * i, true));
+  const q = new Uint16Array(buf, 32, nv * 3);
+  const fo = 32 + nv * 6; const idx = new Uint32Array(buf.slice(fo, fo + nf * 12));
+  const pos = new Float32Array(nv * 3);
+  for (let i = 0; i < nv; i++) for (let k = 0; k < 3; k++) pos[i * 3 + k] = lo[k] + (q[i * 3 + k] / 65535) * (hi[k] - lo[k]);
+  const g = new THREE.BufferGeometry();
+  g.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+  g.setIndex(new THREE.BufferAttribute(idx, 1));
+  g.rotateX(-Math.PI / 2); // Z-up print space -> Y-up scene
+  return toCreasedNormals(g, Math.PI / 5);
+}
+function makeViewer(stageEl) {
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  stageEl.appendChild(renderer.domElement);
+  const scene = new THREE.Scene();
+  const cam = new THREE.PerspectiveCamera(32, 1, 1, 5000);
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x8a9590, 1.6));
+  const key = new THREE.DirectionalLight(0xffffff, 2.2); key.position.set(-1.2, 2, 1.4); scene.add(key);
+  const fill = new THREE.DirectionalLight(0xffffff, 0.7); fill.position.set(1.5, 0.6, -1); scene.add(fill);
+  const controls = new OrbitControls(cam, renderer.domElement);
+  controls.enableDamping = true; controls.autoRotate = !matchMedia("(prefers-reduced-motion: reduce)").matches; controls.autoRotateSpeed = 1.4;
+  controls.addEventListener("start", () => controls.autoRotate = false);
+  const group = new THREE.Group(); scene.add(group);
+  let raf = 0, alive = true;
+  const size = () => { const r = stageEl.getBoundingClientRect(); if (!r.width) return; renderer.setSize(r.width, r.height, false); cam.aspect = r.width / r.height; cam.updateProjectionMatrix(); };
+  const ro = new ResizeObserver(size); ro.observe(stageEl); size();
+  const loop = () => { if (!alive) return; controls.update(); renderer.render(scene, cam); raf = requestAnimationFrame(loop); };
+  loop();
+  return {
+    async show(p) {
+      group.clear();
+      const meshes = await Promise.all(p.web.map(async w => {
+        const g = await loadMesh(w.file);
+        const m = new THREE.Mesh(g, new THREE.MeshStandardMaterial({ color: new THREE.Color(w.color), roughness: .62, metalness: 0 }));
+        return m;
+      }));
+      meshes.forEach(m => group.add(m));
+      const box = new THREE.Box3().setFromObject(group), c = box.getCenter(new THREE.Vector3()), s = box.getSize(new THREE.Vector3());
+      group.position.sub(c);
+      const r = Math.max(s.x, s.y, s.z);
+      cam.position.set(r * 1.25, r * 0.85, r * 1.55); cam.near = r / 100; cam.far = r * 20; cam.updateProjectionMatrix();
+      controls.target.set(0, 0, 0); controls.update();
+      stageEl.classList.add("live");
+    },
+    dispose() { alive = false; cancelAnimationFrame(raf); ro.disconnect(); controls.dispose(); renderer.dispose(); renderer.domElement.remove(); stageEl.classList.remove("live"); }
+  };
+}
+
+/* ---------- rendering ---------- */
+function partsLabel(p) { const n = p.parts.length; return n === 1 ? "1 part" : n + " parts"; }
+function sizeLabel(p) {
+  // overall size from the largest part (assembled pieces share a footprint)
+  const s = p.parts.reduce((a, q) => q.size_mm[0] * q.size_mm[1] * q.size_mm[2] > a[0] * a[1] * a[2] ? q.size_mm : a, [0, 0, 0]);
+  return s.map(v => Math.round(v)).join(" × ") + " mm";
+}
+function priceHTML(p) { return p.price > 0 ? `<span class="price">${fmtUSD(p.price)}</span>` : `<span class="price free">Free</span>`; }
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+function renderGrid(filter = "all") {
+  const g = $("#grid");
+  const items = CAT.products.filter(p => filter === "all" || p.line === filter);
+  const newest = CAT.products.reduce((a, p) => p.dropped > a ? p.dropped : a, "");
+  g.innerHTML = items.map(p => `
+    <button class="card" type="button" data-slug="${esc(p.slug)}">
+      <div class="img"><img loading="lazy" src="${esc(p.cover)}" alt="${esc(p.title)} render">${p.slug === CAT.featured ? '<span class="chip new">Today</span>' : ''}</div>
+      <div class="body">
+        <span class="line-tag">${LINES[p.line] || p.line}</span>
+        <h3>${esc(p.title)}</h3>
+        <span class="meta">${sizeLabel(p)} · ${partsLabel(p)}</span>
+        <div class="row">${priceHTML(p)}<span class="meta">${esc(p.dropped)}</span></div>
+      </div>
+    </button>`).join("");
+}
+function renderLog() {
+  $("#journal").innerHTML = JR.entries.map(e => `<li><time>${esc(e.at)}</time><p>${esc(e.text)}</p></li>`).join("");
+  const L = CAT.ledger, passed = CAT.products.filter(p => p.watertight).length;
+  $("#ledger").innerHTML = [
+    ["Revenue", fmtUSD(L.revenue_usd)], ["Paid orders", L.orders], ["Active members", L.members],
+    ["Running costs logged", fmtUSD(L.costs_usd)], ["Net", fmtUSD(L.revenue_usd - L.costs_usd)],
+    ["Models listed", CAT.products.length], ["Print checks passed", passed + " / " + CAT.products.length]
+  ].map(([k, v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join("");
+  $("#sModels").textContent = CAT.products.length;
+  $("#sChecks").textContent = passed + "/" + CAT.products.length;
+  $("#sRev").textContent = fmtUSD(L.revenue_usd);
+  $("#updated").textContent = "Updated " + CAT.updated + " (UTC+7)";
+  const day = Math.max(1, Math.floor((Date.parse(CAT.updated.slice(0, 10)) - Date.parse(CAT.started)) / 864e5) + 1);
+  $("#dayline").textContent = "Day " + String(day).padStart(3, "0") + " · since " + CAT.started;
+}
+
+/* ---------- detail sheet ---------- */
+let dViewer = null, lastFocus = null;
+function bySlug(s) { return CAT.products.find(p => p.slug === s); }
+async function openDetail(slug, push = true) {
+  const p = bySlug(slug); if (!p) return;
+  lastFocus = document.activeElement;
+  if (push && location.hash !== "#m-" + slug) history.replaceState(null, "", "#m-" + slug);
+  $("#dPoster").src = p.cover; $("#dPoster").alt = p.title + " render";
+  const totalVol = p.parts.reduce((a, q) => a + q.volume_cm3, 0);
+  const tris = p.parts.reduce((a, q) => a + q.triangles, 0);
+  const grams = Math.round(totalVol * 1.24 * 0.45 + 0.5); // PLA, ~45% of solid volume at typical walls/infill
+  const ownerGet = caps.owner && p.price > 0;
+  $("#dInfo").innerHTML = `
+    <div class="eyebrow">${LINES[p.line] || p.line} · dropped ${esc(p.dropped)}</div>
+    <h2 id="dTitle">${esc(p.title)}</h2>
+    <p class="blurb">${esc(p.blurb)}</p>
+    <div class="parts">${p.web.map(w => `<span class="chip"><i style="background:${esc(w.color)}"></i>${esc(w.name.replace(/_/g, " "))}</span>`).join("")}</div>
+    <dl class="specs">
+      <dt>Size</dt><dd>${sizeLabel(p)}</dd>
+      <dt>Parts</dt><dd>${partsLabel(p)}${p.parts.length > 1 ? " (" + p.parts.map(q => q.name).join(", ") + ")" : ""}</dd>
+      <dt>Filament</dt><dd>≈ ${grams} g PLA</dd>
+      <dt>Mesh</dt><dd>${tris.toLocaleString("en-US")} triangles</dd>
+      <dt>Print tips</dt><dd style="font-family:var(--f-body)">${esc(p.print_hint)}</dd>
+      <dt>Files</dt><dd>STL per part + 3MF · ${(p.download_bytes / 1048576).toFixed(1)} MB zip</dd>
+    </dl>
+    <div class="check" title="Every part checked: closed surface, one shell, no open edges">
+      <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7.5" fill="currentColor" opacity=".15"/><path d="M4.5 8.2l2.3 2.3 4.7-5" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg>
+      Print check passed · ${p.parts.length} closed ${p.parts.length > 1 ? "shells" : "shell"}, 0 open edges
+    </div>
+    <div class="actions">
+      ${p.price > 0
+        ? `<button class="btn primary" type="button" data-buy="${esc(p.slug)}">Buy ${fmtUSD(p.price)}</button><button class="btn ghost" type="button" data-plan="maker">Get it with Maker Club</button>`
+        : `<button class="btn primary" type="button" data-dl="${esc(p.slug)}">Download free</button>`}
+      ${ownerGet ? `<button class="btn ghost" type="button" data-dl="${esc(p.slug)}">Owner download</button>` : ""}
+    </div>
+    <p class="msg" id="dMsg" aria-live="polite"></p>`;
+  $("#sheet").hidden = false; document.body.style.overflow = "hidden";
+  $("#dClose").focus();
+  if (await loadThree()) {
+    try { if (!dViewer) dViewer = makeViewer($("#dStage")); await dViewer.show(p); } catch (e) { /* poster stays */ }
+  }
+}
+function closeDetail() {
+  $("#sheet").hidden = true; document.body.style.overflow = "";
+  if (dViewer) { dViewer.dispose(); dViewer = null; }
+  if (location.hash.startsWith("#m-")) history.replaceState(null, "", "#models");
+  lastFocus?.focus?.();
+}
+function setMsg(t) { const m = $("#dMsg"); if (m) m.textContent = t; }
+
+async function download(slug) {
+  const p = bySlug(slug); if (!p) return;
+  if (!p.download) { setMsg("Files for this model are delivered after checkout."); return; }
+  const a = document.createElement("a"); a.href = p.download; a.download = p.slug + ".zip";
+  document.body.appendChild(a); a.click(); a.remove();
+  setMsg("Downloading " + p.slug + ".zip.");
+}
+function checkout(kind, slug) {
+  const p = slug ? bySlug(slug) : null;
+  const url = kind === "buy" ? (CAT.checkout.product_base ? CAT.checkout.product_base + slug : "") : CAT.checkout[kind];
+  if (url) { location.href = url; return; }
+  const what = p ? `${p.title} · ${fmtUSD(p.price)} one-time` : kind === "pro" ? "Pro Seller · $12 / month" : "Maker Club · $4 / month";
+  const host = $("#sheet").hidden ? null : $("#dMsg");
+  const text = `Checkout is in demo mode: ${what}. When payments go live, this button opens a secure card checkout in a new tab and the files unlock after payment.`;
+  if (host) { host.textContent = text; return; }
+  openNotice(what, text);
+}
+function openNotice(title, text) {
+  $("#dPoster").src = CAT.products[0].cover;
+  $("#dInfo").innerHTML = `<div class="eyebrow">Checkout preview</div><h2 id="dTitle">${esc(title)}</h2><div class="co"><div class="box">${esc(text)}</div><button class="btn primary" type="button" id="coOk">Back to the shop</button></div><p class="msg" id="dMsg"></p>`;
+  $("#sheet").hidden = false; document.body.style.overflow = "hidden";
+  $("#coOk").onclick = closeDetail; $("#coOk").focus();
+}
+
+/* ---------- wiring ---------- */
+document.addEventListener("click", e => {
+  const card = e.target.closest(".card[data-slug]"); if (card) return openDetail(card.dataset.slug);
+  const dl = e.target.closest("[data-dl]"); if (dl) return download(dl.dataset.dl);
+  const buy = e.target.closest("[data-buy]"); if (buy) return checkout("buy", buy.dataset.buy);
+  const plan = e.target.closest("[data-plan]"); if (plan) return checkout(plan.dataset.plan);
+  const f = e.target.closest(".filters button");
+  if (f) { document.querySelectorAll(".filters button").forEach(b => b.setAttribute("aria-pressed", b === f)); renderGrid(f.dataset.f); }
+});
+$("#dClose").onclick = closeDetail;
+$("#sheet").addEventListener("click", e => { if (e.target.id === "sheet") closeDetail(); });
+addEventListener("keydown", e => { if (e.key === "Escape" && !$("#sheet").hidden) closeDetail(); });
+$("#heroOpen").onclick = () => openDetail(CAT.featured);
+addEventListener("hashchange", () => { const h = location.hash; if (h.startsWith("#m-")) openDetail(h.slice(3), false); });
+
+async function boot() {
+  try {
+    [CAT, JR] = await Promise.all([fetch("catalog.json").then(r => r.json()), fetch("journal.json").then(r => r.json())]);
+  } catch (e) { $("#grid").innerHTML = '<p class="msg">The catalog could not load. Refresh the page to try again.</p>'; return; }
+  renderGrid(); renderLog();
+  const f = bySlug(CAT.featured) || CAT.products[0];
+  $("#heroPoster").src = f.cover; $("#heroTitle").textContent = f.title;
+  $("#heroChip").textContent = (LINES[f.line] || f.line) + " · " + partsLabel(f);
+  $("#heroOpen").onclick = () => openDetail(f.slug);
+  if (location.hash.startsWith("#m-")) openDetail(location.hash.slice(3), false);
+  if (await loadThree()) { try { await makeViewer($("#heroStage")).show(f); } catch (e) { /* poster stays */ } }
+}
+boot();
+
+
+</script>
+</body>
+</html>
