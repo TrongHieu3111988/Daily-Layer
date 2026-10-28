@@ -1,0 +1,550 @@
+<title>Doodle Puff</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@500;600;700;800&display=swap">
+<style>
+/* Layout: one-screen app. Top bar (back, name, undo/redo, the big "make it 3D" button), a square sheet of
+   paper in the middle, and a crayon tray at the bottom within thumb reach. The 3D view replaces the paper
+   and its own tray holds the print options. */
+:root{
+  --bg:#EEF3E8; --panel:#FFFFFF; --ink:#1F2A22; --muted:#5F6E62; --line:#D5DECF;
+  --paper:#FFFDF6; --paper-dot:#E6E2D3; --accent:#FF6B4A; --accent-ink:#FFFFFF; --sel:#1F2A22; --sel-ink:#FFFFFF;
+  --stage:#DCE6D3; --good:#1E9E6A; --warn:#B86A00;
+  --shadow:0 2px 6px rgba(31,42,34,.08),0 10px 30px rgba(31,42,34,.10);
+  --f-display:"Baloo 2","Nunito",ui-rounded,system-ui,sans-serif;
+  --f-body:"Nunito",ui-rounded,system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#121915; --panel:#1C2620; --ink:#EAF2EA; --muted:#A5B4A8; --line:#2E3B32;
+  --paper:#FFFDF6; --paper-dot:#E6E2D3; --accent:#FF7A5C; --accent-ink:#1A0D08; --sel:#EAF2EA; --sel-ink:#121915;
+  --stage:#18221C; --good:#47D196; --warn:#F2B04B;
+  --shadow:0 2px 6px rgba(0,0,0,.4),0 12px 30px rgba(0,0,0,.35); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121915; --panel:#1C2620; --ink:#EAF2EA; --muted:#A5B4A8; --line:#2E3B32;
+  --paper:#FFFDF6; --paper-dot:#E6E2D3; --accent:#FF7A5C; --accent-ink:#1A0D08; --sel:#EAF2EA; --sel-ink:#121915;
+  --stage:#18221C; --good:#47D196; --warn:#F2B04B;
+  --shadow:0 2px 6px rgba(0,0,0,.4),0 12px 30px rgba(0,0,0,.35); color-scheme:dark}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;overflow:hidden;-webkit-user-select:none;user-select:none}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.app{height:100%;display:flex;flex-direction:column}
+.bar{display:flex;align-items:center;gap:6px;padding-block:8px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.bar h1{font-family:var(--f-display);font-weight:800;font-size:22px;margin:0 auto 0 2px;letter-spacing:-.01em;white-space:nowrap}
+.bar h1 span{color:var(--accent)}
+.ibtn{width:42px;height:42px;border-radius:14px;border:1px solid var(--line);background:var(--panel);display:grid;place-items:center;flex:none;text-decoration:none;color:var(--ink)}
+.ibtn:disabled{opacity:.35;cursor:default}
+.ibtn svg{width:22px;height:22px}
+.pill{height:42px;border-radius:14px;padding:0 16px;border:0;background:var(--accent);color:var(--accent-ink);font-weight:800;font-size:15px;display:flex;align-items:center;gap:7px;flex:none;box-shadow:var(--shadow)}
+.pill.ghost{background:var(--panel);color:var(--ink);border:1px solid var(--line);box-shadow:none}
+.pill:disabled{opacity:.5;cursor:default}
+.pill svg{width:20px;height:20px}
+@media (max-width:460px){.bar h1{font-size:18px}.pill .lbl-s{display:none}}
+
+.stage{position:relative;flex:1;min-height:0;margin-left:max(16px,env(safe-area-inset-left,0px));margin-right:max(16px,env(safe-area-inset-right,0px));border-radius:22px;overflow:hidden;background:var(--stage);display:grid;place-items:center}
+.paper{position:relative;width:min(100%,100cqh);aspect-ratio:1;max-width:100%;max-height:100%;border-radius:18px;box-shadow:var(--shadow);
+  background-color:var(--paper);background-image:radial-gradient(var(--paper-dot) 1.2px,transparent 1.3px);background-size:22px 22px;overflow:hidden}
+.stage{container-type:size}
+.paper canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none;display:block}
+.view3d{position:absolute;inset:0;background:radial-gradient(120% 90% at 50% 20%,var(--panel) 0%,var(--stage) 75%)}
+.view3d canvas{display:block;width:100%;height:100%;touch-action:none}
+.hint{position:absolute;left:50%;transform:translateX(-50%);bottom:10px;font-size:12.5px;font-weight:700;color:var(--muted);background:color-mix(in srgb,var(--panel) 86%,transparent);padding:5px 12px;border-radius:999px;white-space:nowrap;pointer-events:none;max-width:94%;overflow:hidden;text-overflow:ellipsis}
+.busy{position:absolute;inset:0;display:grid;place-items:center;background:color-mix(in srgb,var(--bg) 60%,transparent);font-family:var(--f-display);font-weight:800;font-size:20px;text-align:center;padding:20px}
+.busy .blob{width:64px;height:64px;margin:0 auto 10px;border-radius:50%;background:var(--accent);animation:puff 1.1s ease-in-out infinite}
+@keyframes puff{0%,100%{transform:scale(.7);border-radius:50%}50%{transform:scale(1);border-radius:44% 56% 52% 48%}}
+@media (prefers-reduced-motion:reduce){.busy .blob{animation:none}}
+
+.dock{padding-block:10px 12px;display:grid;gap:9px}
+.row{display:flex;gap:7px;align-items:center;flex-wrap:wrap;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.row::-webkit-scrollbar{display:none}
+.tool{flex:1 1 0;max-width:84px;min-width:0;border:1px solid var(--line);background:var(--panel);border-radius:16px;padding:7px 2px 5px;display:flex;flex-direction:column;align-items:center;gap:1px;font-weight:800;font-size:12px}
+.tool svg{width:28px;height:28px}
+.tool[aria-pressed="true"]{background:var(--sel);color:var(--sel-ink);border-color:var(--sel)}
+.sizes{display:flex;gap:6px;flex:none}
+.size{width:42px;height:42px;border-radius:14px;border:1px solid var(--line);background:var(--panel);display:grid;place-items:center}
+.size i{display:block;border-radius:50%;background:currentColor}
+.size[aria-pressed="true"]{background:var(--sel);color:var(--sel-ink);border-color:var(--sel)}
+.sw{flex:none;width:38px;height:38px;border-radius:50%;border:3px solid var(--panel);box-shadow:0 0 0 1px var(--line);padding:0}
+.sw[aria-pressed="true"]{box-shadow:0 0 0 3px var(--sel);transform:scale(1.08)}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px 14px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.slider{display:flex;align-items:center;gap:8px;min-width:0}
+.slider label{font-weight:800;font-size:13px;color:var(--muted);min-width:66px}
+.slider input{flex:1;accent-color:var(--accent);height:28px;min-width:0}
+.slider output{font-weight:800;font-size:13px;min-width:48px;text-align:right;font-variant-numeric:tabular-nums}
+.toggles{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+.toggle{height:36px;border-radius:12px;border:1px solid var(--line);background:var(--panel);padding:0 12px;font-weight:800;font-size:13px}
+.toggle[aria-pressed="true"]{background:var(--sel);color:var(--sel-ink);border-color:var(--sel)}
+.bodycol{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.bodycol span{font-weight:800;font-size:13px;color:var(--muted);margin-right:2px}
+.bodycol .sw{width:30px;height:30px;border-width:2px}
+.stats{display:flex;gap:6px 14px;flex-wrap:wrap;font-size:13px;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums}
+.stats b{color:var(--ink)}
+.note{font-size:12.5px;line-height:1.45;font-weight:700}
+.note.ok{color:var(--good)} .note.warn{color:var(--warn)}
+.actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.actions .msg{font-size:13px;font-weight:700;color:var(--muted);min-width:0;flex:1 1 180px}
+details.safe{font-size:12.5px;line-height:1.5;color:var(--muted);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+details.safe summary{font-weight:800;color:var(--ink);cursor:pointer}
+details.safe ul{margin:4px 0 0;padding-left:18px}
+
+.sheet{position:fixed;inset:0;z-index:20;background:rgba(10,16,12,.5);display:grid;place-items:end center;padding-top:env(safe-area-inset-top,0px)}
+.card{background:var(--panel);width:100%;max-width:520px;border-radius:24px 24px 0 0;max-height:92%;overflow:auto;padding-block:20px calc(20px + env(safe-area-inset-bottom,0px));padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px));display:grid;gap:14px}
+@media (min-width:700px){.sheet{place-items:center}.card{border-radius:24px}}
+.card h2{font-family:var(--f-display);font-weight:800;font-size:24px;margin:0;line-height:1.1}
+.card p{margin:0;color:var(--muted);line-height:1.5}
+.tpls{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.tpl{border:1px solid var(--line);background:var(--bg);border-radius:16px;padding:8px;display:grid;gap:4px;justify-items:center;font-weight:800;font-size:13px}
+.tpl canvas{width:100%;aspect-ratio:1;max-width:100%;border-radius:10px;background:var(--paper)}
+.cardrow{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+</style>
+
+<div class="app">
+  <header class="bar">
+    <a class="ibtn" id="back" href="/" aria-label="Back to the shop"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></a>
+    <h1>Doodle <span>Puff</span></h1>
+    <button class="ibtn" id="undo" aria-label="Undo" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 010 12h-3"/></svg></button>
+    <button class="ibtn" id="redo" aria-label="Redo" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14l5-5-5-5"/><path d="M20 9H10a6 6 0 000 12h3"/></svg></button>
+    <button class="pill" id="go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/><path d="M12 12l8-4.5M12 12v9M12 12L4 7.5"/></svg><span id="goLbl">Make it 3D</span></button>
+  </header>
+
+  <main class="stage" id="stage">
+    <div class="paper" id="paper">
+      <canvas id="draw" width="512" height="512" aria-label="Drawing paper"></canvas>
+    </div>
+    <div class="view3d" id="view3d" hidden><canvas id="c3d"></canvas></div>
+    <div class="hint" id="hint"></div>
+    <div class="busy" id="busy" hidden><div><div class="blob"></div><span id="busyMsg"></span></div></div>
+  </main>
+
+  <section class="dock" id="drawDock">
+    <div class="row" id="tools"></div>
+    <div class="row" id="swatches"></div>
+  </section>
+
+  <section class="dock" id="printDock" hidden>
+    <div class="opts">
+      <div class="slider"><label for="puff" id="lPuff">Puffiness</label><input id="puff" type="range" min="2" max="9" step="0.5" value="5"><output id="puffVal">5 mm</output></div>
+      <div class="slider"><label for="size" id="lSize">Size</label><input id="size" type="range" min="50" max="140" step="5" value="80"><output id="sizeVal">80 mm</output></div>
+      <div class="bodycol" id="bodycol"><span id="lBody">Paper colour</span></div>
+      <div class="toggles">
+        <button class="toggle" id="loop" aria-pressed="false">Keyring loop</button>
+        <button class="toggle" id="fine" aria-pressed="false">Extra smooth</button>
+      </div>
+    </div>
+    <div class="opts"><div class="stats" id="stats"></div><div class="note" id="note"></div></div>
+    <div class="actions">
+      <button class="pill ghost" id="redraw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l4-1L19 8l-3-3L5 16z"/></svg><span id="redrawLbl">Keep drawing</span></button>
+      <button class="pill" id="download" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg><span id="dlLbl">Download print files</span></button>
+      <span class="msg" id="msg" role="status"></span>
+    </div>
+    <details class="safe"><summary id="safeTitle">Safety for kids</summary><ul id="safeList"></ul></details>
+  </section>
+</div>
+
+<div class="sheet" id="tplSheet" hidden role="dialog" aria-modal="true" aria-labelledby="tplTitle">
+  <div class="card">
+    <h2 id="tplTitle">Pick a picture to colour</h2>
+    <p id="tplText">It replaces what is on the paper. You can undo.</p>
+    <div class="tpls" id="tpls"></div>
+    <div class="cardrow"><button class="pill ghost" id="tplClose">Close</button></div>
+  </div>
+</div>
+<div class="sheet" id="clearSheet" hidden role="dialog" aria-modal="true" aria-labelledby="clearTitle">
+  <div class="card">
+    <h2 id="clearTitle">Start a new drawing?</h2>
+    <p id="clearText">The paper will be wiped clean. You can undo.</p>
+    <div class="cardrow"><button class="pill ghost" id="clearNo">Cancel</button><button class="pill" id="clearYes">Wipe the paper</button></div>
+  </div>
+</div>
+
+<script id="doodle-core">/*DOODLE*/</script>
+<script>
+"use strict";
+const $ = s => document.querySelector(s);
+/* ---------- words ---------- */
+const T = {
+  vi: { go: "Thành 3D", busy: "Đang thổi phồng tranh…", redraw: "Vẽ tiếp", dl: "Tải file in", puff: "Độ phồng", size: "Kích thước", body: "Màu phần trống",
+        loop: "Móc khoá", fine: "Mịn hơn", safeTitle: "An toàn cho bé",
+        safe: ["Dành cho bé từ 3 tuổi, có người lớn giám sát.", "Tranh in thành một miếng liền, không có chi tiết rời.", "Không gắn nam châm nhỏ: bé có thể nuốt.", "Không cho bé ngậm hay cắn. Chà nhẹ chỗ sắc sau khi in."],
+        tools: { pen: "Bút sáp", fill: "Tô màu", eye: "Mắt", eraser: "Tẩy", tpl: "Tranh mẫu", clear: "Giấy mới" },
+        hints: { pen: "Vẽ con vật hoặc hình bé thích · nét vẽ sẽ nổi lên", fill: "Chạm vào bên trong hình để tô màu", eye: "Chạm để dán mắt tròn xoe",
+                 eraser: "Kéo để tẩy", view: "Kéo để xoay · chụm 2 ngón để phóng to" },
+        leak: "Hình còn hở nên màu sẽ tràn ra ngoài. Nối kín nét vẽ rồi tô lại nhé!", empty: "Giấy còn trống. Bé vẽ gì đó trước đã!",
+        statSize: "Kích thước", statPla: "Nhựa PLA", statCols: "Màu", ok: "Đã kiểm tra: khối kín, in được ngay.", notOk: "Còn chỗ hở. Thử đổi Độ phồng hoặc vẽ nét dày hơn.",
+        dropped: n => `${n} hình rời không dính vào hình chính nên sẽ không được in. Hãy vẽ nối chúng lại.`,
+        many: n => `${n} màu: máy có 1 AMS (4 khe) cần gộp bớt màu khi nhập vào Bambu Studio.`,
+        preparing: "Đang chuẩn bị file…", saved: "Đã lưu. Kéo file .obj vào Bambu Studio, máy tự gán màu cho từng cuộn nhựa.", declined: "Đã huỷ tải.", noSave: "Trình xem này không lưu được file.",
+        no3d: "Không tải được trình xem 3D, nhưng vẫn tải được file in.",
+        tplTitle: "Chọn tranh để tô", tplText: "Tranh mẫu sẽ thay cho giấy hiện tại. Có thể hoàn tác.", close: "Đóng",
+        clearTitle: "Bắt đầu tranh mới?", clearText: "Giấy sẽ được xoá sạch. Có thể hoàn tác.", cancel: "Huỷ", wipe: "Xoá giấy",
+        tpls: ["Cá", "Ngôi sao", "Mèo"], cols: ["Mực", "Đỏ", "Cam", "Vàng", "Lá", "Trời", "Tím", "Hồng", "Nâu", "Trắng"] },
+  en: { go: "Make it 3D", busy: "Puffing up the drawing…", redraw: "Keep drawing", dl: "Download print files", puff: "Puffiness", size: "Size", body: "Empty areas",
+        loop: "Keyring loop", fine: "Extra smooth", safeTitle: "Safety for kids",
+        safe: ["For ages 3 and up, with an adult nearby.", "The drawing prints as one solid piece with no loose parts.", "Don't glue small magnets on: children can swallow them.", "Not for mouthing or chewing. Sand any sharp spots after printing."],
+        tools: { pen: "Crayon", fill: "Fill", eye: "Eyes", eraser: "Eraser", tpl: "Pictures", clear: "New paper" },
+        hints: { pen: "Draw an animal or any shape · crayon lines come out raised", fill: "Tap inside a shape to colour it", eye: "Tap to stick on googly eyes",
+                 eraser: "Drag to erase", view: "Drag to turn · pinch to zoom" },
+        leak: "The shape has a gap, so the colour would spill out. Close the line and try again!", empty: "The paper is empty. Draw something first!",
+        statSize: "Size", statPla: "PLA", statCols: "Colours", ok: "Checked: closed solid, ready to print.", notOk: "Some gaps remain. Try another puffiness or thicker lines.",
+        dropped: n => `${n} separate shape${n > 1 ? "s" : ""} not touching the main drawing won't be printed. Join them with a line.`,
+        many: n => `${n} colours: with one AMS (4 slots), merge some colours when importing into Bambu Studio.`,
+        preparing: "Preparing files…", saved: "Saved. Drag the .obj into Bambu Studio and it matches each colour to a filament.", declined: "Download cancelled.", noSave: "This viewer can't save files.",
+        no3d: "The 3D viewer didn't load, but the print files still download.",
+        tplTitle: "Pick a picture to colour", tplText: "It replaces what is on the paper. You can undo.", close: "Close",
+        clearTitle: "Start a new drawing?", clearText: "The paper will be wiped clean. You can undo.", cancel: "Cancel", wipe: "Wipe the paper",
+        tpls: ["Fish", "Star", "Cat"], cols: ["Ink", "Red", "Orange", "Sun", "Leaf", "Sky", "Lilac", "Pink", "Brown", "White"] }
+};
+const LANG = /^vi/i.test(navigator.language || "") || /lang=vi/.test(location.hash) ? "vi" : "en";
+const t = k => T[LANG][k];
+
+/* ---------- palette (label 0 = paper) ---------- */
+const PAL = [null, "#24283A", "#E8483B", "#FF9B3D", "#FFD24C", "#5CBF6A", "#4FA8E8", "#9B6BD6", "#F7A1B5", "#A86B45", "#FFFFFF"];
+const NAMES = [null, "ink", "red", "orange", "sun", "leaf", "sky", "lilac", "pink", "brown", "white"];
+const RGB = PAL.map(h => h ? [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)] : null);
+
+/* ---------- drawing state ---------- */
+const W = 512, H = 512;
+let lab = new Uint8Array(W * H), bump = new Float32Array(W * H);
+let tool = "pen", colour = 1, sizeIx = 1, bodyLabel = 10;
+const SIZES = [5, 9, 15];               // crayon radius in pixels (paper is 512 px wide)
+const cv = $("#draw"), ctx = cv.getContext("2d"), img = ctx.createImageData(W, H);
+function paint(x0, y0, x1, y1) {        // redraw a region of the paper from the label raster
+  x0 = Math.max(0, x0 | 0); y0 = Math.max(0, y0 | 0); x1 = Math.min(W - 1, x1 | 0); y1 = Math.min(H - 1, y1 | 0);
+  const d = img.data;
+  for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) {
+    const p = x + W * y, l = lab[p], o = 4 * p;
+    if (!l) { d[o + 3] = 0; continue; }
+    // a touch of shading on raised parts so children see where the relief will be
+    const s = 1 - Math.min(0.12, bump[p] * 0.08) + (bump[p] > 0.9 ? 0.06 : 0);
+    d[o] = Math.min(255, RGB[l][0] * s); d[o + 1] = Math.min(255, RGB[l][1] * s); d[o + 2] = Math.min(255, RGB[l][2] * s); d[o + 3] = 255;
+  }
+  ctx.putImageData(img, 0, 0, x0, y0, x1 - x0 + 1, y1 - y0 + 1);
+}
+const paintAll = () => paint(0, 0, W - 1, H - 1);
+
+/* undo: compact snapshots (labels + relief in 0.01 mm steps) */
+const undo = [], redo = [];
+const snap = () => ({ l: lab.slice(), b: Uint8Array.from(bump, v => Math.round(v * 100)) });
+const restore = s => { lab = s.l.slice(); bump = Float32Array.from(s.b, v => v / 100); paintAll(); };
+function pushUndo() { undo.push(snap()); if (undo.length > 30) undo.shift(); redo.length = 0; syncUndo(); }
+function syncUndo() { $("#undo").disabled = !undo.length; $("#redo").disabled = !redo.length; }
+$("#undo").onclick = () => { if (!undo.length) return; redo.push(snap()); restore(undo.pop()); syncUndo(); saveDraft(); };
+$("#redo").onclick = () => { if (!redo.length) return; undo.push(snap()); restore(redo.pop()); syncUndo(); saveDraft(); };
+
+/* per-viewer draft so a child's picture survives a reload */
+let draftTimer = 0;
+function saveDraft() { clearTimeout(draftTimer); draftTimer = setTimeout(() => {
+  try { const b = Uint8Array.from(bump, v => Math.round(v * 100)), all = new Uint8Array(W * H * 2); all.set(lab); all.set(b, W * H);
+        let s = ""; for (let i = 0; i < all.length; i += 8192) s += String.fromCharCode.apply(null, all.subarray(i, i + 8192));
+        localStorage.setItem("doodle-draft-v1", btoa(s)); } catch (e) {} }, 400); }
+function loadDraft() {
+  try { const s = localStorage.getItem("doodle-draft-v1"); if (!s) return false; const r = atob(s); if (r.length !== W * H * 2) return false;
+        for (let i = 0; i < W * H; i++) { lab[i] = r.charCodeAt(i); bump[i] = r.charCodeAt(W * H + i) / 100; } return lab.some(v => v); } catch (e) { return false; }
+}
+
+/* ---------- brushes ---------- */
+function dab(x, y, r, l, relief) {
+  for (let j = Math.floor(y - r); j <= y + r; j++) for (let i = Math.floor(x - r); i <= x + r; i++) {
+    if (i < 0 || j < 0 || i >= W || j >= H) continue;
+    if ((i - x) * (i - x) + (j - y) * (j - y) > r * r) continue;
+    const p = i + W * j;
+    if (l === 0) { lab[p] = 0; bump[p] = 0; } else { lab[p] = l; bump[p] = Math.max(bump[p], relief); }
+  }
+}
+function eye(x, y) {
+  const R = [12, 17, 23][sizeIx], r2 = R * 0.5, px = x + R * 0.18, py = y + R * 0.12;
+  for (let j = Math.floor(y - R); j <= y + R; j++) for (let i = Math.floor(x - R); i <= x + R; i++) {
+    if (i < 0 || j < 0 || i >= W || j >= H) continue;
+    const d = Math.hypot(i - x, j - y); if (d > R) continue;
+    const p = i + W * j, dome = 1.3 * Math.sqrt(Math.max(0, 1 - (d / R) ** 2));
+    const dp = Math.hypot(i - px, j - py);
+    lab[p] = dp <= r2 ? 1 : 10; bump[p] = Math.max(bump[p], dome + (dp <= r2 ? 0.25 * Math.sqrt(Math.max(0, 1 - (dp / r2) ** 2)) : 0));
+    if (Math.hypot(i - (px - r2 * 0.35), j - (py - r2 * 0.4)) < r2 * 0.28) lab[p] = 10;   // tiny shine
+  }
+  paint(x - R - 1, y - R - 1, x + R + 1, y + R + 1);
+}
+function fill(x, y) {
+  const s = (x | 0) + W * (y | 0), from = lab[s];
+  if (from === colour) return;
+  const seen = new Uint8Array(W * H), st = [s]; seen[s] = 1; const reg = [];
+  let touchesEdge = false;
+  while (st.length) {
+    const p = st.pop(); reg.push(p); const px = p % W, py = (p - px) / W;
+    if (px === 0 || py === 0 || px === W - 1 || py === H - 1) touchesEdge = true;
+    for (const q of [px > 0 ? p - 1 : -1, px < W - 1 ? p + 1 : -1, py > 0 ? p - W : -1, py < H - 1 ? p + W : -1])
+      if (q >= 0 && !seen[q] && lab[q] === from) { seen[q] = 1; st.push(q); }
+  }
+  if (from === 0 && touchesEdge) { flash(t("leak")); return; }
+  pushUndo();
+  for (const p of reg) lab[p] = colour;
+  paintAll(); saveDraft();
+}
+let flashTimer = 0;
+function flash(m) { const h = $("#hint"); h.textContent = m; h.style.color = "var(--warn)"; clearTimeout(flashTimer); flashTimer = setTimeout(() => { h.style.color = ""; setHint(); }, 3200); }
+function setHint() { $("#hint").textContent = $("#view3d").hidden ? T[LANG].hints[tool] || "" : T[LANG].hints.view; }
+
+/* pointer drawing */
+let drawing = false, last = null;
+function toPaper(e) { const r = cv.getBoundingClientRect(); return [(e.clientX - r.left) / r.width * W, (e.clientY - r.top) / r.height * H]; }
+cv.addEventListener("pointerdown", e => {
+  e.preventDefault(); const [x, y] = toPaper(e);
+  if (tool === "fill") return fill(x, y);
+  if (tool === "eye") { pushUndo(); eye(x, y); saveDraft(); return; }
+  cv.setPointerCapture(e.pointerId); drawing = true; pushUndo(); last = [x, y]; stroke([x, y]);
+});
+cv.addEventListener("pointermove", e => {
+  if (!drawing) return;
+  const evs = e.getCoalescedEvents ? e.getCoalescedEvents() : [e];
+  for (const ev of evs.length ? evs : [e]) stroke(toPaper(ev));
+});
+const end = () => { if (drawing) { drawing = false; last = null; saveDraft(); } };
+cv.addEventListener("pointerup", end); cv.addEventListener("pointercancel", end);
+function stroke(p) {
+  const r = tool === "eraser" ? SIZES[sizeIx] * 1.6 : SIZES[sizeIx], l = tool === "eraser" ? 0 : colour;
+  const [ax, ay] = last || p, [bx, by] = p, n = Math.max(1, Math.ceil(Math.hypot(bx - ax, by - ay) / (r * 0.35)));
+  for (let i = last ? 1 : 0; i <= n; i++) { const k = i / n; dab(ax + (bx - ax) * k, ay + (by - ay) * k, r, l, 0.7); }
+  paint(Math.min(ax, bx) - r - 1, Math.min(ay, by) - r - 1, Math.max(ax, bx) + r + 1, Math.max(ay, by) + r + 1);
+  last = p;
+}
+
+/* ---------- tray ---------- */
+const ICON = {
+  pen: '<path d="M4 20l3.5-1L19 7.5 16.5 5 5 16.5z"/><path d="M14.5 7l2.5 2.5"/>',
+  fill: '<path d="M5 11l7-7 7 7-7 7z"/><path d="M19 15c0 1.5 1 2.5 1 3.5a1 1 0 01-2 0c0-1 1-2 1-3.5z"/>',
+  eye: '<circle cx="12" cy="12" r="7.5"/><circle cx="13.5" cy="13" r="3.2" fill="currentColor"/>',
+  eraser: '<path d="M8 20h11"/><path d="M4.5 15.5l9-9 5 5-6.5 6.5H8z"/>',
+  tpl: '<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 15c2-4 6-4 8 0"/><circle cx="9.5" cy="9.5" r="1.2" fill="currentColor"/>',
+  clear: '<path d="M6 4h9l4 4v12H6z"/><path d="M15 4v4h4"/>'
+};
+function buildTray() {
+  const tools = $("#tools"); tools.innerHTML = "";
+  for (const k of ["pen", "fill", "eye", "eraser", "tpl", "clear"]) {
+    const b = document.createElement("button"); b.className = "tool"; b.id = "tool-" + k;
+    b.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICON[k]}</svg>${T[LANG].tools[k]}`;
+    if (["pen", "fill", "eye", "eraser"].includes(k)) { b.setAttribute("aria-pressed", k === tool); b.onclick = () => { tool = k; syncTools(); }; }
+    else b.onclick = () => (k === "tpl" ? openTpl() : ($("#clearSheet").hidden = false));
+    tools.appendChild(b);
+  }
+  const sz = document.createElement("div"); sz.className = "sizes";
+  SIZES.forEach((s, i) => { const b = document.createElement("button"); b.className = "size"; b.id = "size-" + i; b.setAttribute("aria-label", ["Small", "Medium", "Large"][i]);
+    b.innerHTML = `<i style="width:${6 + i * 6}px;height:${6 + i * 6}px"></i>`; b.setAttribute("aria-pressed", i === sizeIx); b.onclick = () => { sizeIx = i; syncTools(); }; sz.appendChild(b); });
+  const sw = $("#swatches"); sw.innerHTML = ""; sw.appendChild(sz);
+  for (let l = 1; l < PAL.length; l++) {
+    const b = document.createElement("button"); b.className = "sw"; b.id = "sw-" + l; b.style.background = PAL[l]; b.setAttribute("aria-label", T[LANG].cols[l - 1]);
+    b.setAttribute("aria-pressed", l === colour); b.onclick = () => { colour = l; if (tool === "eraser" || tool === "eye") tool = "pen"; syncTools(); }; sw.appendChild(b);
+  }
+  const bc = $("#bodycol"); bc.querySelectorAll(".sw").forEach(n => n.remove());
+  for (const l of [10, 4, 8, 6, 5, 3]) {
+    const b = document.createElement("button"); b.className = "sw"; b.id = "body-" + l; b.style.background = PAL[l]; b.setAttribute("aria-label", T[LANG].cols[l - 1]);
+    b.setAttribute("aria-pressed", l === bodyLabel); b.onclick = () => { bodyLabel = l; bc.querySelectorAll(".sw").forEach(n => n.setAttribute("aria-pressed", n === b)); rebuild(); }; bc.appendChild(b);
+  }
+}
+function syncTools() {
+  document.querySelectorAll("#tools .tool[aria-pressed]").forEach(b => b.setAttribute("aria-pressed", b.id === "tool-" + tool));
+  document.querySelectorAll("#tools .size").forEach((b, i) => b.setAttribute("aria-pressed", i === sizeIx));
+  document.querySelectorAll("#swatches .sw").forEach(b => b.setAttribute("aria-pressed", b.id === "sw-" + colour));
+  setHint();
+}
+$("#clearNo").onclick = () => ($("#clearSheet").hidden = true);
+$("#clearYes").onclick = () => { pushUndo(); lab.fill(0); bump.fill(0); paintAll(); saveDraft(); $("#clearSheet").hidden = true; };
+
+/* ---------- pictures to colour (our own simple outlines) ---------- */
+function outline(pts, r) { for (let k = 0; k < pts.length - 1; k++) { const [a, b] = [pts[k], pts[k + 1]], n = Math.ceil(Math.hypot(b[0] - a[0], b[1] - a[1]) / 2); for (let i = 0; i <= n; i++) dab(a[0] + (b[0] - a[0]) * i / n, a[1] + (b[1] - a[1]) * i / n, r, 1, 0.7); } }
+const ring = (cx, cy, rx, ry, a0 = 0, a1 = 2 * Math.PI, n = 72) => Array.from({ length: n + 1 }, (_, i) => { const a = a0 + (a1 - a0) * i / n; return [cx + rx * Math.cos(a), cy + ry * Math.sin(a)]; });
+const TPL = [
+  () => { outline(ring(230, 256, 150, 105, 0.42, 2 * Math.PI - 0.42), 6); outline([[369, 214], [455, 150], [440, 256], [455, 362], [369, 298]], 6);
+          outline(ring(220, 256, 60, 75, -1.2, 1.2, 30), 5); eyeAt(140, 225, 22); outline(ring(112, 290, 26, 14, 0.2, Math.PI - 0.2, 20), 5); },
+  () => { const p = []; for (let i = 0; i <= 10; i++) { const a = -Math.PI / 2 + i * Math.PI / 5, r = i % 2 ? 92 : 210; p.push([256 + r * Math.cos(a), 276 + r * Math.sin(a)]); } outline(p, 7);
+          eyeAt(218, 262, 20); eyeAt(294, 262, 20); outline(ring(256, 300, 30, 18, 0.2, Math.PI - 0.2, 20), 5); },
+  () => { const head = []; for (let a = 0; a <= 72; a++) { const u = a / 72 * 2 * Math.PI; head.push([256 + 165 * Math.cos(u), 300 + 140 * Math.sin(u)]); }
+          outline(head, 6); outline([[138, 205], [128, 80], [222, 172]], 6); outline([[290, 172], [384, 80], [374, 205]], 6);
+          eyeAt(200, 280, 22); eyeAt(312, 280, 22); outline([[236, 345], [256, 360], [276, 345]], 5);
+          outline([[150, 335], [80, 325]], 4); outline([[150, 352], [82, 362]], 4); outline([[362, 335], [432, 325]], 4); outline([[362, 352], [430, 362]], 4); }
+];
+function eyeAt(x, y, R) { const keep = sizeIx; sizeIx = R > 18 ? 2 : R > 14 ? 1 : 0; eye(x, y); sizeIx = keep; }
+function openTpl() {
+  const box = $("#tpls"); box.innerHTML = "";
+  TPL.forEach((fn, i) => {
+    const b = document.createElement("button"); b.className = "tpl"; b.id = "tpl-" + i;
+    const c = document.createElement("canvas"); c.width = c.height = 128;
+    const keepL = lab, keepB = bump; lab = new Uint8Array(W * H); bump = new Float32Array(W * H); fn();
+    const g = c.getContext("2d"), im = g.createImageData(128, 128);
+    for (let y = 0; y < 128; y++) for (let x = 0; x < 128; x++) { const l = lab[x * 4 + W * y * 4], o = 4 * (x + 128 * y); if (l) { im.data[o] = RGB[l][0]; im.data[o + 1] = RGB[l][1]; im.data[o + 2] = RGB[l][2]; im.data[o + 3] = 255; } }
+    g.putImageData(im, 0, 0); lab = keepL; bump = keepB;
+    b.appendChild(c); b.append(T[LANG].tpls[i]);
+    b.onclick = () => { pushUndo(); lab = new Uint8Array(W * H); bump = new Float32Array(W * H); fn(); paintAll(); saveDraft(); $("#tplSheet").hidden = true; tool = "fill"; colour = [3, 4, 5][i]; syncTools(); };
+    box.appendChild(b);
+  });
+  paintAll();
+  $("#tplSheet").hidden = false;
+}
+$("#tplClose").onclick = () => ($("#tplSheet").hidden = true);
+
+/* ---------- 3D: build in a worker so the page stays responsive ---------- */
+let worker = null, jobId = 0, result = null;
+try {
+  const src = document.getElementById("doodle-core").textContent +
+    "\nonmessage = e => { const d = e.data; let r = null; try { r = Doodle.build(d.lab, d.bump, d.W, d.H, d.opts); } catch (err) { postMessage({ id: d.id, error: String(err) }); return; }" +
+    " postMessage({ id: d.id, r }, r ? [r.pos.buffer, r.idx.buffer, r.faceLab.buffer] : []); };";
+  worker = new Worker(URL.createObjectURL(new Blob([src], { type: "text/javascript" })));
+} catch (e) { worker = null; }
+function opts() { return { sizeMM: +$("#size").value, puff: +$("#puff").value, fillLabel: bodyLabel, loop: $("#loop").getAttribute("aria-pressed") === "true",
+                           quality: $("#fine").getAttribute("aria-pressed") === "true" ? 240 : 170 }; }
+function buildModel() {
+  const id = ++jobId, o = opts();
+  return new Promise(res => {
+    const done = r => { if (id === jobId) res(r); };
+    if (worker) {
+      const h = e => { if (e.data.id !== id) return; worker.removeEventListener("message", h); done(e.data.r || null); };
+      worker.addEventListener("message", h);
+      worker.onerror = () => { worker = null; setTimeout(() => done(window.Doodle.build(lab, bump, W, H, o)), 20); };
+      worker.postMessage({ id, lab: lab.slice(), bump: bump.slice(), W, H, opts: o });
+    } else setTimeout(() => done(window.Doodle.build(lab, bump, W, H, o)), 30);
+  });
+}
+async function rebuild() {
+  if ($("#view3d").hidden) return;
+  $("#busyMsg").textContent = t("busy"); $("#busy").hidden = false; $("#download").disabled = true; $("#msg").textContent = "";
+  const r = await buildModel();
+  $("#busy").hidden = true;
+  if (!r) { $("#stats").textContent = ""; $("#note").textContent = t("empty"); $("#note").className = "note warn"; return; }
+  result = r; window.lastDoodle = r;
+  const cols = r.used.length, g = Math.max(1, Math.round(r.volume / 1000 * 1.24 * 0.55));
+  $("#stats").innerHTML = `<span>${t("statSize")} <b>${r.size.map(v => Math.round(v)).join(" × ")} mm</b></span><span>${t("statPla")} <b>≈ ${g} g</b></span><span>${t("statCols")} <b>${cols}</b></span>`;
+  const notes = [];
+  if (r.dropped) notes.push(T[LANG].dropped(r.dropped));
+  if (cols > 4) notes.push(T[LANG].many(cols));
+  notes.unshift(r.check.watertight ? t("ok") : t("notOk"));
+  $("#note").textContent = notes.join(" "); $("#note").className = "note " + (r.check.watertight && !r.dropped && cols <= 4 ? "ok" : "warn");
+  $("#download").disabled = !r.check.watertight;
+  if (window.Viewer3D) window.Viewer3D.show(r, PAL); else $("#msg").textContent = t("no3d");
+}
+$("#go").onclick = async () => {
+  if (!lab.some(v => v)) { flash(t("empty")); return; }
+  $("#paper").hidden = true; $("#view3d").hidden = false; $("#drawDock").hidden = true; $("#printDock").hidden = false;
+  $("#go").hidden = true; $("#undo").hidden = true; $("#redo").hidden = true; setHint();
+  window.Viewer3D?.resize?.();
+  rebuild();
+};
+$("#redraw").onclick = () => { $("#paper").hidden = false; $("#view3d").hidden = true; $("#drawDock").hidden = false; $("#printDock").hidden = true; $("#go").hidden = false; $("#undo").hidden = false; $("#redo").hidden = false; setHint(); };
+let rbTimer = 0; const later = () => { clearTimeout(rbTimer); rbTimer = setTimeout(rebuild, 350); };
+$("#puff").oninput = () => { $("#puffVal").textContent = $("#puff").value + " mm"; later(); };
+$("#size").oninput = () => { $("#sizeVal").textContent = $("#size").value + " mm"; later(); };
+for (const id of ["#loop", "#fine"]) $(id).onclick = () => { const b = $(id); b.setAttribute("aria-pressed", b.getAttribute("aria-pressed") !== "true"); rebuild(); };
+
+/* ---------- download: deflated zip of STL + painted OBJ/MTL + painted 3MF ---------- */
+const CRC = (() => { const tb = new Uint32Array(256); for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; tb[n] = c >>> 0; } return tb; })();
+const crc32 = u8 => { let c = 0xFFFFFFFF; for (let i = 0; i < u8.length; i++) c = CRC[(c ^ u8[i]) & 255] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; };
+async function deflate(u8) {
+  if (typeof CompressionStream === "undefined") return null;
+  try { return new Uint8Array(await new Response(new Blob([u8]).stream().pipeThrough(new CompressionStream("deflate-raw"))).arrayBuffer()); } catch (e) { return null; }
+}
+async function zip(files) {
+  const enc = s => new TextEncoder().encode(s), chunks = [], central = []; let off = 0;
+  for (const f of files) {
+    const nm = enc(f.name), crc = crc32(f.data), z = await deflate(f.data), method = z ? 8 : 0, body = z || f.data;
+    const lh = new DataView(new ArrayBuffer(30));
+    lh.setUint32(0, 0x04034b50, true); lh.setUint16(4, 20, true); lh.setUint16(8, method, true);
+    lh.setUint32(14, crc, true); lh.setUint32(18, body.length, true); lh.setUint32(22, f.data.length, true); lh.setUint16(26, nm.length, true);
+    chunks.push(new Uint8Array(lh.buffer), nm, body);
+    const ch = new DataView(new ArrayBuffer(46));
+    ch.setUint32(0, 0x02014b50, true); ch.setUint16(4, 20, true); ch.setUint16(6, 20, true); ch.setUint16(10, method, true);
+    ch.setUint32(16, crc, true); ch.setUint32(20, body.length, true); ch.setUint32(24, f.data.length, true); ch.setUint16(28, nm.length, true); ch.setUint32(42, off, true);
+    central.push(new Uint8Array(ch.buffer), nm); off += 30 + nm.length + body.length;
+  }
+  const cd = central.reduce((a, b) => a + b.length, 0), e = new DataView(new ArrayBuffer(22));
+  e.setUint32(0, 0x06054b50, true); e.setUint16(8, files.length, true); e.setUint16(10, files.length, true); e.setUint32(12, cd, true); e.setUint32(16, off, true);
+  return new Blob([...chunks, ...central, new Uint8Array(e.buffer)], { type: "application/zip" });
+}
+function package3mf(xml) {
+  const enc = s => new TextEncoder().encode(s);
+  return [{ name: "[Content_Types].xml", data: enc('<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="model" ContentType="application/vnd.ms-package.3dmanufacturing-3dmodel+xml"/></Types>') },
+          { name: "_rels/.rels", data: enc('<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Target="/3D/3dmodel.model" Id="rel0" Type="http://schemas.microsoft.com/3dmanufacturing/2013/01/3dmodel"/></Relationships>') },
+          { name: "3D/3dmodel.model", data: enc(xml) }];
+}
+let downloads = null;
+if (window.claude?.use) window.claude.use("downloads").then(d => { downloads = d; }).catch(() => {});
+$("#download").onclick = async () => {
+  if (!result) return;
+  const r = result, D = window.Doodle, base = "doodle-" + new Date().toISOString().slice(0, 10), enc = s => new TextEncoder().encode(s);
+  $("#download").disabled = true; $("#msg").textContent = t("preparing");
+  await new Promise(res => setTimeout(res, 30));
+  const o = D.obj(r.pos, r.idx, r.faceLab, PAL, NAMES, base);
+  const m3 = await zip(package3mf(D.model3mf(r.pos, r.idx, r.faceLab, PAL, NAMES, "Doodle Puff")));
+  const readme = ["Doodle Puff by Daily Layer", "",
+    base + "_painted.obj (+ .mtl): one solid piece with the drawing's colours. Bambu Studio: drag the .obj in; the import window matches each colour to a filament. Keep the .mtl next to it.",
+    base + "_painted.3mf: the same coloured piece as a 3MF (colour per triangle). Bambu Studio 2.5+ offers to import its colours.",
+    base + ".stl: single colour; the crayon lines and eyes are raised, so the drawing still shows.", "",
+    "Size " + r.size.map(v => v.toFixed(1)).join(" x ") + " mm. Lies flat on the bed, no supports. 0.16-0.2 mm layers, 3 walls, 15% infill.", "",
+    "Safety: for ages 3+, adult supervision. One solid piece, no loose parts. Don't glue on small magnets. Not for mouthing or chewing."].join("\n");
+  const blob = await zip([
+    { name: base + "_painted.obj", data: o.obj }, { name: base + ".mtl", data: o.mtl },
+    { name: base + "_painted.3mf", data: new Uint8Array(await m3.arrayBuffer()) },
+    { name: base + ".stl", data: D.stl(r.pos, r.idx, "Doodle Puff") }, { name: "README.txt", data: enc(readme) }]);
+  const name = base + ".zip";
+  $("#download").disabled = false;
+  if (downloads) {
+    try { await downloads.save({ filename: name, data: new Uint8Array(await blob.arrayBuffer()) }); $("#msg").textContent = t("saved"); }
+    catch (e) { $("#msg").textContent = e && e.code === "declined" ? t("declined") : t("noSave"); }
+    return;
+  }
+  try { const url = URL.createObjectURL(blob), a = document.createElement("a"); a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 5000); $("#msg").textContent = t("saved"); }
+  catch (e) { $("#msg").textContent = t("noSave"); }
+};
+
+/* ---------- words into the page ---------- */
+function applyWords() {
+  document.documentElement.lang = LANG;
+  $("#goLbl").textContent = t("go"); $("#redrawLbl").textContent = t("redraw"); $("#dlLbl").textContent = t("dl");
+  $("#lPuff").textContent = t("puff"); $("#lSize").textContent = t("size"); $("#lBody").textContent = t("body");
+  $("#loop").textContent = t("loop"); $("#fine").textContent = t("fine"); $("#safeTitle").textContent = t("safeTitle");
+  $("#safeList").innerHTML = T[LANG].safe.map(s => `<li>${s}</li>`).join("");
+  $("#tplTitle").textContent = t("tplTitle"); $("#tplText").textContent = t("tplText"); $("#tplClose").textContent = t("close");
+  $("#clearTitle").textContent = t("clearTitle"); $("#clearText").textContent = t("clearText"); $("#clearNo").textContent = t("cancel"); $("#clearYes").textContent = t("wipe");
+}
+
+/* ---------- boot: a picture ready to colour, or the child's saved drawing ---------- */
+$("#back").href = window.SHOP_URL || "/";
+applyWords(); buildTray();
+if (!loadDraft()) { TPL[0](); colour = 3; tool = "fill"; }
+paintAll(); syncTools(); syncUndo();
+</script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+const holder = document.getElementById("view3d"), canvas = document.getElementById("c3d");
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2)); renderer.outputColorSpace = THREE.SRGBColorSpace;
+const scene = new THREE.Scene(), cam = new THREE.PerspectiveCamera(30, 1, 1, 5000);
+scene.add(new THREE.HemisphereLight(0xffffff, 0x8f9a90, 1.5));
+const key = new THREE.DirectionalLight(0xffffff, 2.3); key.position.set(-1.2, 1.6, 2.2); scene.add(key);
+const fillL = new THREE.DirectionalLight(0xffffff, 0.6); fillL.position.set(1.5, -0.4, 1); scene.add(fillL);
+const controls = new OrbitControls(cam, canvas); controls.enableDamping = true;
+let mesh = null, framed = false;
+function resize() { const r = holder.getBoundingClientRect(); if (!r.width) return; renderer.setSize(r.width, r.height, false); cam.aspect = r.width / r.height; cam.updateProjectionMatrix(); }
+new ResizeObserver(resize).observe(holder);
+(function loop() { controls.update(); if (!holder.hidden) renderer.render(scene, cam); requestAnimationFrame(loop); })();
+window.Viewer3D = {
+  resize,
+  show(r, PAL) {
+    const g = new THREE.BufferGeometry();
+    g.setAttribute("position", new THREE.BufferAttribute(r.pos, 3)); g.setIndex(new THREE.BufferAttribute(r.idx, 1));
+    g.computeVertexNormals();
+    const ng = g.toNonIndexed(), nf = r.faceLab.length, col = new Float32Array(nf * 9), c = new THREE.Color();
+    for (let f = 0; f < nf; f++) { c.set(PAL[r.faceLab[f]]); for (let k = 0; k < 3; k++) { col[9 * f + 3 * k] = c.r; col[9 * f + 3 * k + 1] = c.g; col[9 * f + 3 * k + 2] = c.b; } }
+    ng.setAttribute("color", new THREE.BufferAttribute(col, 3)); g.dispose();
+    if (mesh) { scene.remove(mesh); mesh.geometry.dispose(); }
+    mesh = new THREE.Mesh(ng, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.55, metalness: 0 }));
+    ng.computeBoundingBox(); const bb = ng.boundingBox, ctr = bb.getCenter(new THREE.Vector3()), s = bb.getSize(new THREE.Vector3());
+    mesh.position.set(-ctr.x, -ctr.y, -ctr.z); scene.add(mesh);
+    resize();
+    if (!framed) {   // fit the whole piece with a margin, whatever the screen shape
+      const tn = Math.tan(THREE.MathUtils.degToRad(cam.fov / 2)), d = Math.max(s.y / (2 * tn), s.x / (2 * tn * cam.aspect)) * 1.35 + s.z;
+      const dir = new THREE.Vector3(-0.3, -0.2, 0.93).normalize();
+      cam.position.copy(dir.multiplyScalar(d)); cam.near = d / 100; cam.far = d * 20; cam.updateProjectionMatrix(); controls.target.set(0, 0, 0); framed = true;
+    }
+  }
+};
+</script>
