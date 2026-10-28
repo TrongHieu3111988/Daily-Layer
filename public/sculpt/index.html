@@ -43,7 +43,10 @@ button{font:inherit;color:inherit;cursor:pointer}
 .pill.ghost{background:var(--panel);color:var(--ink);border:1px solid var(--line);box-shadow:none}
 .pill:disabled{opacity:.5}
 .res{font-variant-numeric:tabular-nums}
-@media (max-width:460px){.bar h1{font-size:17px}.pill .lbl{display:none}.pill{padding:0 11px}.hide-s{display:none}}
+@media (max-width:460px){.bar h1{font-size:17px}.pill .lbl{display:none}.pill{padding:0 11px}.hide-s{display:none}
+  .bar{gap:5px}.bar h1{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis}}
+@media (max-width:400px){.bar .ibtn{width:36px;height:36px;border-radius:12px}.bar .pill{height:36px;padding:0 9px;border-radius:12px}.bar h1 span{display:none}}
+@media (max-width:340px){.bar h1{visibility:hidden}}
 
 .stage{position:relative;flex:1;min-height:0;margin-inline:max(8px,env(safe-area-inset-left,0px));border-radius:20px;overflow:hidden;
   background:radial-gradient(120% 90% at 50% 18%,var(--panel) 0%,var(--stage) 72%)}
