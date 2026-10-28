@@ -1,0 +1,20 @@
+{
+  "name": "Daily Layer",
+  "short_name": "Daily Layer",
+  "description": "Kids draw and sculpt their own toys; grown-ups print them at home on a 3D printer.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#DCF0FF",
+  "theme_color": "#FFC93C",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Doodle Puff", "url": "/doodle/" },
+    { "name": "Sculpt Studio", "url": "/sculpt/" }
+  ]
+}

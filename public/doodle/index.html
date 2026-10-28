@@ -106,7 +106,7 @@ details.safe ul{margin:4px 0 0;padding-left:18px}
 .cardrow{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
 
 /* ---------- crayon box ---------- */
-.paper canvas#fx{pointer-events:none}
+.paper canvas#fx,.paper canvas#under{pointer-events:none}
 .paper.wobble{animation:wobble .45s ease}
 @keyframes wobble{20%{transform:rotate(-1.6deg)}45%{transform:rotate(1.3deg)}70%{transform:rotate(-.7deg)}}
 .hint.warn{color:var(--warn)}
@@ -164,7 +164,8 @@ details.safe ul{margin:4px 0 0;padding-left:18px}
 
   <main class="stage" id="stage">
     <div class="paper" id="paper">
-      <canvas id="draw" width="512" height="512" aria-label="Drawing paper"></canvas>
+      <canvas id="under" width="1024" height="1024" aria-hidden="true"></canvas>
+      <canvas id="draw" width="1024" height="1024" aria-label="Drawing paper"></canvas>
       <canvas id="fx" aria-hidden="true"></canvas>
     </div>
     <div class="view3d" id="view3d" hidden><canvas id="c3d"></canvas></div>
@@ -585,39 +586,83 @@ const W = 512, H = 512;
 let lab = new Uint8Array(W * H), bump = new Float32Array(W * H);
 let tool = "pen", colour = 1, sizeIx = 1, bodyLabel = 10;
 const SIZES = [5, 9, 15];               // crayon radius in pixels (paper is 512 px wide)
-const cv = $("#draw"), ctx = cv.getContext("2d"), img = ctx.createImageData(W, H);
-function paint(x0, y0, x1, y1) {        // redraw a region of the paper from the label raster
-  x0 = Math.max(0, x0 | 0); y0 = Math.max(0, y0 | 0); x1 = Math.min(W - 1, x1 | 0); y1 = Math.min(H - 1, y1 | 0);
-  const d = img.data;
-  for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) {
-    const p = x + W * y, l = lab[p], o = 4 * p;
-    if (!l) { d[o + 3] = 0; continue; }
-    // a touch of shading on raised parts so children see where the relief will be
-    const s = 1 - Math.min(0.12, bump[p] * 0.08) + (bump[p] > 0.9 ? 0.06 : 0);
-    d[o] = Math.min(255, RGB[l][0] * s); d[o + 1] = Math.min(255, RGB[l][1] * s); d[o + 2] = Math.min(255, RGB[l][2] * s); d[o + 3] = 255;
+/* The paper has two layers. "over" holds the crayon lines and stickers, drawn as smooth anti-aliased curves
+   at twice the raster resolution, so lines look crisp. "under" holds filled areas, painted from the label raster
+   with smoothing. The 512 px label raster stays the single source for the 3D model. */
+const DS = 1024, K = DS / W;
+const cv = $("#draw"), ctx = cv.getContext("2d");
+const uv = $("#under"), uctx = uv.getContext("2d");
+let under = new Uint8Array(W * H);                 // 1 = this pixel is shown by the fill layer
+const off = document.createElement("canvas"); off.width = W; off.height = H;
+const octx = off.getContext("2d"), oimg = octx.createImageData(W, H);
+let vec = true;                                    // false while drawing template thumbnails
+function renderUnder() {
+  const d = oimg.data;
+  for (let p = 0; p < W * H; p++) {
+    const o = 4 * p, l = lab[p];
+    if (!l || !under[p]) { d[o + 3] = 0; continue; }
+    d[o] = RGB[l][0]; d[o + 1] = RGB[l][1]; d[o + 2] = RGB[l][2]; d[o + 3] = 255;
   }
-  ctx.putImageData(img, 0, 0, x0, y0, x1 - x0 + 1, y1 - y0 + 1);
+  // grow fills 2 px underneath neighbouring crayon lines so no light seam shows between a fill and its outline
+  for (let pass = 0; pass < 2; pass++) {
+    const grow = [];
+    for (let p = 0; p < W * H; p++) {
+      if (d[4 * p + 3] || !lab[p]) continue;
+      const x = p % W;
+      for (const q of [x > 0 ? p - 1 : -1, x < W - 1 ? p + 1 : -1, p - W, p + W]) if (q >= 0 && q < W * H && d[4 * q + 3]) { grow.push(p, q); break; }
+    }
+    for (let i = 0; i < grow.length; i += 2) { const o = 4 * grow[i], f = 4 * grow[i + 1]; d[o] = d[f]; d[o + 1] = d[f + 1]; d[o + 2] = d[f + 2]; d[o + 3] = 255; }
+  }
+  octx.putImageData(oimg, 0, 0);
+  uctx.clearRect(0, 0, DS, DS); uctx.imageSmoothingEnabled = true; uctx.imageSmoothingQuality = "high";
+  uctx.drawImage(off, 0, 0, DS, DS);
 }
-const paintAll = () => paint(0, 0, W - 1, H - 1);
+let underQueued = false;
+function renderUnderSoon() { if (underQueued) return; underQueued = true; requestAnimationFrame(() => { underQueued = false; renderUnder(); }); }
+function paint() {}                                 // crayon lines are drawn as vectors as they happen
+const paintAll = () => renderUnder();
+function clearOverMask(pixels) {                    // remove crayon lines under a region that is being refilled
+  const m = octx.createImageData(W, H);
+  for (const p of pixels) m.data[4 * p + 3] = 255;
+  octx.putImageData(m, 0, 0);
+  ctx.save(); ctx.globalCompositeOperation = "destination-out"; ctx.imageSmoothingEnabled = true; ctx.drawImage(off, 0, 0, DS, DS); ctx.restore();
+}
 
-/* undo: compact snapshots (labels + relief in 0.01 mm steps) */
+/* undo: compact raster snapshots plus a PNG of the crayon layer */
 const undo = [], redo = [];
-const snap = () => ({ l: lab.slice(), b: Uint8Array.from(bump, v => Math.round(v * 100)) });
-const restore = s => { lab = s.l.slice(); bump = Float32Array.from(s.b, v => v / 100); paintAll(); };
-function pushUndo() { undo.push(snap()); if (undo.length > 30) undo.shift(); redo.length = 0; syncUndo(); }
+function snap() {
+  const s = { l: lab.slice(), b: Uint8Array.from(bump, v => Math.round(v * 100)), u: under.slice(), img: null };
+  s.img = new Promise(res => { try { cv.toBlob(b => res(b), "image/png"); } catch (e) { res(null); } });
+  return s;
+}
+async function restore(s) {
+  lab = s.l.slice(); bump = Float32Array.from(s.b, v => v / 100); under = s.u.slice(); renderUnder();
+  const blob = await s.img; ctx.clearRect(0, 0, DS, DS);
+  if (blob) { try { const bm = await createImageBitmap(blob); ctx.drawImage(bm, 0, 0); } catch (e) {} }
+}
+function pushUndo() { undo.push(snap()); if (undo.length > 25) undo.shift(); redo.length = 0; syncUndo(); }
 function syncUndo() { $("#undo").disabled = !undo.length; $("#redo").disabled = !redo.length; }
-$("#undo").onclick = () => { if (!undo.length) return; redo.push(snap()); restore(undo.pop()); syncUndo(); saveDraft(); };
-$("#redo").onclick = () => { if (!redo.length) return; undo.push(snap()); restore(redo.pop()); syncUndo(); saveDraft(); };
+$("#undo").onclick = async () => { if (!undo.length) return; redo.push(snap()); await restore(undo.pop()); syncUndo(); saveDraft(); };
+$("#redo").onclick = async () => { if (!redo.length) return; undo.push(snap()); await restore(redo.pop()); syncUndo(); saveDraft(); };
 
 /* per-viewer draft so a child's picture survives a reload */
 let draftTimer = 0;
 function saveDraft() { clearTimeout(draftTimer); draftTimer = setTimeout(() => {
-  try { const b = Uint8Array.from(bump, v => Math.round(v * 100)), all = new Uint8Array(W * H * 2); all.set(lab); all.set(b, W * H);
+  try { const b = Uint8Array.from(bump, v => Math.round(v * 100)), all = new Uint8Array(W * H * 3); all.set(lab); all.set(b, W * H); all.set(under, 2 * W * H);
         let s = ""; for (let i = 0; i < all.length; i += 8192) s += String.fromCharCode.apply(null, all.subarray(i, i + 8192));
-        localStorage.setItem("doodle-draft-v1", btoa(s)); } catch (e) {} }, 400); }
-function loadDraft() {
-  try { const s = localStorage.getItem("doodle-draft-v1"); if (!s) return false; const r = atob(s); if (r.length !== W * H * 2) return false;
-        for (let i = 0; i < W * H; i++) { lab[i] = r.charCodeAt(i); bump[i] = r.charCodeAt(W * H + i) / 100; } return lab.some(v => v); } catch (e) { return false; }
+        localStorage.setItem("doodle-draft-v2", btoa(s)); localStorage.setItem("doodle-draft-v2-img", cv.toDataURL("image/png")); } catch (e) {} }, 500); }
+async function loadDraft() {
+  try {
+    const s = localStorage.getItem("doodle-draft-v2");
+    if (s) { const r = atob(s); if (r.length !== W * H * 3) return false;
+      for (let i = 0; i < W * H; i++) { lab[i] = r.charCodeAt(i); bump[i] = r.charCodeAt(W * H + i) / 100; under[i] = r.charCodeAt(2 * W * H + i); }
+      const url = localStorage.getItem("doodle-draft-v2-img");
+      if (url) await new Promise(res => { const im = new Image(); im.onload = () => { ctx.drawImage(im, 0, 0, DS, DS); res(); }; im.onerror = res; im.src = url; });
+      return lab.some(v => v); }
+    const o = localStorage.getItem("doodle-draft-v1"); if (!o) return false; const r = atob(o); if (r.length !== W * H * 2) return false;
+    for (let i = 0; i < W * H; i++) { lab[i] = r.charCodeAt(i); bump[i] = r.charCodeAt(W * H + i) / 100; under[i] = lab[i] ? 1 : 0; }   // older drafts: everything on the fill layer
+    return lab.some(v => v);
+  } catch (e) { return false; }
 }
 
 /* ---------- sparkles: little twinkling stars that follow the crayon and burst when colouring ---------- */
@@ -682,7 +727,16 @@ function eye(x, y) {
     lab[p] = dp <= r2 ? 1 : 10; bump[p] = Math.max(bump[p], dome + (dp <= r2 ? 0.25 * Math.sqrt(Math.max(0, 1 - (dp / r2) ** 2)) : 0));
     if (Math.hypot(i - (px - r2 * 0.35), j - (py - r2 * 0.4)) < r2 * 0.28) lab[p] = 10;   // tiny shine
   }
-  paint(x - R - 1, y - R - 1, x + R + 1, y + R + 1);
+  for (let j = Math.floor(y - R); j <= y + R; j++) for (let i = Math.floor(x - R); i <= x + R; i++) if (i >= 0 && j >= 0 && i < W && j < H && Math.hypot(i - x, j - y) <= R) under[i + W * j] = 0;
+  if (vec) {
+    ctx.save(); ctx.globalCompositeOperation = "source-over";
+    ctx.beginPath(); ctx.arc(x * K, y * K, R * K, 0, 7); ctx.fillStyle = "#FFFFFF"; ctx.fill();
+    ctx.lineWidth = 1.6 * K; ctx.strokeStyle = "rgba(36,40,58,.28)"; ctx.stroke();
+    ctx.beginPath(); ctx.arc(px * K, py * K, r2 * K, 0, 7); ctx.fillStyle = PAL[1]; ctx.fill();
+    ctx.beginPath(); ctx.arc((px - r2 * 0.35) * K, (py - r2 * 0.4) * K, r2 * 0.28 * K, 0, 7); ctx.fillStyle = "#FFFFFF"; ctx.fill();
+    ctx.restore();
+    renderUnderSoon();
+  }
   sparkle(x, y, 10, { size: 6, speed: 2.2, colour: "#FFD24C" });
 }
 /* fill: the colour spreads out from the finger like a ripple, with sparkles riding the wave */
@@ -705,7 +759,8 @@ function fill(x, y) {
   if (from === 0 && touchesEdge) { flash(t("leak")); wobble(); return; }
   pushUndo();
   const col = colour, span = Math.max(1, y1 - y0 + 1);
-  const put = p => { lab[p] = col === "R" ? RAINBOW[Math.min(6, Math.floor(((p / W | 0) - y0) / span * 7))] : col; };
+  const put = p => { lab[p] = col === "R" ? RAINBOW[Math.min(6, Math.floor(((p / W | 0) - y0) / span * 7))] : col; under[p] = 1; };
+  if (from !== 0) clearOverMask(order.subarray(0, n));
   if (CALM) { for (let i = 0; i < n; i++) put(order[i]); paintAll(); saveDraft(); return; }
   const frames = Math.min(22, Math.max(8, Math.round(Math.sqrt(n) / 9))), per = Math.ceil(n / frames);
   let i = 0; filling = true;
@@ -724,34 +779,80 @@ function flash(m) { const h = $("#hint"); h.textContent = m; h.classList.add("wa
 function wobble() { const p = $("#paper"); p.classList.remove("wobble"); void p.offsetWidth; p.classList.add("wobble"); }
 function setHint() { $("#hint").textContent = $("#view3d").hidden ? (tool === "pen" && colour === "R" ? T[LANG].hints.rainbow : T[LANG].hints[tool]) || "" : T[LANG].hints.view; }
 
-/* pointer drawing */
-let drawing = false, last = null, travelled = 0;
+/* pointer drawing: points are smoothed into quadratic curves through the midpoints, so lines come out taut */
+let drawing = false, pts = [], travelled = 0, rb = { base: null, samples: [] };
 function toPaper(e) { const r = cv.getBoundingClientRect(); return [(e.clientX - r.left) / r.width * W, (e.clientY - r.top) / r.height * H]; }
 cv.addEventListener("pointerdown", e => {
   e.preventDefault(); const [x, y] = toPaper(e);
   if (tool === "fill") return fill(x, y);
   if (tool === "eye") { pushUndo(); eye(x, y); saveDraft(); return; }
-  cv.setPointerCapture(e.pointerId); drawing = true; pushUndo(); last = null; travelled = 0; normal = [0, 1]; stroke([x, y]);
+  cv.setPointerCapture(e.pointerId); drawing = true; pushUndo(); pts = [[x, y]]; travelled = 0; normal = [0, 1]; rb = { base: null, samples: [] };
+  seg([x, y], [x, y], [x, y]);
 });
 cv.addEventListener("pointermove", e => {
   if (!drawing) return;
   const evs = e.getCoalescedEvents ? e.getCoalescedEvents() : [];
-  for (const ev of evs.length ? evs : [e]) stroke(toPaper(ev));
+  for (const ev of evs.length ? evs : [e]) addPoint(toPaper(ev));
 });
-const end = () => { if (drawing) { drawing = false; last = null; saveDraft(); } };
+const end = () => {
+  if (!drawing) return; drawing = false;
+  if (pts.length >= 2) { const b = pts[pts.length - 2], c = pts[pts.length - 1]; seg(mid(b, c), c, c); }
+  pts = []; rb = { base: null, samples: [] }; if (tool === "eraser") renderUnder(); saveDraft();
+};
 cv.addEventListener("pointerup", end); cv.addEventListener("pointercancel", end);
-function stroke(p) {
+const mid = (a, b) => [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+function addPoint(p) {
+  const last = pts[pts.length - 1];
+  if (Math.hypot(p[0] - last[0], p[1] - last[1]) < 0.9) return;
+  pts.push(p); if (pts.length > 3) pts.shift();
+  if (pts.length === 2) seg(pts[0], pts[0], mid(pts[0], pts[1]));
+  else seg(mid(pts[0], pts[1]), pts[1], mid(pts[1], pts[2]));
+}
+function brush() {
   const rainbow = tool === "pen" && colour === "R";
-  const r = tool === "eraser" ? SIZES[sizeIx] * 1.6 : rainbow ? RSIZES[sizeIx] : SIZES[sizeIx], l = tool === "eraser" ? 0 : colour;
-  const [ax, ay] = last || p, [bx, by] = p, len = Math.hypot(bx - ax, by - ay);
-  if (rainbow && len > 0.5) { const nx = -(by - ay) / len, ny = (bx - ax) / len; normal = [normal[0] * 0.6 + nx * 0.4, normal[1] * 0.6 + ny * 0.4]; const m = Math.hypot(...normal) || 1; normal = [normal[0] / m, normal[1] / m]; }
-  const n = Math.max(1, Math.ceil(len / (r * 0.3)));
-  for (let i = last ? 1 : 0; i <= n; i++) { const k = i / n; dab(ax + (bx - ax) * k, ay + (by - ay) * k, r, l, 0.7); }
-  paint(Math.min(ax, bx) - r - 1, Math.min(ay, by) - r - 1, Math.max(ax, bx) + r + 1, Math.max(ay, by) + r + 1);
+  return { rainbow, r: tool === "eraser" ? SIZES[sizeIx] * 1.6 : rainbow ? RSIZES[sizeIx] : SIZES[sizeIx], l: tool === "eraser" ? 0 : colour };
+}
+// one quadratic piece s -> e with control c: stamp it into the raster and draw it on the crayon layer
+function seg(s0, c, e) {
+  const { rainbow, r, l } = brush();
+  const q = t => { const u = 1 - t; return [u * u * s0[0] + 2 * u * t * c[0] + t * t * e[0], u * u * s0[1] + 2 * u * t * c[1] + t * t * e[1]]; };
+  const len = Math.hypot(c[0] - s0[0], c[1] - s0[1]) + Math.hypot(e[0] - c[0], e[1] - c[1]);
+  const n = Math.max(1, Math.ceil(len / (rainbow ? 1.5 : r * 0.3)));
+  const samples = [];
+  for (let i = 0; i <= n; i++) {
+    const t = i / n, p = q(t);
+    if (rainbow) {
+      const dx = 2 * (1 - t) * (c[0] - s0[0]) + 2 * t * (e[0] - c[0]), dy = 2 * (1 - t) * (c[1] - s0[1]) + 2 * t * (e[1] - c[1]), dl = Math.hypot(dx, dy);
+      if (dl > 1e-3) { normal = [normal[0] * 0.75 - dy / dl * 0.25, normal[1] * 0.75 + dx / dl * 0.25]; const m = Math.hypot(...normal) || 1; normal = [normal[0] / m, normal[1] / m]; }
+    }
+    samples.push([p[0], p[1], normal[0], normal[1]]);
+    if (!rainbow || i % Math.max(1, Math.round(r * 0.2)) === 0 || i === n) dab(p[0], p[1], r, l, 0.7);
+    for (let j = Math.floor(p[1] - r); j <= p[1] + r; j++) for (let k = Math.floor(p[0] - r); k <= p[0] + r; k++) if (k >= 0 && j >= 0 && k < W && j < H && (k - p[0]) ** 2 + (j - p[1]) ** 2 <= r * r) under[k + W * j] = 0;
+  }
+  ctx.save(); ctx.lineCap = "round"; ctx.lineJoin = "round";
+  if (l === 0) { ctx.globalCompositeOperation = "destination-out"; ctx.strokeStyle = "#000"; }
+  if (rainbow) {
+    // redraw the whole rainbow stroke as seven continuous bands over the paper as it was before the stroke,
+    // so the stripes stay seamless instead of being built from separate pieces
+    if (!rb.base) rb.base = ctx.getImageData(0, 0, DS, DS);
+    rb.samples.push(...samples);
+    ctx.putImageData(rb.base, 0, 0);
+    const bw = 2 * r / 7;
+    for (let b = 0; b < 7; b++) {
+      const o = (-1 + (2 * b + 1) / 7) * r;
+      ctx.beginPath(); rb.samples.forEach(([x, y, nx, ny], i) => (i ? ctx.lineTo : ctx.moveTo).call(ctx, (x + nx * o) * K, (y + ny * o) * K));
+      ctx.strokeStyle = PAL[RAINBOW[b]]; ctx.lineWidth = bw * K * 1.15; ctx.stroke();
+    }
+  } else {
+    ctx.beginPath(); ctx.moveTo(s0[0] * K, s0[1] * K); ctx.quadraticCurveTo(c[0] * K, c[1] * K, e[0] * K, e[1] * K);
+    if (l !== 0) ctx.strokeStyle = PAL[l];
+    ctx.lineWidth = 2 * r * K; ctx.stroke();
+  }
+  ctx.restore();
+  if (l === 0) renderUnderSoon();
   travelled += len;
-  const every = rainbow ? 9 : 22;
-  while (tool !== "eraser" && travelled > every) { travelled -= every; sparkle(bx + normal[0] * r * (Math.random() * 2 - 1), by + normal[1] * r * (Math.random() * 2 - 1), 1, { size: rainbow ? 8 : 6, speed: 0.9, colour: rainbow ? undefined : (colour === 10 ? "#FFD24C" : "#FFFFFF") }); }
-  last = p;
+  const every = rainbow ? 9 : 22, last = samples[samples.length - 1];
+  while (l !== 0 && travelled > every) { travelled -= every; sparkle(last[0] + normal[0] * r * (Math.random() * 2 - 1), last[1] + normal[1] * r * (Math.random() * 2 - 1), 1, { size: rainbow ? 8 : 6, speed: 0.9, colour: rainbow ? undefined : (colour === 10 ? "#FFD24C" : "#FFFFFF") }); }
 }
 
 /* ---------- toolbar and crayon box ---------- */
@@ -831,10 +932,15 @@ function syncTools() {
   setHint();
 }
 $("#clearNo").onclick = () => ($("#clearSheet").hidden = true);
-$("#clearYes").onclick = () => { pushUndo(); lab.fill(0); bump.fill(0); paintAll(); saveDraft(); $("#clearSheet").hidden = true; sparkle(256, 256, 24, { size: 10, speed: 4, jitter: 120 }); };
+$("#clearYes").onclick = () => { pushUndo(); lab.fill(0); bump.fill(0); under.fill(0); ctx.clearRect(0, 0, DS, DS); paintAll(); saveDraft(); $("#clearSheet").hidden = true; sparkle(256, 256, 24, { size: 10, speed: 4, jitter: 120 }); };
 
 /* ---------- pictures to colour (our own simple outlines) ---------- */
-function outline(pts, r) { for (let k = 0; k < pts.length - 1; k++) { const [a, b] = [pts[k], pts[k + 1]], n = Math.ceil(Math.hypot(b[0] - a[0], b[1] - a[1]) / 2); for (let i = 0; i <= n; i++) dab(a[0] + (b[0] - a[0]) * i / n, a[1] + (b[1] - a[1]) * i / n, r, 1, 0.7); } }
+function outline(pts, r) {
+  for (let k = 0; k < pts.length - 1; k++) { const [a, b] = [pts[k], pts[k + 1]], n = Math.ceil(Math.hypot(b[0] - a[0], b[1] - a[1]) / 2); for (let i = 0; i <= n; i++) dab(a[0] + (b[0] - a[0]) * i / n, a[1] + (b[1] - a[1]) * i / n, r, 1, 0.7); }
+  if (!vec) return;
+  ctx.save(); ctx.lineCap = "round"; ctx.lineJoin = "round"; ctx.strokeStyle = PAL[1]; ctx.lineWidth = 2 * r * K;
+  ctx.beginPath(); pts.forEach(([x, y], i) => (i ? ctx.lineTo : ctx.moveTo).call(ctx, x * K, y * K)); ctx.stroke(); ctx.restore();
+}
 const ring = (cx, cy, rx, ry, a0 = 0, a1 = 2 * Math.PI, n = 72) => Array.from({ length: n + 1 }, (_, i) => { const a = a0 + (a1 - a0) * i / n; return [cx + rx * Math.cos(a), cy + ry * Math.sin(a)]; });
 const TPL = [
   () => { outline(ring(230, 256, 150, 105, 0.42, 2 * Math.PI - 0.42), 6); outline([[369, 214], [455, 150], [440, 256], [455, 362], [369, 298]], 6);
@@ -852,12 +958,12 @@ function openTpl() {
   TPL.forEach((fn, i) => {
     const b = document.createElement("button"); b.className = "tpl"; b.id = "tpl-" + i;
     const c = document.createElement("canvas"); c.width = c.height = 128;
-    const keepL = lab, keepB = bump; lab = new Uint8Array(W * H); bump = new Float32Array(W * H); fxOn = false; fn(); fxOn = true;
+    const keepL = lab, keepB = bump, keepU = under; lab = new Uint8Array(W * H); bump = new Float32Array(W * H); under = new Uint8Array(W * H); fxOn = false; vec = false; fn(); vec = true; fxOn = true;
     const g = c.getContext("2d"), im = g.createImageData(128, 128);
     for (let y = 0; y < 128; y++) for (let x = 0; x < 128; x++) { const l = lab[x * 4 + W * y * 4], o = 4 * (x + 128 * y); if (l) { im.data[o] = RGB[l][0]; im.data[o + 1] = RGB[l][1]; im.data[o + 2] = RGB[l][2]; im.data[o + 3] = 255; } }
-    g.putImageData(im, 0, 0); lab = keepL; bump = keepB;
+    g.putImageData(im, 0, 0); lab = keepL; bump = keepB; under = keepU;
     b.appendChild(c); b.append(T[LANG].tpls[i]);
-    b.onclick = () => { pushUndo(); lab = new Uint8Array(W * H); bump = new Float32Array(W * H); fn(); paintAll(); saveDraft(); $("#tplSheet").hidden = true; tool = "fill"; colour = [3, 4, 5][i]; syncTools(); sparkle(256, 256, 30, { size: 11, speed: 4.5, jitter: 160 }); };
+    b.onclick = () => { pushUndo(); lab = new Uint8Array(W * H); bump = new Float32Array(W * H); under = new Uint8Array(W * H); ctx.clearRect(0, 0, DS, DS); fn(); paintAll(); saveDraft(); $("#tplSheet").hidden = true; tool = "fill"; colour = [3, 4, 5][i]; syncTools(); sparkle(256, 256, 30, { size: 11, speed: 4.5, jitter: 160 }); };
     box.appendChild(b);
   });
   paintAll();
@@ -991,8 +1097,8 @@ function applyWords() {
 /* ---------- boot: a picture ready to colour, or the child's saved drawing ---------- */
 $("#back").href = window.SHOP_URL || "/";
 applyWords(); buildTray();
-fxOn = false; if (!loadDraft()) { TPL[0](); colour = 3; tool = "fill"; } fxOn = true;
-paintAll(); syncTools(); syncUndo();
+fxOn = false;
+loadDraft().then(ok => { if (!ok) { ctx.clearRect(0, 0, DS, DS); TPL[0](); colour = 3; tool = "fill"; } fxOn = true; paintAll(); syncTools(); syncUndo(); });
 </script>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 <script type="module">

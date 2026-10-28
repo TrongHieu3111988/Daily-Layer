@@ -3,281 +3,472 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="description" content="A new 3D-printable model every day: organizers, print-in-place toys, decor and multi-colour figures. STL and 3MF files.">
 <title>Daily Layer</title>
+<meta name="description" content="A playground where kids draw and sculpt their own toys, and grown-ups print them at home on a 3D printer. A new printable toy every morning.">
+<meta name="theme-color" content="#FFC93C">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/icons/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Daily Layer">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@500;600;700;800&display=swap">
 <style>
-/* Layout: a print-bed shop. Sticky header, hero split (pitch | live 3D stage with layer lines), stat strip, model grid, tiers, agent log. */
+/* Layout: a toy playground. Sky hero (headline + a turntable showing today's toy, with Layo the printer robot),
+   then a "what shall we play" game shelf, the toy shelf, a grown-ups corner (how it works, safety, club),
+   and the workshop diary. Chunky outlined cards with a toy-block drop shadow carry the look. */
 :root{
-  --bg:#EDEFEA; --surface:#F8F9F5; --ink:#16191A; --muted:#5B635E; --line:#D2D7CF;
-  --accent:#0E7C6B; --accent-ink:#FFFFFF; --hi:#F2B705; --hi-ink:#231B00; --stage:#E2E5E2; --stage-line:rgba(22,25,26,.055);
-  --good:#1E8A4C; --shadow:0 1px 2px rgba(20,30,25,.06),0 8px 24px rgba(20,30,25,.07);
-  --f-display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
-  --f-body:"IBM Plex Sans",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
-  --f-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --sky:#DCF0FF; --sky2:#C9E8FF; --cloud:#FFFFFF; --paper:#FFFFFF; --ink:#1B2547; --muted:#55608A; --outline:#1B2547;
+  --sun:#FFC93C; --coral:#FF6B57; --grass:#3FBF7F; --grape:#8C6BF2; --bubble:#5DB8FF; --pink:#FF8FB8;
+  --band-play:#FFF1C9; --band-parents:#DDF7EA; --tint:#F3F7FF; --good:#1C9A5E; --foot-bg:#1B2547; --foot-fg:#DCF0FF;
+  --pop:0 5px 0 var(--outline); --pop-sm:0 3px 0 var(--outline);
+  --f-display:"Baloo 2","Nunito",ui-rounded,system-ui,sans-serif;
+  --f-body:"Nunito",ui-rounded,system-ui,-apple-system,"Segoe UI",sans-serif;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#111413; --surface:#1A1E1C; --ink:#E7ECE7; --muted:#9BA59F; --line:#2B322E;
-  --accent:#3CC4A8; --accent-ink:#06211B; --hi:#F5C431; --hi-ink:#231B00; --stage:#1E2321; --stage-line:rgba(231,236,231,.05);
-  --good:#4FCB82; --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px rgba(0,0,0,.35); color-scheme:dark}}
+  --sky:#101A3A; --sky2:#14204A; --cloud:#1D2A57; --paper:#1A2550; --ink:#EEF2FF; --muted:#AAB4DA; --outline:#070B1F;
+  --sun:#FFCF4D; --coral:#FF7A66; --grass:#4FD08F; --grape:#A487FF; --bubble:#6CC2FF; --pink:#FF9DC3;
+  --band-play:#2A2440; --band-parents:#12302A; --tint:#16214A; --good:#4FD08F; --foot-bg:#070B1F; --foot-fg:#C9D4FF; color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#111413; --surface:#1A1E1C; --ink:#E7ECE7; --muted:#9BA59F; --line:#2B322E;
-  --accent:#3CC4A8; --accent-ink:#06211B; --hi:#F5C431; --hi-ink:#231B00; --stage:#1E2321; --stage-line:rgba(231,236,231,.05);
-  --good:#4FCB82; --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px rgba(0,0,0,.35); color-scheme:dark}
+  --sky:#101A3A; --sky2:#14204A; --cloud:#1D2A57; --paper:#1A2550; --ink:#EEF2FF; --muted:#AAB4DA; --outline:#070B1F;
+  --sun:#FFCF4D; --coral:#FF7A66; --grass:#4FD08F; --grape:#A487FF; --bubble:#6CC2FF; --pink:#FF9DC3;
+  --band-play:#2A2440; --band-parents:#12302A; --tint:#16214A; --good:#4FD08F; --foot-bg:#070B1F; --foot-fg:#C9D4FF; color-scheme:dark}
 
-*{box-sizing:border-box}
 html{color-scheme:light dark}body{margin:0}img{max-width:100%}[hidden]{display:none!important}
 :root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55}
-body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--bg)}
-.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
-h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;letter-spacing:-.01em}
-.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
-.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
-a{color:var(--accent)}
-button{font:inherit;cursor:pointer}
-:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--sky);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--sky)}
+.wrap{max-width:1160px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--f-display);font-weight:800;text-wrap:balance;margin:0;line-height:1.05;letter-spacing:-.01em}
+a{color:inherit}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--grape);outline-offset:3px;border-radius:10px}
+
+/* buttons: toy blocks that squish when pressed */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;border:2.5px solid var(--outline);border-radius:18px;padding:12px 20px;font-family:var(--f-display);font-weight:800;font-size:18px;line-height:1;text-decoration:none;background:var(--paper);color:var(--ink);box-shadow:var(--pop);transition:transform .12s,box-shadow .12s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 7px 0 var(--outline)}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 var(--outline)}
+.btn svg{width:24px;height:24px;flex:none}
+.btn.coral{background:var(--coral);color:#fff}
+.btn.grass{background:var(--grass);color:#06301B}
+.btn.sun{background:var(--sun);color:#3A2A00}
+.btn.small{font-size:15px;padding:9px 14px;border-radius:14px;box-shadow:var(--pop-sm)}
+.btn[disabled]{opacity:.55;pointer-events:none}
 
 /* header */
-header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
-header.top .wrap{display:flex;align-items:center;gap:20px;padding-block:12px}
-.mark{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);font-family:var(--f-display);font-weight:800;font-size:20px}
-.mark svg{flex:none}
-nav.links{display:flex;gap:18px;margin-left:auto;font-size:14px}
-nav.links a{color:var(--muted);text-decoration:none}
-nav.links a:hover{color:var(--ink)}
-@media (max-width:560px){nav.links{gap:12px;font-size:13px}.mark{font-size:18px}}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:color-mix(in srgb,var(--sky) 90%,transparent);backdrop-filter:blur(10px)}
+header.top .wrap{display:flex;align-items:center;gap:12px;padding-block:10px}
+.mark{display:flex;align-items:center;gap:9px;text-decoration:none;font-family:var(--f-display);font-weight:800;font-size:22px;white-space:nowrap}
+.mark svg{width:34px;height:34px;flex:none}
+nav.tabs{display:flex;gap:6px;margin-left:auto;overflow-x:auto;scrollbar-width:none}
+nav.tabs::-webkit-scrollbar{display:none}
+nav.tabs a{text-decoration:none;font-family:var(--f-display);font-weight:700;font-size:16px;padding:6px 12px;border-radius:12px;white-space:nowrap}
+nav.tabs a:hover{background:var(--paper);box-shadow:var(--pop-sm)}
+.lang{flex:none;border:2.5px solid var(--outline);background:var(--sun);color:#3A2A00;border-radius:12px;font-family:var(--f-display);font-weight:800;font-size:14px;padding:4px 9px;box-shadow:var(--pop-sm)}
+@media (max-width:720px){nav.tabs{display:none}.lang{margin-left:auto}}
 
-/* hero */
-.hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:40px;align-items:center;padding-block:40px 28px}
-.hero h1{font-size:clamp(34px,5.2vw,60px);line-height:1.02;font-weight:800;margin-top:12px}
-.hero h1 em{font-style:normal;color:var(--accent)}
-.hero p.lede{font-size:17px;color:var(--muted);max-width:46ch;margin:18px 0 24px}
-.ctas{display:flex;gap:10px;flex-wrap:wrap}
-.btn{display:inline-flex;align-items:center;gap:8px;border-radius:10px;padding:11px 18px;font-weight:600;border:1px solid transparent;text-decoration:none;font-size:15px}
-.btn.primary{background:var(--accent);color:var(--accent-ink)}
-.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
-.btn.ghost:hover{border-color:var(--ink)}
-.btn.primary:hover{filter:brightness(1.07)}
-.btn[disabled]{opacity:.55;cursor:default}
-@media (max-width:860px){.hero{grid-template-columns:1fr;gap:24px;padding-block:24px 16px}}
+/* hero: sky with clouds */
+.hero{position:relative;overflow:hidden;padding-block:20px 72px}
+.cloud{position:absolute;background:var(--cloud);border-radius:999px;opacity:.9;pointer-events:none}
+.cloud::before,.cloud::after{content:"";position:absolute;background:inherit;border-radius:50%}
+.cloud.c1{width:180px;height:46px;left:-30px;top:60px}.cloud.c1::before{width:80px;height:80px;left:30px;top:-40px}.cloud.c1::after{width:60px;height:60px;left:90px;top:-26px}
+.cloud.c2{width:220px;height:54px;right:-40px;top:24px}.cloud.c2::before{width:96px;height:96px;left:44px;top:-50px}.cloud.c2::after{width:70px;height:70px;left:120px;top:-30px}
+.cloud.c3{width:140px;height:38px;left:44%;bottom:40px;opacity:.6}.cloud.c3::before{width:60px;height:60px;left:24px;top:-30px}.cloud.c3::after{width:46px;height:46px;left:70px;top:-20px}
+.hero .wrap{position:relative;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:36px;align-items:center}
+.sticker{display:inline-flex;align-items:center;gap:8px;background:var(--paper);border:2.5px solid var(--outline);border-radius:999px;padding:5px 14px 5px 6px;font-weight:800;font-size:14px;box-shadow:var(--pop-sm);transform:rotate(-2deg)}
+.sticker b{background:var(--coral);color:#fff;border-radius:999px;padding:2px 10px;font-family:var(--f-display);font-variant-numeric:tabular-nums}
+.hero h1{font-size:clamp(40px,6.4vw,74px);margin:18px 0 0}
+.hero h1 .w1{color:var(--coral)}.hero h1 .w2{color:var(--grass)}.hero h1 .w3{color:var(--grape)}
+.hero h1 .squig{display:inline-block;background:linear-gradient(transparent 70%,color-mix(in srgb,var(--sun) 70%,transparent) 70%);padding:0 4px;margin:0 -4px}
+.hero p.lede{font-size:clamp(17px,1.9vw,20px);color:var(--muted);max-width:44ch;margin:16px 0 26px;font-weight:600}
+.ctas{display:flex;gap:12px;flex-wrap:wrap}
+@media (max-width:860px){.hero .wrap{grid-template-columns:1fr;gap:26px}.hero{padding-block:8px 64px}}
 
-.stage{position:relative;border-radius:16px;background:
-  repeating-linear-gradient(0deg,var(--stage-line) 0 1px,transparent 1px 6px),var(--stage);
-  aspect-ratio:5/4;max-width:100%;overflow:hidden;border:1px solid var(--line)}
-.stage canvas{display:block;width:100%!important;height:100%!important;touch-action:none}
-.stage .poster{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity .4s}
-.stage.live .poster{opacity:0;pointer-events:none}
-.stage .tag{position:absolute;left:12px;top:12px;display:flex;gap:6px;flex-wrap:wrap}
-.chip{font-family:var(--f-mono);font-size:11.5px;padding:3px 8px;border-radius:999px;background:var(--surface);border:1px solid var(--line);color:var(--ink);white-space:nowrap}
-.chip.new{background:var(--hi);color:var(--hi-ink);border-color:transparent;font-weight:500}
-.stage .hint{position:absolute;right:12px;bottom:10px;font-family:var(--f-mono);font-size:11px;color:var(--muted)}
-.stage .zlabel{position:absolute;left:12px;bottom:10px;font-family:var(--f-mono);font-size:11px;color:var(--muted)}
-.feat-cap{display:flex;justify-content:space-between;gap:12px;align-items:baseline;margin-top:12px;flex-wrap:wrap}
-.feat-cap h3{font-size:20px}
-.feat-cap button{background:none;border:0;color:var(--accent);font-weight:600;padding:0}
+/* turntable stage */
+.scene{position:relative;padding-top:58px}
+.turntable{position:relative;aspect-ratio:1/1;max-width:100%;border-radius:36px;border:3px solid var(--outline);box-shadow:0 8px 0 var(--outline);overflow:hidden;
+  background:radial-gradient(70% 22% at 50% 86%,color-mix(in srgb,var(--outline) 16%,transparent),transparent 70%),radial-gradient(120% 90% at 50% 10%,var(--paper),var(--sky2) 80%)}
+.turntable canvas{position:absolute;inset:0;width:100%!important;height:100%!important;touch-action:none}
+.turntable .poster{position:absolute;inset:8%;width:84%;height:84%;object-fit:contain;transition:opacity .4s;mix-blend-mode:multiply}
+:root[data-theme="dark"] .turntable .poster{mix-blend-mode:normal}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .turntable .poster{mix-blend-mode:normal}}
+.turntable.live .poster{opacity:0;pointer-events:none}
+.turntable .today{position:absolute;left:14px;top:14px;background:var(--sun);color:#3A2A00;border:2.5px solid var(--outline);border-radius:12px;padding:3px 10px;font-family:var(--f-display);font-weight:800;font-size:15px;box-shadow:var(--pop-sm);transform:rotate(-4deg)}
+.turntable .drag{position:absolute;right:14px;bottom:12px;font-size:12.5px;font-weight:800;color:var(--muted);background:color-mix(in srgb,var(--paper) 85%,transparent);border-radius:999px;padding:3px 10px}
+.toycap{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:16px;flex-wrap:wrap}
+.toycap h3{font-size:24px}
+.layo{position:absolute;z-index:3;width:112px;right:-8px;top:0;filter:drop-shadow(0 4px 0 var(--outline));animation:bob 3.2s ease-in-out infinite}
+.bubble{position:absolute;z-index:3;right:112px;top:8px;background:var(--paper);border:2.5px solid var(--outline);border-radius:16px;padding:6px 12px;font-weight:800;font-size:14px;max-width:190px;box-shadow:var(--pop-sm)}
+.bubble::after{content:"";position:absolute;right:-10px;top:14px;border:8px solid transparent;border-left-color:var(--outline)}
+@media (max-width:860px){.scene{padding-top:52px}.layo{width:90px;right:-4px;top:2px}.bubble{right:90px;top:6px;font-size:13px;max-width:200px}}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-8px) rotate(3deg)}}
 
-/* stats */
-.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-block:1px solid var(--line);margin-block:12px 8px}
-.stat{padding:16px 0 14px;padding-right:12px}
-.stat+.stat{border-left:1px solid var(--line);padding-left:16px}
-.stat b{display:block;font-family:var(--f-display);font-size:26px;font-weight:700;font-variant-numeric:tabular-nums}
-.stat span{font-size:13px;color:var(--muted)}
-@media (max-width:640px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.stat:nth-child(3){border-left:0;padding-left:0}.stat:nth-child(n+3){border-top:1px solid var(--line)}}
+/* wavy band edges */
+.band{position:relative;padding-block:28px 64px}
+.band::before{content:"";position:absolute;left:0;right:0;top:-34px;height:36px;background:inherit;
+  -webkit-mask:radial-gradient(28px 22px at 50% 100%,#000 98%,transparent) 0 0/56px 36px repeat-x;mask:radial-gradient(28px 22px at 50% 100%,#000 98%,transparent) 0 0/56px 36px repeat-x}
+.band.play{background:var(--band-play)}
+.band.toys{background:var(--sky)}
+.band.parents{background:var(--band-parents)}
+.band.diary{background:var(--tint)}
+.head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:24px}
+.head h2{font-size:clamp(32px,4.4vw,48px)}
+.head p{margin:6px 0 0;color:var(--muted);font-weight:600;max-width:58ch}
+.kicker{font-family:var(--f-display);font-weight:800;font-size:15px;letter-spacing:.06em;text-transform:uppercase;color:var(--coral)}
 
-section{padding-block:44px 8px}
-.sec-head{display:flex;justify-content:space-between;align-items:end;gap:16px;flex-wrap:wrap;margin-bottom:18px}
-.sec-head h2{font-size:clamp(26px,3.4vw,36px);font-weight:700}
-.sec-head p{color:var(--muted);margin:6px 0 0;max-width:60ch}
+/* game shelf */
+.games{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px}
+@media (max-width:980px){.games{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.games{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.game{border-radius:22px;box-shadow:0 5px 0 var(--outline)}.game h3{font-size:19px}.game p{font-size:13.5px}.game .txt{padding:10px 12px 14px}.game .go{font-size:16px}.ribbon{font-size:11px;right:-44px;top:14px}.badge-new{font-size:12px;left:8px;top:8px}}
+.game{position:relative;display:flex;flex-direction:column;border:3px solid var(--outline);border-radius:28px;background:var(--paper);box-shadow:0 7px 0 var(--outline);overflow:hidden;text-decoration:none;color:inherit;transition:transform .18s cubic-bezier(.34,1.56,.64,1)}
+a.game:hover{transform:translateY(-4px) rotate(-.6deg)}
+a.game:active{transform:translateY(3px)}
+.game .art{position:relative;aspect-ratio:16/10;display:grid;place-items:center;border-bottom:3px solid var(--outline)}
+.game .art svg{width:72%;height:84%}
+.game .txt{padding:16px 18px 20px;display:flex;flex-direction:column;gap:6px;flex:1}
+.game h3{font-size:26px}
+.game p{margin:0;color:var(--muted);font-weight:600;font-size:15.5px}
+.game .go{margin-top:auto;padding-top:10px;display:flex;align-items:center;gap:8px;font-family:var(--f-display);font-weight:800;font-size:18px;color:var(--coral)}
+.game .go svg{width:22px;height:22px;transition:transform .2s}
+a.game:hover .go svg{transform:translateX(4px)}
+.game.soon{opacity:.96}
+.game.soon .art{filter:saturate(.75)}
+.ribbon{position:absolute;right:-38px;top:20px;transform:rotate(35deg);background:var(--grape);color:#fff;font-family:var(--f-display);font-weight:800;font-size:13px;padding:4px 44px;border-block:2.5px solid var(--outline)}
+.badge-new{position:absolute;left:14px;top:14px;background:var(--coral);color:#fff;border:2.5px solid var(--outline);border-radius:12px;padding:2px 10px;font-family:var(--f-display);font-weight:800;font-size:14px;transform:rotate(-5deg);box-shadow:var(--pop-sm)}
 
-/* filters + grid */
+/* toy shelf */
 .filters{display:flex;gap:8px;flex-wrap:wrap}
-.filters button{border:1px solid var(--line);background:transparent;color:var(--ink);padding:7px 13px;border-radius:999px;font-size:13.5px}
-.filters button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:18px}
-.card{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;text-align:left;padding:0;color:inherit;transition:transform .15s,box-shadow .15s}
-.card:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
-.card .img{position:relative;aspect-ratio:1/1;background:var(--stage)}
-.card .img img{width:100%;height:100%;object-fit:cover;display:block}
-.card .img .chip{position:absolute;left:10px;top:10px}
-.card .body{padding:14px 14px 16px;display:flex;flex-direction:column;gap:6px;flex:1;min-width:0}
-.card h3{font-size:17.5px;font-weight:700}
-.card .meta{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
-.card .row{display:flex;justify-content:space-between;align-items:center;margin-top:auto;padding-top:8px}
-.price{font-family:var(--f-display);font-weight:700;font-size:18px;font-variant-numeric:tabular-nums}
-.price.free{color:var(--good)}
-.line-tag{font-size:12px;color:var(--muted)}
+.filters button{border:2.5px solid var(--outline);background:var(--paper);border-radius:999px;padding:6px 14px;font-family:var(--f-display);font-weight:700;font-size:15.5px;box-shadow:var(--pop-sm)}
+.filters button[aria-pressed="true"]{background:var(--ink);color:var(--sky)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:22px}
+@media (max-width:560px){.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.card{border-radius:20px;box-shadow:0 5px 0 var(--outline)}.card h3{font-size:16.5px}.card .meta{font-size:12px}.card .line{font-size:12.5px}.card .body{padding:10px 10px 12px}.price-tag{min-width:46px;height:46px;font-size:14px;right:6px;top:6px}}
+.card{position:relative;display:flex;flex-direction:column;background:var(--paper);border:3px solid var(--outline);border-radius:24px;box-shadow:0 6px 0 var(--outline);overflow:hidden;text-align:left;padding:0;color:inherit;transition:transform .18s cubic-bezier(.34,1.56,.64,1)}
+.card:hover{transform:translateY(-4px) rotate(.5deg)}
+.card:nth-child(even):hover{transform:translateY(-4px) rotate(-.5deg)}
+.card .img{position:relative;aspect-ratio:1/1;background:radial-gradient(90% 80% at 50% 30%,var(--paper),var(--sky2))}
+.card .img img{width:100%;height:100%;object-fit:cover;display:block;mix-blend-mode:multiply}
+:root[data-theme="dark"] .card .img img{mix-blend-mode:normal}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .card .img img{mix-blend-mode:normal}}
+.card .band-top{height:10px;border-bottom:3px solid var(--outline)}
+.card .body{padding:12px 14px 16px;display:flex;flex-direction:column;gap:4px;flex:1;min-width:0}
+.card h3{font-size:21px}
+.card .meta{font-size:13.5px;color:var(--muted);font-weight:700;font-variant-numeric:tabular-nums}
+.card .line{font-family:var(--f-display);font-weight:700;font-size:14px}
+.price-tag{position:absolute;right:10px;top:10px;min-width:60px;height:60px;border-radius:50%;display:grid;place-items:center;padding:0 6px;background:var(--sun);color:#3A2A00;border:2.5px solid var(--outline);font-family:var(--f-display);font-weight:800;font-size:17px;transform:rotate(10deg);box-shadow:var(--pop-sm);font-variant-numeric:tabular-nums}
+.price-tag.free{background:var(--grass);color:#06301B}
+.card .today{position:absolute;left:10px;top:10px;background:var(--coral);color:#fff;border:2.5px solid var(--outline);border-radius:10px;padding:1px 9px;font-family:var(--f-display);font-weight:800;font-size:14px;transform:rotate(-6deg)}
 
-/* tiers */
-.tiers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
-.tier{border:1px solid var(--line);border-radius:14px;padding:22px;display:flex;flex-direction:column;gap:12px;background:var(--bg)}
-.tier.pick{background:var(--surface);border-color:var(--accent);box-shadow:var(--shadow)}
-.tier h3{font-size:20px}
-.tier .amt{font-family:var(--f-display);font-size:38px;font-weight:800;line-height:1}
-.tier .amt small{font-size:15px;font-weight:500;color:var(--muted)}
-.tier ul{margin:0;padding:0;list-style:none;display:grid;gap:8px;font-size:14.5px}
-.tier li{display:grid;grid-template-columns:18px 1fr;gap:8px}
-.tier li::before{content:"";width:8px;height:8px;margin-top:7px;border-radius:2px;background:var(--accent)}
-.tier .btn{margin-top:auto;justify-content:center}
-@media (max-width:860px){.tiers{grid-template-columns:1fr}}
+/* grown-ups corner */
+.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;counter-reset:s;margin-bottom:34px}
+@media (max-width:860px){.steps{grid-template-columns:1fr}}
+.step{position:relative;background:var(--paper);border:3px solid var(--outline);border-radius:24px;padding:34px 20px 20px;box-shadow:var(--pop);margin-top:14px}
+.step::before{counter-increment:s;content:counter(s);position:absolute;left:18px;top:-24px;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background:var(--coral);color:#fff;border:3px solid var(--outline);font-family:var(--f-display);font-weight:800;font-size:22px}
+.step:nth-child(2)::before{background:var(--grape)}.step:nth-child(3)::before{background:var(--grass);color:#06301B}
+.step h3{font-size:22px;margin-bottom:6px}
+.step p{margin:0;color:var(--muted);font-weight:600}
+.split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:26px;align-items:start}
+@media (max-width:900px){.split{grid-template-columns:1fr}}
+.promise{background:var(--paper);border:3px solid var(--outline);border-radius:24px;padding:20px;box-shadow:var(--pop)}
+.promise h3{font-size:24px;margin-bottom:12px}
+.promise ul{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+.promise li{display:grid;grid-template-columns:40px 1fr;gap:12px;align-items:start;font-weight:600}
+.promise li svg{width:40px;height:40px}
+.promise li b{display:block;font-family:var(--f-display);font-size:17px}
+.promise li span{color:var(--muted);font-size:14.5px}
+.tiers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+@media (max-width:640px){.tiers{grid-template-columns:1fr}}
+.tier{background:var(--paper);border:3px solid var(--outline);border-radius:24px;padding:18px;display:flex;flex-direction:column;gap:10px;box-shadow:var(--pop)}
+.tier.pick{background:var(--sun);color:#3A2A00;transform:rotate(-1deg)}
+.tier.pick .muted{color:#5A4500}
+.tier h3{font-size:22px}
+.tier .amt{font-family:var(--f-display);font-size:40px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+.tier .amt small{font-size:15px;font-weight:700}
+.tier ul{margin:0;padding:0;list-style:none;display:grid;gap:6px;font-size:14.5px;font-weight:600}
+.tier li{display:grid;grid-template-columns:18px 1fr;gap:6px}
+.tier li::before{content:"";width:12px;height:12px;margin-top:5px;border-radius:4px;background:var(--grass);border:2px solid var(--outline)}
+.tier .btn{margin-top:auto}
+.muted{color:var(--muted)}
 
-/* log */
-.logcols{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:28px}
-@media (max-width:860px){.logcols{grid-template-columns:1fr}}
-.journal{list-style:none;margin:0;padding:0;border-left:2px solid var(--line)}
-.journal li{position:relative;padding:0 0 18px 18px}
-.journal li::before{content:"";position:absolute;left:-6px;top:7px;width:10px;height:10px;border-radius:50%;background:var(--bg);border:2px solid var(--accent)}
-.journal time{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
-.journal p{margin:2px 0 0;max-width:62ch}
-.ledger{border:1px solid var(--line);border-radius:14px;background:var(--surface);padding:18px}
-.ledger table{width:100%;border-collapse:collapse;font-size:14.5px}
-.ledger td{padding:9px 0;border-bottom:1px solid var(--line)}
+/* diary */
+.diary-grid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:26px;align-items:start}
+@media (max-width:900px){.diary-grid{grid-template-columns:1fr}}
+.journal{list-style:none;margin:0;padding:0;display:grid;gap:14px}
+.journal li{background:var(--paper);border:2.5px solid var(--outline);border-radius:18px;padding:12px 16px;box-shadow:var(--pop-sm)}
+.journal time{font-size:12.5px;font-weight:800;color:var(--coral);font-variant-numeric:tabular-nums}
+.journal p{margin:2px 0 0;font-size:15px}
+.journal li.more{display:none}
+.journal.open li.more{display:block}
+.ledger{background:var(--paper);border:2.5px solid var(--outline);border-radius:18px;padding:16px;box-shadow:var(--pop-sm)}
+.ledger table{width:100%;border-collapse:collapse;font-size:15px}
+.ledger td{padding:7px 0;border-bottom:2px dashed color-mix(in srgb,var(--outline) 22%,transparent)}
 .ledger tr:last-child td{border-bottom:0}
-.ledger td:last-child{text-align:right;font-family:var(--f-mono);font-variant-numeric:tabular-nums}
-.ledger .note{font-size:13px;color:var(--muted);margin:12px 0 0}
+.ledger td:last-child{text-align:right;font-weight:800;font-variant-numeric:tabular-nums}
+.ledger .note{font-size:13.5px;color:var(--muted);margin:10px 0 0}
 
-footer{margin-top:48px;border-top:1px solid var(--line);padding-block:22px 36px;color:var(--muted);font-size:13.5px}
-footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+footer{background:var(--foot-bg);color:var(--foot-fg);padding-block:36px 40px;position:relative}
+footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;align-items:center}
+footer a{color:var(--sun)}
+footer small{opacity:.8;font-size:13.5px}
 
 /* detail sheet */
-.sheet{position:fixed;inset:0;z-index:40;display:grid;place-items:center;background:rgba(10,14,12,.55);padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
-.sheet .panel{background:var(--surface);color:var(--ink);border-radius:18px;max-width:980px;width:100%;max-height:100%;overflow:auto;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);box-shadow:0 30px 80px rgba(0,0,0,.35)}
-.sheet .stage{border-radius:0;border:0;aspect-ratio:auto;min-height:420px}
-.sheet .info{padding:24px;display:flex;flex-direction:column;gap:14px;min-width:0}
-.sheet .x{position:absolute;right:10px;top:10px;width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:20px;line-height:1;z-index:2}
-.sheet h2{font-size:28px;font-weight:800}
-.sheet .blurb{color:var(--muted);margin:0}
-.specs{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:13.5px;margin:0}
-.specs dt{color:var(--muted)}
-.specs dd{margin:0;font-family:var(--f-mono);font-variant-numeric:tabular-nums;min-width:0;overflow-wrap:anywhere}
-.parts{display:flex;flex-wrap:wrap;gap:6px}
-.parts .chip i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;vertical-align:-1px;border:1px solid rgba(0,0,0,.2)}
-.check{display:flex;gap:8px;align-items:center;font-size:13.5px;color:var(--good);font-weight:500}
-.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:auto}
-.msg{font-size:13.5px;color:var(--muted);min-height:1.2em;margin:0}
-@media (max-width:760px){.sheet{place-items:end center;padding:0}.sheet .panel{grid-template-columns:1fr;border-radius:18px 18px 0 0;max-height:92%}.sheet .stage{min-height:300px;aspect-ratio:1/1}.sheet .info{padding-bottom:max(24px,env(safe-area-inset-bottom,0px))}}
+.sheet{position:fixed;inset:0;z-index:40;display:grid;place-items:center;background:rgba(9,14,34,.6);padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.sheet .panel{position:relative;background:var(--paper);color:var(--ink);border:3px solid var(--outline);border-radius:28px;max-width:980px;width:100%;max-height:100%;overflow:auto;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);box-shadow:0 10px 0 var(--outline)}
+.sheet .turntable{border:0;border-right:3px solid var(--outline);border-radius:0;box-shadow:none;aspect-ratio:auto;min-height:440px}
+.sheet .info{padding:24px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.sheet .x{position:absolute;right:12px;top:12px;width:42px;height:42px;border-radius:14px;border:2.5px solid var(--outline);background:var(--paper);font-size:22px;line-height:1;z-index:3;box-shadow:var(--pop-sm)}
+.sheet h2{font-size:32px}
+.sheet .blurb{color:var(--muted);margin:0;font-weight:600}
+.specs{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:14.5px;margin:0}
+.specs dt{color:var(--muted);font-weight:700}
+.specs dd{margin:0;min-width:0;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:13.5px;font-weight:700;padding:3px 10px;border-radius:999px;background:var(--tint);border:2px solid var(--outline)}
+.chip i{width:11px;height:11px;border-radius:50%;border:1.5px solid var(--outline)}
+.check{display:flex;gap:8px;align-items:center;font-size:14.5px;color:var(--good);font-weight:800}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:auto;padding-top:6px}
+.msg{font-size:14px;color:var(--muted);min-height:1.2em;margin:0;font-weight:600}
+@media (max-width:760px){.sheet{place-items:end center;padding:0}.sheet .panel{grid-template-columns:1fr;border-radius:28px 28px 0 0;max-height:92%;border-bottom:0}.sheet .turntable{min-height:300px;aspect-ratio:1/1;border-right:0;border-bottom:3px solid var(--outline)}.sheet .info{padding-bottom:max(24px,env(safe-area-inset-bottom,0px))}}
+.co .box{border:2.5px dashed var(--outline);border-radius:16px;padding:14px;font-size:15px;font-weight:600}
 
-/* demo checkout */
-.co{display:grid;gap:12px}
-.co .box{border:1px dashed var(--line);border-radius:12px;padding:14px;font-size:14px;color:var(--muted)}
-@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+.float{position:absolute;pointer-events:none;animation:bob 4s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}html{scroll-behavior:auto}}
 </style>
 
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-pencil" viewBox="0 0 24 24"><path d="M4 20l3.2-.8L19 7.4 16.6 5 4.8 16.8z" fill="currentColor" opacity=".25"/><path d="M4 20l3.2-.8L19 7.4 16.6 5 4.8 16.8zM14.6 7l2.4 2.4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/></symbol>
+    <symbol id="i-clay" viewBox="0 0 24 24"><path d="M5 15c-1-4 2-8 7-8s8 3 7 7-4 6-8 6-5-2-6-5z" fill="currentColor" opacity=".25"/><path d="M5 15c-1-4 2-8 7-8s8 3 7 7-4 6-8 6-5-2-6-5z" fill="none" stroke="currentColor" stroke-width="2.2"/><circle cx="10" cy="13" r="1.2" fill="currentColor"/><circle cx="14.5" cy="13" r="1.2" fill="currentColor"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h13M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  </defs>
+</svg>
+
 <header class="top"><div class="wrap">
   <a class="mark" href="#top" aria-label="Daily Layer home">
-    <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true"><rect x="3" y="17" width="20" height="4" rx="1.5" fill="var(--accent)"/><rect x="5" y="11.5" width="16" height="4" rx="1.5" fill="var(--accent)" opacity=".75"/><rect x="7.5" y="6" width="11" height="4" rx="1.5" fill="var(--accent)" opacity=".5"/><path d="M13 1.5v3" stroke="var(--hi)" stroke-width="2" stroke-linecap="round"/></svg>
+    <svg viewBox="0 0 34 34" aria-hidden="true"><rect x="4" y="22" width="26" height="8" rx="3" fill="#FF6B57" stroke="var(--outline)" stroke-width="2.2"/><rect x="7" y="14" width="20" height="8" rx="3" fill="#FFC93C" stroke="var(--outline)" stroke-width="2.2"/><rect x="10.5" y="6" width="13" height="8" rx="3" fill="#3FBF7F" stroke="var(--outline)" stroke-width="2.2"/><circle cx="17" cy="3.4" r="2.2" fill="#8C6BF2" stroke="var(--outline)" stroke-width="1.6"/></svg>
     Daily Layer
   </a>
-  <nav class="links"><a href="/sculpt/">Sculpt Studio</a><a href="/doodle/">Doodle Puff</a><a href="#models">Models</a><a href="#membership">Membership</a><a href="#log">Agent log</a></nav>
+  <nav class="tabs" aria-label="Sections"><a href="#play" data-i18n="navPlay">Play</a><a href="#toys" data-i18n="navToys">Toys</a><a href="#parents" data-i18n="navParents">Grown-ups</a><a href="#club" data-i18n="navClub">Club</a></nav>
+  <button class="lang" type="button" id="lang" aria-label="Switch language">VI</button>
 </div></header>
 
 <main id="top">
-  <div class="wrap">
-    <div class="hero">
+  <section class="hero">
+    <div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div>
+    <div class="wrap">
       <div>
-        <div class="eyebrow" id="dayline">Day 001 · Shop log open</div>
-        <h1>A new printable model <em>every day</em>, designed and checked by an AI agent.</h1>
-        <p class="lede">Desk organizers, print-in-place toys, decor and multi-colour figures. Each file is built from code, tested for closed surfaces, and ready for your slicer as STL and 3MF.</p>
+        <span class="sticker"><b id="dayNum">Day 1</b><span data-i18n="sticker">A new toy every morning</span></span>
+        <h1 data-i18n-html="h1"><span class="w1">Draw</span> it. <span class="w2">Squish</span> it. <span class="squig">Print it</span> for <span class="w3">real</span>.</h1>
+        <p class="lede" data-i18n="lede">A playground where kids make their own toys on screen, and grown-ups print them at home on a 3D printer.</p>
         <div class="ctas">
-          <a class="btn primary" href="#models">Browse models</a>
-          <a class="btn ghost" href="#membership">Join Maker Club</a>
-          <a class="btn ghost" href="/sculpt/">Sculpt your own</a>
-          <a class="btn ghost" href="/doodle/">Draw &amp; puff it</a>
+          <a class="btn coral" data-tool="doodle" href="#"><svg aria-hidden="true"><use href="#i-pencil"/></svg><span data-i18n="ctaDraw">Draw &amp; puff</span></a>
+          <a class="btn grass" data-tool="sculpt" href="#"><svg aria-hidden="true"><use href="#i-clay"/></svg><span data-i18n="ctaClay">Squish clay</span></a>
         </div>
       </div>
-      <div>
-        <div class="stage" id="heroStage">
-          <img class="poster" id="heroPoster" alt="" src="products/chibi-whale-4part/cover.jpg">
-          <div class="tag"><span class="chip new">Today's drop</span><span class="chip" id="heroChip">Figure · 4 parts</span></div>
-          <div class="zlabel" id="heroZ">Z 0.20 mm</div>
-          <div class="hint">Drag to rotate</div>
+      <div class="scene">
+        <div class="bubble" id="bubble">Today's toy!</div>
+        <svg class="layo" viewBox="0 0 120 130" role="img" aria-label="Layo, the little printer robot">
+          <path d="M60 4v14" stroke="var(--outline)" stroke-width="4" stroke-linecap="round"/><path d="M52 18h16l-4 10h-8z" fill="#FF6B57" stroke="var(--outline)" stroke-width="3.5" stroke-linejoin="round"/>
+          <rect x="16" y="28" width="88" height="78" rx="24" fill="#FFC93C" stroke="var(--outline)" stroke-width="4"/>
+          <rect x="28" y="40" width="64" height="40" rx="14" fill="#1B2547" stroke="var(--outline)" stroke-width="3"/>
+          <ellipse cx="46" cy="58" rx="7" ry="9" fill="#fff"/><ellipse cx="74" cy="58" rx="7" ry="9" fill="#fff"/><circle cx="48" cy="60" r="3.5" fill="#1B2547"/><circle cx="76" cy="60" r="3.5" fill="#1B2547"/>
+          <path d="M50 70q10 8 20 0" fill="none" stroke="#FF8FB8" stroke-width="3.5" stroke-linecap="round"/>
+          <path d="M16 74q-12 0-12-14" fill="none" stroke="var(--outline)" stroke-width="5" stroke-linecap="round"/><path d="M104 74q12 0 12-14" fill="none" stroke="var(--outline)" stroke-width="5" stroke-linecap="round"/>
+          <rect x="34" y="88" width="52" height="8" rx="4" fill="#3FBF7F" stroke="var(--outline)" stroke-width="2.5"/>
+          <rect x="30" y="106" width="16" height="14" rx="5" fill="#8C6BF2" stroke="var(--outline)" stroke-width="3"/><rect x="74" y="106" width="16" height="14" rx="5" fill="#8C6BF2" stroke="var(--outline)" stroke-width="3"/>
+        </svg>
+        <div class="turntable" id="heroStage">
+          <img class="poster" id="heroPoster" alt="">
+          <span class="today" data-i18n="today">Today</span>
+          <span class="drag" data-i18n="drag">Drag to spin</span>
         </div>
-        <div class="feat-cap"><h3 id="heroTitle">Chibi Whale</h3><button type="button" id="heroOpen">See details →</button></div>
+        <div class="toycap"><h3 id="heroTitle">…</h3><button class="btn small sun" type="button" id="heroOpen"><span data-i18n="peek">Take a look</span><svg aria-hidden="true"><use href="#i-arrow"/></svg></button></div>
       </div>
     </div>
+  </section>
 
-    <div class="stats" aria-label="Shop status">
-      <div class="stat"><b id="sModels">6</b><span>models listed</span></div>
-      <div class="stat"><b id="sChecks">6/6</b><span>passed print checks</span></div>
-      <div class="stat"><b>09:00</b><span>next drop (Vietnam time)</span></div>
-      <div class="stat"><b id="sRev">$0.00</b><span>revenue so far</span></div>
+  <section class="band play" id="play">
+    <div class="wrap">
+      <div class="head"><div><div class="kicker" data-i18n="playKick">Games</div><h2 data-i18n="playH">What shall we play?</h2><p data-i18n="playP">Everything a child makes here can become a real toy.</p></div></div>
+      <div class="games" id="games"></div>
     </div>
+  </section>
 
-    <section id="models">
-      <div class="sec-head">
-        <div><h2>Models</h2><p>Free models download right away. Paid models unlock with a one-time purchase or any membership.</p></div>
-        <div class="filters" role="group" aria-label="Filter by line">
-          <button type="button" data-f="all" aria-pressed="true">All</button>
-          <button type="button" data-f="functional" aria-pressed="false">Functional</button>
-          <button type="button" data-f="print-in-place" aria-pressed="false">Print-in-place</button>
-          <button type="button" data-f="decor" aria-pressed="false">Decor</button>
-          <button type="button" data-f="figure" aria-pressed="false">Figures</button>
-        </div>
+  <section class="band toys" id="toys">
+    <div class="wrap">
+      <div class="head">
+        <div><div class="kicker" data-i18n="toysKick">Toy shelf</div><h2 data-i18n="toysH">Fresh off the printer</h2><p data-i18n="toysP">A new model every morning, checked for clean printing. Free ones download straight away.</p></div>
+        <div class="filters" role="group" aria-label="Filter toys" id="filters"></div>
       </div>
       <div class="grid" id="grid"></div>
-    </section>
+    </div>
+  </section>
 
-    <section id="membership">
-      <div class="sec-head"><div><h2>Membership</h2><p>One new model lands every morning. Members get every file in the library, including all past drops.</p></div></div>
-      <div class="tiers">
-        <div class="tier">
-          <div class="eyebrow">Free</div><h3>Browse</h3>
-          <div class="amt">$0</div>
-          <ul><li>Free models, STL + 3MF</li><li>Interactive 3D preview of every model</li><li>Personal use</li></ul>
-          <a class="btn ghost" href="#models">Browse free models</a>
+  <section class="band parents" id="parents">
+    <div class="wrap">
+      <div class="head"><div><div class="kicker" data-i18n="parKick">For grown-ups</div><h2 data-i18n="parH">From screen to shelf in three steps</h2></div></div>
+      <div class="steps">
+        <div class="step"><h3 data-i18n="s1h">Your child makes it</h3><p data-i18n="s1p">They draw, colour or sculpt in the browser. Nothing is uploaded: drawings stay on your device.</p></div>
+        <div class="step"><h3 data-i18n="s2h">You download the files</h3><p data-i18n="s2p">A coloured OBJ and 3MF for multi-colour printers, plus a one-colour STL. Every file is checked as a closed solid.</p></div>
+        <div class="step"><h3 data-i18n="s3h">Print it at home</h3><p data-i18n="s3p">Drag the file into Bambu Studio, Orca or PrusaSlicer. Colours match to your filaments automatically.</p></div>
+      </div>
+      <div class="split" id="club">
+        <div class="promise">
+          <h3 data-i18n="promH">Our promises</h3>
+          <ul>
+            <li><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="17" fill="#3FBF7F" stroke="var(--outline)" stroke-width="3"/><path d="M12 20.5l5.5 5.5L28.5 15" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg><div><b data-i18n="pr1b">One solid piece</b><span data-i18n="pr1s">Kids' prints have no loose parts and no slots for small magnets. Made for ages 3 and up, with a grown-up nearby.</span></div></li>
+            <li><svg viewBox="0 0 40 40" aria-hidden="true"><rect x="5" y="9" width="30" height="22" rx="6" fill="#5DB8FF" stroke="var(--outline)" stroke-width="3"/><path d="M13 20h14M20 13v14" stroke="#fff" stroke-width="4" stroke-linecap="round" transform="rotate(45 20 20)"/></svg><div><b data-i18n="pr2b">No uploads, no ads</b><span data-i18n="pr2s">Children's drawings never leave the device. There are no ads and no chat with strangers.</span></div></li>
+            <li><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M20 4l4.5 9.6 10.5 1.3-7.7 7.2 2 10.4L20 27.4 10.7 32.5l2-10.4L5 14.9l10.5-1.3z" fill="#FFC93C" stroke="var(--outline)" stroke-width="3" stroke-linejoin="round"/></svg><div><b data-i18n="pr3b">Original designs only</b><span data-i18n="pr3s">Every character is our own invention. No copied cartoons or brands.</span></div></li>
+          </ul>
         </div>
-        <div class="tier pick">
-          <div class="eyebrow">Most picked</div><h3>Maker Club</h3>
-          <div class="amt">$4<small> / month</small></div>
-          <ul><li>Every model, past and future</li><li>A new model every day</li><li>Vote on what the agent builds next</li><li>Personal use</li></ul>
-          <button class="btn primary" type="button" data-plan="maker">Join Maker Club</button>
-        </div>
-        <div class="tier">
-          <div class="eyebrow">For print sellers</div><h3>Pro Seller</h3>
-          <div class="amt">$12<small> / month</small></div>
-          <ul><li>Everything in Maker Club</li><li>Commercial license to sell your prints</li><li>Colour-mapped 3MF for multi-material printers</li><li>One custom request each month</li></ul>
-          <button class="btn ghost" type="button" data-plan="pro">Go Pro</button>
+        <div>
+          <div class="head" style="margin-bottom:14px"><div><div class="kicker" data-i18n="clubKick">Maker Club</div><h2 style="font-size:clamp(28px,3.6vw,38px)" data-i18n="clubH">Every toy, every morning</h2></div></div>
+          <div class="tiers">
+            <div class="tier"><h3 data-i18n="t1h">Free</h3><div class="amt">$0</div><ul><li data-i18n="t1a">All the games</li><li data-i18n="t1b">Free models</li><li data-i18n="t1c">Personal use</li></ul><a class="btn small" href="#toys" data-i18n="t1btn">Browse</a></div>
+            <div class="tier pick"><h3 data-i18n="t2h">Maker Club</h3><div class="amt">$4<small class="muted" data-i18n="perMo"> / month</small></div><ul><li data-i18n="t2a">Every model, past and future</li><li data-i18n="t2b">A new toy every day</li><li data-i18n="t2c">Vote on the next toy</li></ul><button class="btn small coral" type="button" data-plan="maker" data-i18n="t2btn">Join</button></div>
+            <div class="tier"><h3 data-i18n="t3h">Pro Seller</h3><div class="amt">$12<small class="muted" data-i18n="perMo"> / month</small></div><ul><li data-i18n="t3a">Everything in Maker Club</li><li data-i18n="t3b">Sell your prints</li><li data-i18n="t3c">One custom request a month</li></ul><button class="btn small" type="button" data-plan="pro" data-i18n="t3btn">Go Pro</button></div>
+          </div>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <section id="log">
-      <div class="sec-head"><div><h2>Agent log</h2><p>What the shop agent did and why, written after each run. The numbers on the right are counted, not estimated.</p></div></div>
-      <div class="logcols">
-        <ol class="journal" id="journal"></ol>
-        <div class="ledger">
-          <div class="eyebrow" style="margin-bottom:6px">Ledger · USD</div>
-          <table><tbody id="ledger"></tbody></table>
-          <p class="note" id="ledgerNote">Payments are not connected yet, so revenue stays at zero until checkout goes live.</p>
-        </div>
+  <section class="band diary" id="log">
+    <div class="wrap">
+      <div class="head"><div><div class="kicker" data-i18n="logKick">Workshop diary</div><h2 data-i18n="logH">What our toy-maker robot did</h2><p data-i18n="logP">The shop is run by an AI agent. It writes down what it made and why after every run.</p></div></div>
+      <div class="diary-grid">
+        <div><ol class="journal" id="journal"></ol><button class="btn small" type="button" id="moreLog" style="margin-top:14px" data-i18n="more">Show older entries</button></div>
+        <div class="ledger"><table><tbody id="ledger"></tbody></table><p class="note" data-i18n="ledgerNote">Payments are not connected yet, so revenue stays at zero until checkout goes live.</p></div>
       </div>
-    </section>
-  </div>
+    </div>
+  </section>
 </main>
 
 <footer><div class="wrap">
-  <span>Daily Layer · files for personal use unless you hold a Pro Seller license.</span>
-  <span class="mono" id="updated">Updated —</span>
+  <div><strong style="font-family:var(--f-display);font-size:22px">Daily Layer</strong><br><small data-i18n="foot">Made for curious kids and the grown-ups who print with them. Files are for personal use unless you hold a Pro Seller licence.</small></div>
+  <small id="updated">Updated —</small>
 </div></footer>
 
 <div class="sheet" id="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="dTitle">
-  <div class="panel" style="position:relative">
+  <div class="panel">
     <button class="x" type="button" id="dClose" aria-label="Close">×</button>
-    <div class="stage" id="dStage"><img class="poster" id="dPoster" alt=""><div class="hint">Drag to rotate · pinch to zoom</div></div>
+    <div class="turntable" id="dStage"><img class="poster" id="dPoster" alt=""><span class="drag" data-i18n="drag2">Drag to spin · pinch to zoom</span></div>
     <div class="info" id="dInfo"></div>
   </div>
 </div>
 
+<script>window.HOST = "web";</script>
+<script>
+/* ---------- words ---------- */
+window.T = {
+  en: { navPlay: "Play", navToys: "Toys", navParents: "Grown-ups", navClub: "Club", sticker: "A new toy every morning",
+    h1: '<span class="w1">Draw</span> it. <span class="w2">Squish</span> it. <span class="squig">Print it</span> for <span class="w3">real</span>.',
+    lede: "A playground where kids make their own toys on screen, and grown-ups print them at home on a 3D printer.",
+    ctaDraw: "Draw & puff", ctaClay: "Squish clay", today: "Today's toy", drag: "Drag to spin", drag2: "Drag to spin · pinch to zoom", peek: "Take a look",
+    playKick: "Games", playH: "What shall we play?", playP: "Everything a child makes here can become a real toy.",
+    toysKick: "Toy shelf", toysH: "Fresh off the printer", toysP: "A new model every morning, checked for clean printing. Free ones download straight away.",
+    parKick: "For grown-ups", parH: "From screen to shelf in three steps",
+    s1h: "Your child makes it", s1p: "They draw, colour or sculpt in the browser. Nothing is uploaded: drawings stay on your device.",
+    s2h: "You download the files", s2p: "A coloured OBJ and 3MF for multi-colour printers, plus a one-colour STL. Every file is checked as a closed solid.",
+    s3h: "Print it at home", s3p: "Drag the file into Bambu Studio, Orca or PrusaSlicer. Colours match to your filaments automatically.",
+    promH: "Our promises", pr1b: "One solid piece", pr1s: "Kids' prints have no loose parts and no slots for small magnets. Made for ages 3 and up, with a grown-up nearby.",
+    pr2b: "No uploads, no ads", pr2s: "Children's drawings never leave the device. There are no ads and no chat with strangers.",
+    pr3b: "Original designs only", pr3s: "Every character is our own invention. No copied cartoons or brands.",
+    clubKick: "Maker Club", clubH: "Every toy, every morning", t1h: "Free", t1a: "All the games", t1b: "Free models", t1c: "Personal use", t1btn: "Browse",
+    t2h: "Maker Club", t2a: "Every model, past and future", t2b: "A new toy every day", t2c: "Vote on the next toy", t2btn: "Join", perMo: " / month",
+    t3h: "Pro Seller", t3a: "Everything in Maker Club", t3b: "Sell your prints", t3c: "One custom request a month", t3btn: "Go Pro",
+    logKick: "Workshop diary", logH: "What our toy-maker robot did", logP: "The shop is run by an AI agent. It writes down what it made and why after every run.",
+    more: "Show older entries", less: "Show fewer", ledgerNote: "Payments are not connected yet, so revenue stays at zero until checkout goes live.",
+    foot: "Made for curious kids and the grown-ups who print with them. Files are for personal use unless you hold a Pro Seller licence.",
+    day: n => "Day " + n, bubble: t => "Today's toy: " + t + "!", play: "Play now", soon: "Coming soon", newTag: "New",
+    games: { doodle: ["Doodle Puff", "Draw anything and watch it puff up into a squishy 3D toy."], sculpt: ["Sculpt Studio", "Squish, pinch and paint clay, then print your own figure."],
+      stack: ["Stack the Drop", "Pile today's toys into a tower before it wobbles over."], spot: ["Spot the Oops", "Find what went wrong with each print, as fast as you can."],
+      shelf: ["Shelf Life", "Arrange a toy shelf so every friend gets a spot."], kits: ["Little Hands Kits", "Sorting, stacking and counting sets to print and play with."] },
+    lines: { all: "All", figure: "Cute figures", "print-in-place": "Moving toys", functional: "Handy things", decor: "Decor" },
+    free: "Free", todayTag: "Today", parts: n => n === 1 ? "1 piece" : n + " pieces", revenue: "Revenue", orders: "Paid orders", members: "Members", costs: "Running costs", net: "Net", listed: "Models listed", passed: "Print checks passed",
+    updated: t => "Updated " + t + " (UTC+7)", dropped: d => "added " + d, size: "Size", piecesL: "Pieces", filament: "Filament", files: "Files", tips: "Print tips",
+    filesV: (mb, painted) => (painted ? "Coloured OBJ + 3MF, colour-split 3MF, STL" : "STL per part + 3MF") + " · " + mb + " MB zip",
+    checkOk: n => "Print check passed · " + n + " closed " + (n > 1 ? "pieces" : "piece") + ", 0 open edges",
+    buy: p => "Buy " + p, withClub: "Get it with Maker Club", dlFree: "Download free", ownerDl: "Owner download",
+    preparing: s => "Preparing " + s + ".zip …", saved: s => "Saved " + s + ".zip.", declined: "Download cancelled.", busySave: "A save prompt is already open. Try again in a moment.",
+    noSave: "This view can't save files.", needClaude: "Downloads work when this page is opened in Claude.", afterCheckout: "Files for this model are delivered after checkout.", downloading: s => "Downloading " + s + ".zip.",
+    demo: what => "Checkout is in demo mode: " + what + ". When payments go live, this button opens a secure card checkout and the files unlock after payment.",
+    coTitle: "Checkout preview", back: "Back to the shop", oneTime: p => p + " one-time", club: "Maker Club · $4 / month", pro: "Pro Seller · $12 / month", noCat: "The toy shelf could not load. Refresh the page to try again." },
+  vi: { navPlay: "Chơi", navToys: "Đồ chơi", navParents: "Bố mẹ", navClub: "Câu lạc bộ", sticker: "Mỗi sáng một đồ chơi mới",
+    h1: '<span class="w1">Vẽ</span> một nét. <span class="w2">Nặn</span> một cục. <span class="squig">In ra</span> đồ chơi <span class="w3">thật</span>!',
+    lede: "Sân chơi nơi bé tự làm đồ chơi trên màn hình, rồi bố mẹ in ra bằng máy in 3D ở nhà.",
+    ctaDraw: "Vẽ tranh phồng", ctaClay: "Nặn đất sét", today: "Đồ chơi hôm nay", drag: "Kéo để xoay", drag2: "Kéo để xoay · chụm 2 ngón để phóng to", peek: "Xem thử",
+    playKick: "Trò chơi", playH: "Hôm nay chơi gì nào?", playP: "Bé làm gì ở đây cũng có thể in thành đồ chơi thật.",
+    toysKick: "Kệ đồ chơi", toysH: "Mới ra lò", toysP: "Mỗi sáng một mẫu mới, đã kiểm tra in được. Mẫu miễn phí tải về ngay.",
+    parKick: "Dành cho bố mẹ", parH: "Từ màn hình lên kệ đồ chơi trong 3 bước",
+    s1h: "Bé tự làm", s1p: "Bé vẽ, tô màu hoặc nặn ngay trên trình duyệt. Không tải gì lên mạng: tranh của bé nằm trên máy của bạn.",
+    s2h: "Bạn tải file in", s2p: "File OBJ và 3MF có sẵn màu cho máy in nhiều màu, kèm file STL một màu. File nào cũng được kiểm tra là khối kín.",
+    s3h: "In ở nhà", s3p: "Kéo file vào Bambu Studio, Orca hoặc PrusaSlicer. Màu tự khớp với các cuộn nhựa của bạn.",
+    promH: "Cam kết của chúng tôi", pr1b: "Một miếng liền", pr1s: "Đồ in cho bé không có chi tiết rời, không có chỗ gắn nam châm nhỏ. Dành cho bé từ 3 tuổi, có người lớn bên cạnh.",
+    pr2b: "Không tải lên, không quảng cáo", pr2s: "Tranh của bé không rời khỏi máy. Không quảng cáo, không chat với người lạ.",
+    pr3b: "Chỉ thiết kế gốc", pr3s: "Mọi nhân vật đều do chúng tôi tự sáng tạo. Không sao chép hoạt hình hay thương hiệu.",
+    clubKick: "Câu lạc bộ", clubH: "Mọi đồ chơi, mỗi sáng", t1h: "Miễn phí", t1a: "Tất cả trò chơi", t1b: "Các mẫu miễn phí", t1c: "Dùng cá nhân", t1btn: "Xem kệ",
+    t2h: "Maker Club", t2a: "Mọi mẫu, cũ và mới", t2b: "Mỗi ngày một đồ chơi mới", t2c: "Bình chọn đồ chơi tiếp theo", t2btn: "Tham gia", perMo: " / tháng",
+    t3h: "Pro Seller", t3a: "Mọi quyền lợi Maker Club", t3b: "Được bán đồ in", t3c: "Mỗi tháng một yêu cầu riêng", t3btn: "Lên Pro",
+    logKick: "Nhật ký xưởng", logH: "Robot làm đồ chơi đã làm gì", logP: "Cửa hàng do một AI agent vận hành. Sau mỗi lần chạy, nó ghi lại đã làm gì và vì sao (bằng tiếng Anh).",
+    more: "Xem nhật ký cũ hơn", less: "Thu gọn", ledgerNote: "Chưa kết nối thanh toán nên doanh thu vẫn bằng 0 cho đến khi mở bán.",
+    foot: "Làm cho những bé tò mò và bố mẹ cùng in với bé. File dùng cho cá nhân, trừ khi bạn có giấy phép Pro Seller.",
+    day: n => "Ngày " + n, bubble: t => "Đồ chơi hôm nay: " + t + "!", play: "Chơi ngay", soon: "Sắp ra mắt", newTag: "Mới",
+    games: { doodle: ["Tranh Phồng", "Vẽ gì cũng được, tranh sẽ phồng lên thành đồ chơi 3D mềm mại."], sculpt: ["Xưởng Nặn", "Nặn, vuốt, tô màu đất sét rồi in ra tượng của riêng bé."],
+      stack: ["Xếp Tháp", "Chồng đồ chơi hôm nay thành tháp trước khi nó lắc lư đổ."], spot: ["Tìm Lỗi In", "Tìm xem bản in nào bị lỗi gì, càng nhanh càng giỏi."],
+      shelf: ["Kệ Đồ Chơi", "Sắp xếp kệ sao cho bạn nào cũng có chỗ ngồi."], kits: ["Bộ Đồ Chơi Montessori", "Bộ phân loại, xếp chồng, tập đếm để in về chơi cùng bé."] },
+    lines: { all: "Tất cả", figure: "Thú dễ thương", "print-in-place": "Đồ chơi cử động", functional: "Đồ tiện ích", decor: "Trang trí" },
+    free: "Miễn phí", todayTag: "Hôm nay", parts: n => n + " mảnh", revenue: "Doanh thu", orders: "Đơn đã trả", members: "Thành viên", costs: "Chi phí vận hành", net: "Lãi ròng", listed: "Số mẫu", passed: "Đạt kiểm tra in",
+    updated: t => "Cập nhật " + t + " (giờ VN)", dropped: d => "đăng " + d, size: "Kích thước", piecesL: "Số mảnh", filament: "Nhựa", files: "File", tips: "Mẹo in",
+    filesV: (mb, painted) => (painted ? "OBJ + 3MF có màu, 3MF tách màu, STL" : "STL từng mảnh + 3MF") + " · zip " + mb + " MB",
+    checkOk: n => "Đạt kiểm tra in · " + n + " khối kín, 0 cạnh hở",
+    buy: p => "Mua " + p, withClub: "Nhận qua Maker Club", dlFree: "Tải miễn phí", ownerDl: "Chủ shop tải",
+    preparing: s => "Đang chuẩn bị " + s + ".zip …", saved: s => "Đã lưu " + s + ".zip.", declined: "Đã huỷ tải.", busySave: "Đang có một hộp lưu mở. Thử lại sau giây lát.",
+    noSave: "Trình xem này không lưu được file.", needClaude: "Chỉ tải được khi mở trang trong Claude.", afterCheckout: "File của mẫu này được gửi sau khi thanh toán.", downloading: s => "Đang tải " + s + ".zip.",
+    demo: what => "Thanh toán đang ở chế độ thử: " + what + ". Khi mở bán, nút này mở trang thanh toán thẻ an toàn và file được mở khoá sau khi trả tiền.",
+    coTitle: "Xem trước thanh toán", back: "Về cửa hàng", oneTime: p => p + " một lần", club: "Maker Club · $4 / tháng", pro: "Pro Seller · $12 / tháng", noCat: "Không tải được kệ đồ chơi. Tải lại trang để thử lại." }
+};
+</script>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 <script type="module">
 const $ = (s, el = document) => el.querySelector(s);
-const LINES = { "functional": "Functional", "print-in-place": "Print-in-place", "decor": "Decor", "figure": "Figure" };
+const HOST = window.HOST || "artifact";
+const TOOLS = window.TOOLS || { doodle: "/doodle/", sculpt: "/sculpt/" };
+let LANG = "en";
+try { LANG = localStorage.getItem("dl-lang") || (/^vi/i.test(navigator.language || "") ? "vi" : "en"); } catch (e) { LANG = /^vi/i.test(navigator.language || "") ? "vi" : "en"; }
+const t = k => T[LANG][k];
 const fmtUSD = n => "$" + Number(n || 0).toFixed(2);
-let CAT = null, JR = { entries: [] };
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+let CAT = null, JR = { entries: [] }, filter = "all";
 let caps = { downloads: null, user: null, owner: false };
+const LINE_COL = { figure: "#FF8FB8", "print-in-place": "#8C6BF2", functional: "#5DB8FF", decor: "#3FBF7F" };
+
+/* ---------- game shelf art (our own drawings) ---------- */
+const ART = {
+  doodle: `<svg viewBox="0 0 200 125" aria-hidden="true"><path d="M30 92c22-38 50-40 66-18s40 22 70-24" fill="none" stroke="#FF6B57" stroke-width="12" stroke-linecap="round"/><path d="M30 92c22-38 50-40 66-18s40 22 70-24" fill="none" stroke="#FFC93C" stroke-width="5" stroke-linecap="round" transform="translate(0,9)"/><path d="M118 30l10 22 24 3-18 16 5 24-21-12-21 12 5-24-18-16 24-3z" fill="#5DB8FF" stroke="#1B2547" stroke-width="4.5" stroke-linejoin="round"/><circle cx="111" cy="58" r="3.5" fill="#1B2547"/><circle cx="127" cy="58" r="3.5" fill="#1B2547"/><path d="M112 68q7 6 14 0" fill="none" stroke="#1B2547" stroke-width="3.5" stroke-linecap="round"/><g transform="rotate(-38 168 92)"><rect x="150" y="84" width="46" height="15" rx="4" fill="#3FBF7F" stroke="#1B2547" stroke-width="4"/><path d="M150 84l-14 7.5 14 7.5z" fill="#FFE0A8" stroke="#1B2547" stroke-width="4" stroke-linejoin="round"/></g></svg>`,
+  sculpt: `<svg viewBox="0 0 200 125" aria-hidden="true"><ellipse cx="100" cy="108" rx="62" ry="9" fill="#1B2547" opacity=".12"/><path d="M52 98c-10-34 14-66 48-66s56 26 50 58c-3 14-22 18-50 18s-44-1-48-10z" fill="#FF8FB8" stroke="#1B2547" stroke-width="4.5"/><path d="M70 40c8-14 22-20 30-8" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".7"/><ellipse cx="85" cy="70" rx="6" ry="8" fill="#1B2547"/><ellipse cx="117" cy="70" rx="6" ry="8" fill="#1B2547"/><path d="M92 84q9 8 18 0" fill="none" stroke="#1B2547" stroke-width="4" stroke-linecap="round"/><path d="M150 30l20-14M156 44l24-4" stroke="#1B2547" stroke-width="4" stroke-linecap="round"/><circle cx="40" cy="36" r="7" fill="#FFC93C" stroke="#1B2547" stroke-width="3.5"/></svg>`,
+  stack: `<svg viewBox="0 0 200 125" aria-hidden="true"><rect x="62" y="92" width="76" height="22" rx="7" fill="#5DB8FF" stroke="#1B2547" stroke-width="4.5"/><rect x="74" y="66" width="56" height="24" rx="7" fill="#FFC93C" stroke="#1B2547" stroke-width="4.5" transform="rotate(4 102 78)"/><rect x="82" y="40" width="40" height="24" rx="7" fill="#FF6B57" stroke="#1B2547" stroke-width="4.5" transform="rotate(-6 102 52)"/><circle cx="104" cy="22" r="14" fill="#3FBF7F" stroke="#1B2547" stroke-width="4.5"/><path d="M146 40q8 6 0 12M154 34q14 12 0 24" fill="none" stroke="#1B2547" stroke-width="4" stroke-linecap="round"/></svg>`,
+  spot: `<svg viewBox="0 0 200 125" aria-hidden="true"><rect x="40" y="30" width="70" height="70" rx="14" fill="#fff" stroke="#1B2547" stroke-width="4.5"/><path d="M52 84h46M56 72h38M60 60h30M64 48h22" stroke="#8C6BF2" stroke-width="5" stroke-linecap="round"/><path d="M84 60h8" stroke="#FF6B57" stroke-width="6" stroke-linecap="round"/><circle cx="130" cy="62" r="26" fill="#DCF0FF" stroke="#1B2547" stroke-width="5"/><path d="M149 81l22 22" stroke="#1B2547" stroke-width="9" stroke-linecap="round"/></svg>`,
+  shelf: `<svg viewBox="0 0 200 125" aria-hidden="true"><rect x="30" y="20" width="140" height="92" rx="10" fill="#FFE0A8" stroke="#1B2547" stroke-width="4.5"/><path d="M30 66h140" stroke="#1B2547" stroke-width="4.5"/><circle cx="60" cy="50" r="12" fill="#FF8FB8" stroke="#1B2547" stroke-width="4"/><rect x="88" y="38" width="24" height="24" rx="5" fill="#5DB8FF" stroke="#1B2547" stroke-width="4"/><path d="M134 62l12-24 12 24z" fill="#3FBF7F" stroke="#1B2547" stroke-width="4" stroke-linejoin="round"/><rect x="50" y="80" width="30" height="28" rx="8" fill="#FFC93C" stroke="#1B2547" stroke-width="4"/><circle cx="125" cy="94" r="13" fill="none" stroke="#1B2547" stroke-width="4" stroke-dasharray="6 6"/></svg>`,
+  kits: `<svg viewBox="0 0 200 125" aria-hidden="true"><rect x="96" y="20" width="8" height="90" rx="4" fill="#A86B45" stroke="#1B2547" stroke-width="4"/><ellipse cx="100" cy="100" rx="46" ry="11" fill="#FF6B57" stroke="#1B2547" stroke-width="4.5"/><ellipse cx="100" cy="82" rx="38" ry="10" fill="#FFC93C" stroke="#1B2547" stroke-width="4.5"/><ellipse cx="100" cy="64" rx="30" ry="9" fill="#3FBF7F" stroke="#1B2547" stroke-width="4.5"/><ellipse cx="100" cy="47" rx="22" ry="8" fill="#5DB8FF" stroke="#1B2547" stroke-width="4.5"/><circle cx="100" cy="24" r="9" fill="#8C6BF2" stroke="#1B2547" stroke-width="4"/></svg>`
+};
+const GAMES = [
+  { id: "doodle", ready: true, bg: "#FFE3DE", isNew: true }, { id: "sculpt", ready: true, bg: "#DDF7EA" },
+  { id: "stack", bg: "#DCF0FF" }, { id: "spot", bg: "#ECE5FF" }, { id: "shelf", bg: "#FFF1C9" }, { id: "kits", bg: "#FFE6F0" }
+];
+function toolLink(el, id) { el.href = TOOLS[id]; if (HOST === "artifact") { el.target = "_blank"; el.rel = "noopener"; } }
+function renderGames() {
+  $("#games").innerHTML = GAMES.map(g => {
+    const [name, desc] = T[LANG].games[g.id];
+    const inner = `<div class="art" style="background:${g.bg}">${ART[g.id]}${g.isNew ? `<span class="badge-new">${t("newTag")}</span>` : ""}</div>
+      <div class="txt"><h3>${esc(name)}</h3><p>${esc(desc)}</p>${g.ready ? `<span class="go">${t("play")}<svg aria-hidden="true"><use href="#i-arrow"/></svg></span>` : ""}</div>${g.ready ? "" : `<span class="ribbon">${t("soon")}</span>`}`;
+    return g.ready ? `<a class="game" data-tool="${g.id}" href="#">${inner}</a>` : `<div class="game soon" aria-label="${esc(name)}, ${t("soon")}">${inner}</div>`;
+  }).join("");
+  document.querySelectorAll("[data-tool]").forEach(a => toolLink(a, a.dataset.tool));
+}
 
 /* ---------- 3D viewer ---------- */
 let THREE = null, OrbitControls = null, toCreasedNormals = null;
@@ -290,19 +481,18 @@ async function loadThree() {
     return true;
   } catch (e) { return false; }
 }
-async function fetchB64(url) {
+async function fetchBytes(url) {                 // artifact copies are base64 text (.txt); the website serves real files
   const res = await fetch(url);
   if (!res.ok) throw new Error("fetch " + res.status);
-  const bin = atob((await res.text()).trim());
-  const out = new Uint8Array(bin.length);
+  if (!url.endsWith(".txt")) return new Uint8Array(await res.arrayBuffer());
+  const bin = atob((await res.text()).trim()), out = new Uint8Array(bin.length);
   for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
   return out;
 }
 async function loadMesh(url, smooth, faceCol) {
   if (typeof DecompressionStream === "undefined") throw new Error("no gzip");
-  const res = await fetch(url);
-  if (!res.ok) throw new Error("mesh " + res.status);
-  const buf = await new Response(res.body.pipeThrough(new DecompressionStream("gzip"))).arrayBuffer();
+  const gz = await fetchBytes(url);
+  const buf = await new Response(new Blob([gz]).stream().pipeThrough(new DecompressionStream("gzip"))).arrayBuffer();
   const dv = new DataView(buf);
   const nv = dv.getUint32(0, true), nf = dv.getUint32(4, true);
   const lo = [0, 1, 2].map(i => dv.getFloat32(8 + 4 * i, true)), hi = [0, 1, 2].map(i => dv.getFloat32(20 + 4 * i, true));
@@ -313,32 +503,27 @@ async function loadMesh(url, smooth, faceCol) {
   const g = new THREE.BufferGeometry();
   g.setAttribute("position", new THREE.BufferAttribute(pos, 3));
   g.setIndex(new THREE.BufferAttribute(idx, 1));
-  g.rotateX(-Math.PI / 2); // Z-up print space -> Y-up scene
-  if (faceCol) {   // painted preview: smooth normals from the shared mesh, then one flat colour per triangle (crisp borders)
+  g.rotateX(-Math.PI / 2);
+  if (faceCol) {
     g.computeVertexNormals();
     const ng = g.toNonIndexed(), rgb = new Uint8Array(buf, fo + nf * 12, nf * 3), col = new Float32Array(nf * 9), c = new THREE.Color();
-    for (let t = 0; t < nf; t++) {
-      c.setRGB(rgb[3 * t] / 255, rgb[3 * t + 1] / 255, rgb[3 * t + 2] / 255, THREE.SRGBColorSpace);
-      for (let k = 0; k < 3; k++) { col[9 * t + 3 * k] = c.r; col[9 * t + 3 * k + 1] = c.g; col[9 * t + 3 * k + 2] = c.b; }
-    }
+    for (let f = 0; f < nf; f++) { c.setRGB(rgb[3 * f] / 255, rgb[3 * f + 1] / 255, rgb[3 * f + 2] / 255, THREE.SRGBColorSpace); for (let k = 0; k < 3; k++) { col[9 * f + 3 * k] = c.r; col[9 * f + 3 * k + 1] = c.g; col[9 * f + 3 * k + 2] = c.b; } }
     ng.setAttribute("color", new THREE.BufferAttribute(col, 3));
     return ng;
   }
-  if (smooth) { g.computeVertexNormals(); return g; }   // organic sculpts: fully smooth shading
+  if (smooth) { g.computeVertexNormals(); return g; }
   return toCreasedNormals(g, Math.PI / 5);
 }
-function makeViewer(stageEl) {
+function makeViewer(stageEl, spin = 1.6) {
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2)); renderer.outputColorSpace = THREE.SRGBColorSpace;
   stageEl.appendChild(renderer.domElement);
-  const scene = new THREE.Scene();
-  const cam = new THREE.PerspectiveCamera(32, 1, 1, 5000);
-  scene.add(new THREE.HemisphereLight(0xffffff, 0x8a9590, 1.6));
+  const scene = new THREE.Scene(), cam = new THREE.PerspectiveCamera(30, 1, 1, 5000);
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x9aa6c4, 1.7));
   const key = new THREE.DirectionalLight(0xffffff, 2.2); key.position.set(-1.2, 2, 1.4); scene.add(key);
   const fill = new THREE.DirectionalLight(0xffffff, 0.7); fill.position.set(1.5, 0.6, -1); scene.add(fill);
   const controls = new OrbitControls(cam, renderer.domElement);
-  controls.enableDamping = true; controls.autoRotate = !matchMedia("(prefers-reduced-motion: reduce)").matches; controls.autoRotateSpeed = 1.4;
+  controls.enableDamping = true; controls.autoRotate = !matchMedia("(prefers-reduced-motion: reduce)").matches; controls.autoRotateSpeed = spin;
   controls.addEventListener("start", () => controls.autoRotate = false);
   const group = new THREE.Group(); scene.add(group);
   let raf = 0, alive = true;
@@ -349,17 +534,13 @@ function makeViewer(stageEl) {
   return {
     async show(p) {
       group.clear();
-      const meshes = p.preview ? [new THREE.Mesh(await loadMesh(p.preview, true, !!p.preview_face), new THREE.MeshStandardMaterial({ vertexColors: true, roughness: .62, metalness: 0 }))]
-        : await Promise.all(p.web.map(async w => {
-        const g = await loadMesh(w.file, p.smooth);
-        const m = new THREE.Mesh(g, new THREE.MeshStandardMaterial({ color: new THREE.Color(w.color), roughness: .62, metalness: 0 }));
-        return m;
-      }));
+      const meshes = p.preview ? [new THREE.Mesh(await loadMesh(p.preview, true, !!p.preview_face), new THREE.MeshStandardMaterial({ vertexColors: true, roughness: .6, metalness: 0 }))]
+        : await Promise.all(p.web.filter(w => w.file).map(async w => new THREE.Mesh(await loadMesh(w.file, p.smooth), new THREE.MeshStandardMaterial({ color: new THREE.Color(w.color), roughness: .6, metalness: 0 }))));
       meshes.forEach(m => group.add(m));
       const box = new THREE.Box3().setFromObject(group), c = box.getCenter(new THREE.Vector3()), s = box.getSize(new THREE.Vector3());
       group.position.sub(c);
       const r = Math.max(s.x, s.y, s.z);
-      cam.position.set(r * 1.25, r * 0.85, r * 1.55); cam.near = r / 100; cam.far = r * 20; cam.updateProjectionMatrix();
+      cam.position.set(r * 1.3, r * 0.8, r * 1.65); cam.near = r / 100; cam.far = r * 20; cam.updateProjectionMatrix();
       controls.target.set(0, 0, 0); controls.update();
       stageEl.classList.add("live");
     },
@@ -367,120 +548,115 @@ function makeViewer(stageEl) {
   };
 }
 
-/* ---------- rendering ---------- */
-function partsLabel(p) { const n = p.parts.length; return n === 1 ? "1 part" : n + " parts"; }
-function sizeLabel(p) {
-  // overall size from the largest part (assembled pieces share a footprint)
-  const s = p.parts.reduce((a, q) => q.size_mm[0] * q.size_mm[1] * q.size_mm[2] > a[0] * a[1] * a[2] ? q.size_mm : a, [0, 0, 0]);
-  return s.map(v => Math.round(v)).join(" × ") + " mm";
+/* ---------- toy shelf ---------- */
+const lineName = l => T[LANG].lines[l] || l;
+function sizeLabel(p) { const s = p.parts.reduce((a, q) => q.size_mm[0] * q.size_mm[1] * q.size_mm[2] > a[0] * a[1] * a[2] ? q.size_mm : a, [0, 0, 0]); return s.map(v => Math.round(v)).join(" × ") + " mm"; }
+function renderFilters() {
+  const keys = ["all", ...Object.keys(T.en.lines).filter(k => k !== "all" && CAT.products.some(p => p.line === k))];
+  $("#filters").innerHTML = keys.map(k => `<button type="button" data-f="${k}" aria-pressed="${k === filter}">${esc(lineName(k))}</button>`).join("");
 }
-function priceHTML(p) { return p.price > 0 ? `<span class="price">${fmtUSD(p.price)}</span>` : `<span class="price free">Free</span>`; }
-const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-
-function renderGrid(filter = "all") {
-  const g = $("#grid");
-  const items = CAT.products.filter(p => filter === "all" || p.line === filter);
-  const newest = CAT.products.reduce((a, p) => p.dropped > a ? p.dropped : a, "");
-  g.innerHTML = items.map(p => `
+function renderGrid() {
+  // figures first: they are the kids' favourites
+  const order = { figure: 0, "print-in-place": 1, decor: 2, functional: 3 };
+  const items = CAT.products.filter(p => filter === "all" || p.line === filter).sort((a, b) => (order[a.line] ?? 9) - (order[b.line] ?? 9) || (b.dropped > a.dropped ? 1 : -1));
+  $("#grid").innerHTML = items.map(p => `
     <button class="card" type="button" data-slug="${esc(p.slug)}">
-      <div class="img"><img loading="lazy" src="${esc(p.cover)}" alt="${esc(p.title)} render">${p.slug === CAT.featured ? '<span class="chip new">Today</span>' : ''}</div>
-      <div class="body">
-        <span class="line-tag">${LINES[p.line] || p.line}</span>
-        <h3>${esc(p.title)}</h3>
-        <span class="meta">${sizeLabel(p)} · ${partsLabel(p)}</span>
-        <div class="row">${priceHTML(p)}<span class="meta">${esc(p.dropped)}</span></div>
-      </div>
+      <div class="band-top" style="background:${LINE_COL[p.line] || "#FFC93C"}"></div>
+      <div class="img"><img loading="lazy" src="${esc(p.cover)}" alt="${esc(p.title)}">${p.slug === CAT.featured ? `<span class="today">${t("todayTag")}</span>` : ""}
+        <span class="price-tag${p.price > 0 ? "" : " free"}">${p.price > 0 ? fmtUSD(p.price) : t("free")}</span></div>
+      <div class="body"><span class="line" style="color:${LINE_COL[p.line] ? "inherit" : "inherit"}">${esc(lineName(p.line))}</span><h3>${esc(p.title)}</h3><span class="meta">${sizeLabel(p)} · ${T[LANG].parts(p.parts.length)}</span></div>
     </button>`).join("");
 }
+let logOpen = false;
 function renderLog() {
-  $("#journal").innerHTML = JR.entries.map(e => `<li><time>${esc(e.at)}</time><p>${esc(e.text)}</p></li>`).join("");
+  $("#journal").innerHTML = JR.entries.map((e, i) => `<li class="${i >= 4 ? "more" : ""}"><time>${esc(e.at)}</time><p>${esc(e.text)}</p></li>`).join("");
+  $("#journal").classList.toggle("open", logOpen);
+  $("#moreLog").hidden = JR.entries.length <= 4; $("#moreLog").textContent = logOpen ? t("less") : t("more");
   const L = CAT.ledger, passed = CAT.products.filter(p => p.watertight).length;
-  $("#ledger").innerHTML = [
-    ["Revenue", fmtUSD(L.revenue_usd)], ["Paid orders", L.orders], ["Active members", L.members],
-    ["Running costs logged", fmtUSD(L.costs_usd)], ["Net", fmtUSD(L.revenue_usd - L.costs_usd)],
-    ["Models listed", CAT.products.length], ["Print checks passed", passed + " / " + CAT.products.length]
-  ].map(([k, v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join("");
-  $("#sModels").textContent = CAT.products.length;
-  $("#sChecks").textContent = passed + "/" + CAT.products.length;
-  $("#sRev").textContent = fmtUSD(L.revenue_usd);
-  $("#updated").textContent = "Updated " + CAT.updated + " (UTC+7)";
+  $("#ledger").innerHTML = [[t("revenue"), fmtUSD(L.revenue_usd)], [t("orders"), L.orders], [t("members"), L.members], [t("costs"), fmtUSD(L.costs_usd)], [t("net"), fmtUSD(L.revenue_usd - L.costs_usd)], [t("listed"), CAT.products.length], [t("passed"), passed + " / " + CAT.products.length]]
+    .map(([k, v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join("");
+  $("#updated").textContent = T[LANG].updated(CAT.updated);
   const day = Math.max(1, Math.floor((Date.parse(CAT.updated.slice(0, 10)) - Date.parse(CAT.started)) / 864e5) + 1);
-  $("#dayline").textContent = "Day " + String(day).padStart(3, "0") + " · since " + CAT.started;
+  $("#dayNum").textContent = T[LANG].day(day);
 }
 
 /* ---------- detail sheet ---------- */
 let dViewer = null, lastFocus = null;
-function bySlug(s) { return CAT.products.find(p => p.slug === s); }
+const bySlug = s => CAT.products.find(p => p.slug === s);
 async function openDetail(slug, push = true) {
   const p = bySlug(slug); if (!p) return;
   lastFocus = document.activeElement;
   if (push && location.hash !== "#m-" + slug) history.replaceState(null, "", "#m-" + slug);
-  $("#dPoster").src = p.cover; $("#dPoster").alt = p.title + " render";
-  const totalVol = p.parts.reduce((a, q) => a + q.volume_cm3, 0);
-  const tris = p.parts.reduce((a, q) => a + q.triangles, 0);
-  const grams = Math.round(totalVol * 1.24 * 0.45 + 0.5); // PLA, ~45% of solid volume at typical walls/infill
-  const ownerGet = caps.owner && p.price > 0;
+  $("#dPoster").src = p.cover; $("#dPoster").alt = p.title;
+  const vol = p.parts.reduce((a, q) => a + q.volume_cm3, 0), grams = Math.round(vol * 1.24 * 0.45 + 0.5);
+  const cols = (p.web || []).filter(w => w.color);
   $("#dInfo").innerHTML = `
-    <div class="eyebrow">${LINES[p.line] || p.line} · dropped ${esc(p.dropped)}</div>
+    <span class="line" style="font-family:var(--f-display);font-weight:800;color:var(--coral)">${esc(lineName(p.line))} · ${T[LANG].dropped(esc(p.dropped))}</span>
     <h2 id="dTitle">${esc(p.title)}</h2>
     <p class="blurb">${esc(p.blurb)}</p>
-    <div class="parts">${p.web.map(w => `<span class="chip"><i style="background:${esc(w.color)}"></i>${esc(w.name.replace(/_/g, " "))}</span>`).join("")}</div>
+    ${cols.length ? `<div class="chips">${cols.map(w => `<span class="chip"><i style="background:${esc(w.color)}"></i>${esc(String(w.name).replace(/_/g, " "))}</span>`).join("")}</div>` : ""}
     <dl class="specs">
-      <dt>Size</dt><dd>${sizeLabel(p)}</dd>
-      <dt>Parts</dt><dd>${partsLabel(p)}${p.parts.length > 1 ? " (" + p.parts.map(q => q.name).join(", ") + ")" : ""}</dd>
-      <dt>Filament</dt><dd>≈ ${grams} g PLA</dd>
-      <dt>Mesh</dt><dd>${tris.toLocaleString("en-US")} triangles</dd>
-      <dt>Print tips</dt><dd style="font-family:var(--f-body)">${esc(p.print_hint)}</dd>
-      <dt>Files</dt><dd>STL per part + 3MF · ${(p.download_bytes / 1048576).toFixed(1)} MB zip</dd>
+      <dt>${t("size")}</dt><dd>${sizeLabel(p)}</dd>
+      <dt>${t("piecesL")}</dt><dd>${T[LANG].parts(p.parts.length)}</dd>
+      <dt>${t("filament")}</dt><dd>≈ ${grams} g PLA</dd>
+      <dt>${t("tips")}</dt><dd>${esc(p.print_hint)}</dd>
+      <dt>${t("files")}</dt><dd>${T[LANG].filesV((p.download_bytes / 1048576).toFixed(1), !!p.preview)}</dd>
     </dl>
-    <div class="check" title="Every part checked: closed surface, one shell, no open edges">
-      <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7.5" fill="currentColor" opacity=".15"/><path d="M4.5 8.2l2.3 2.3 4.7-5" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg>
-      Print check passed · ${p.parts.length} closed ${p.parts.length > 1 ? "shells" : "shell"}, 0 open edges
-    </div>
+    <div class="check"><svg width="18" height="18" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7.5" fill="currentColor" opacity=".18"/><path d="M4.5 8.2l2.3 2.3 4.7-5" stroke="currentColor" stroke-width="1.9" fill="none" stroke-linecap="round"/></svg>${T[LANG].checkOk(p.parts.length)}</div>
     <div class="actions">
-      ${p.price > 0
-        ? `<button class="btn primary" type="button" data-buy="${esc(p.slug)}">Buy ${fmtUSD(p.price)}</button><button class="btn ghost" type="button" data-plan="maker">Get it with Maker Club</button>`
-        : `<button class="btn primary" type="button" data-dl="${esc(p.slug)}">Download free</button>`}
-      ${ownerGet ? `<button class="btn ghost" type="button" data-dl="${esc(p.slug)}">Owner download</button>` : ""}
+      ${p.price > 0 ? `<button class="btn coral small" type="button" data-buy="${esc(p.slug)}">${T[LANG].buy(fmtUSD(p.price))}</button><button class="btn small" type="button" data-plan="maker">${t("withClub")}</button>`
+                    : `<button class="btn grass small" type="button" data-dl="${esc(p.slug)}">${t("dlFree")}</button>`}
+      ${caps.owner && p.price > 0 ? `<button class="btn small" type="button" data-dl="${esc(p.slug)}">${t("ownerDl")}</button>` : ""}
     </div>
     <p class="msg" id="dMsg" aria-live="polite"></p>`;
-  $("#sheet").hidden = false; document.body.style.overflow = "hidden";
-  $("#dClose").focus();
-  if (await loadThree()) {
-    try { if (!dViewer) dViewer = makeViewer($("#dStage")); await dViewer.show(p); } catch (e) { /* poster stays */ }
-  }
+  $("#sheet").hidden = false; document.body.style.overflow = "hidden"; $("#dClose").focus();
+  if (await loadThree()) { try { if (!dViewer) dViewer = makeViewer($("#dStage"), 2); await dViewer.show(p); } catch (e) {} }
 }
 function closeDetail() {
   $("#sheet").hidden = true; document.body.style.overflow = "";
   if (dViewer) { dViewer.dispose(); dViewer = null; }
-  if (location.hash.startsWith("#m-")) history.replaceState(null, "", "#models");
+  if (location.hash.startsWith("#m-")) history.replaceState(null, "", "#toys");
   lastFocus?.focus?.();
 }
-function setMsg(t) { const m = $("#dMsg"); if (m) m.textContent = t; }
-
+const setMsg = m => { const e = $("#dMsg"); if (e) e.textContent = m; };
 async function download(slug) {
   const p = bySlug(slug); if (!p) return;
-  if (!p.download) { setMsg("Files for this model are delivered after checkout."); return; }
-  const a = document.createElement("a"); a.href = p.download; a.download = p.slug + ".zip";
-  document.body.appendChild(a); a.click(); a.remove();
-  setMsg("Downloading " + p.slug + ".zip.");
+  if (caps.downloads) {
+    setMsg(T[LANG].preparing(p.slug));
+    try { await caps.downloads.save({ filename: p.slug + ".zip", data: await fetchBytes(p.download) }); setMsg(T[LANG].saved(p.slug)); }
+    catch (e) { const c = e && e.code; setMsg(c === "declined" ? t("declined") : c === "rate_limited" ? t("busySave") : t("noSave")); }
+    return;
+  }
+  if (HOST === "web") {
+    if (!p.download) { setMsg(t("afterCheckout")); return; }
+    const a = document.createElement("a"); a.href = p.download; a.download = p.slug + ".zip"; document.body.appendChild(a); a.click(); a.remove();
+    setMsg(T[LANG].downloading(p.slug)); return;
+  }
+  setMsg(t("needClaude"));
 }
 function checkout(kind, slug) {
   const p = slug ? bySlug(slug) : null;
   const url = kind === "buy" ? (CAT.checkout.product_base ? CAT.checkout.product_base + slug : "") : CAT.checkout[kind];
-  if (url) { location.href = url; return; }
-  const what = p ? `${p.title} · ${fmtUSD(p.price)} one-time` : kind === "pro" ? "Pro Seller · $12 / month" : "Maker Club · $4 / month";
-  const host = $("#sheet").hidden ? null : $("#dMsg");
-  const text = `Checkout is in demo mode: ${what}. When payments go live, this button opens a secure card checkout in a new tab and the files unlock after payment.`;
-  if (host) { host.textContent = text; return; }
-  openNotice(what, text);
-}
-function openNotice(title, text) {
-  $("#dPoster").src = CAT.products[0].cover;
-  $("#dInfo").innerHTML = `<div class="eyebrow">Checkout preview</div><h2 id="dTitle">${esc(title)}</h2><div class="co"><div class="box">${esc(text)}</div><button class="btn primary" type="button" id="coOk">Back to the shop</button></div><p class="msg" id="dMsg"></p>`;
+  if (url) { if (HOST === "web") location.href = url; else window.open(url, "_blank", "noopener"); return; }
+  const what = p ? `${p.title} · ${T[LANG].oneTime(fmtUSD(p.price))}` : kind === "pro" ? t("pro") : t("club");
+  if (!$("#sheet").hidden && $("#dMsg")) { setMsg(T[LANG].demo(what)); return; }
+  $("#dPoster").src = (bySlug(CAT.featured) || CAT.products[0]).cover;
+  $("#dInfo").innerHTML = `<span class="kicker">${t("coTitle")}</span><h2 id="dTitle">${esc(what)}</h2><div class="co"><div class="box">${esc(T[LANG].demo(what))}</div></div><div class="actions"><button class="btn sun small" type="button" id="coOk">${t("back")}</button></div><p class="msg" id="dMsg"></p>`;
   $("#sheet").hidden = false; document.body.style.overflow = "hidden";
   $("#coOk").onclick = closeDetail; $("#coOk").focus();
 }
+
+/* ---------- language ---------- */
+function applyLang() {
+  document.documentElement.lang = LANG;
+  document.querySelectorAll("[data-i18n]").forEach(el => { const v = T[LANG][el.dataset.i18n]; if (typeof v === "string") el.textContent = v; });
+  document.querySelectorAll("[data-i18n-html]").forEach(el => { el.innerHTML = T[LANG][el.dataset.i18nHtml]; });
+  $("#lang").textContent = LANG === "vi" ? "EN" : "VI";
+  $("#lang").setAttribute("aria-label", LANG === "vi" ? "Switch to English" : "Chuyển sang tiếng Việt");
+  renderGames();
+  if (CAT) { renderFilters(); renderGrid(); renderLog(); const f = bySlug(CAT.featured) || CAT.products[0]; $("#bubble").textContent = T[LANG].bubble(f.title); }
+}
+$("#lang").onclick = () => { LANG = LANG === "vi" ? "en" : "vi"; try { localStorage.setItem("dl-lang", LANG); } catch (e) {} applyLang(); };
 
 /* ---------- wiring ---------- */
 document.addEventListener("click", e => {
@@ -488,30 +664,33 @@ document.addEventListener("click", e => {
   const dl = e.target.closest("[data-dl]"); if (dl) return download(dl.dataset.dl);
   const buy = e.target.closest("[data-buy]"); if (buy) return checkout("buy", buy.dataset.buy);
   const plan = e.target.closest("[data-plan]"); if (plan) return checkout(plan.dataset.plan);
-  const f = e.target.closest(".filters button");
-  if (f) { document.querySelectorAll(".filters button").forEach(b => b.setAttribute("aria-pressed", b === f)); renderGrid(f.dataset.f); }
+  const f = e.target.closest("#filters button"); if (f) { filter = f.dataset.f; renderFilters(); renderGrid(); }
 });
+$("#moreLog").onclick = () => { logOpen = !logOpen; renderLog(); };
 $("#dClose").onclick = closeDetail;
 $("#sheet").addEventListener("click", e => { if (e.target.id === "sheet") closeDetail(); });
 addEventListener("keydown", e => { if (e.key === "Escape" && !$("#sheet").hidden) closeDetail(); });
-$("#heroOpen").onclick = () => openDetail(CAT.featured);
 addEventListener("hashchange", () => { const h = location.hash; if (h.startsWith("#m-")) openDetail(h.slice(3), false); });
 
 async function boot() {
-  try {
-    [CAT, JR] = await Promise.all([fetch("catalog.json").then(r => r.json()), fetch("journal.json").then(r => r.json())]);
-  } catch (e) { $("#grid").innerHTML = '<p class="msg">The catalog could not load. Refresh the page to try again.</p>'; return; }
-  renderGrid(); renderLog();
+  applyLang();
+  try { [CAT, JR] = await Promise.all([fetch("catalog.json").then(r => r.json()), fetch("journal.json").then(r => r.json())]); }
+  catch (e) { $("#grid").innerHTML = `<p class="msg">${t("noCat")}</p>`; return; }
+  applyLang();
   const f = bySlug(CAT.featured) || CAT.products[0];
-  $("#heroPoster").src = f.cover; $("#heroTitle").textContent = f.title;
-  $("#heroChip").textContent = (LINES[f.line] || f.line) + " · " + partsLabel(f);
+  $("#heroPoster").src = f.cover; $("#heroPoster").alt = f.title; $("#heroTitle").textContent = f.title;
   $("#heroOpen").onclick = () => openDetail(f.slug);
   if (location.hash.startsWith("#m-")) openDetail(location.hash.slice(3), false);
-  if (await loadThree()) { try { await makeViewer($("#heroStage")).show(f); } catch (e) { /* poster stays */ } }
+  if (await loadThree()) { try { await makeViewer($("#heroStage")).show(f); } catch (e) {} }
 }
 boot();
-
-
+if (window.claude?.use) {
+  claude.use("downloads").then(d => { caps.downloads = d; });
+  claude.use("user").then(async u => { caps.user = u; caps.owner = u ? await u.isOwner() : false; });
+}
+</script>
+<script>
+if ("serviceWorker" in navigator) addEventListener("load", () => navigator.serviceWorker.register("/sw.js").catch(() => {}));
 </script>
 </body>
 </html>
