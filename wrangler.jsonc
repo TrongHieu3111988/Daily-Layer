@@ -1,0 +1,6 @@
+{
+  // Static shop served as Worker assets; Cloudflare Workers Builds runs `npx wrangler deploy` on every push to main.
+  "name": "dailylayer",
+  "compatibility_date": "2026-10-01",
+  "assets": { "directory": "." }
+}
