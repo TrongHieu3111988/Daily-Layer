@@ -237,7 +237,8 @@
       this.region(p, r, (id, x, y, z, w) => { if (f[id] > -3.5 * h && w > 0.15 && keep(id) > 0.5) this.c[id] = op.color; });
     } else if (tool === "blob") {                    // add a ball (used by Eyes)
       const k = Math.max(r * 0.35, 1.5 * h);
-      this.region(p, r + 2 * h, (id, x, y, z) => {
+      // the smooth-min blend reaches k beyond the ball, so the region must too, or a ridge forms at its edge
+      this.region(p, r + k + 2 * h, (id, x, y, z) => {
         const d = Math.hypot(x - p[0], y - p[1], z - p[2]) - r;
         const hh = Math.max(k - Math.abs(f[id] - d), 0) / k;
         const nv = Math.min(f[id], d) - hh * hh * k * 0.25;

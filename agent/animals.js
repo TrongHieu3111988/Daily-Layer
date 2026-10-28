@@ -80,7 +80,7 @@ function exportAnimal(name, outDir, N, heightMM) {
   const s = Studio(N, BASE[name]);
   ANIMALS[name](s);
   // gentle overall smoothing pass so blobs read as one soft figure
-  const out = s.printable({ heightMM, baseFrac: 0.04, thicken: 0.3, relax: 1 });
+  const out = s.printable({ heightMM, baseFrac: 0.04, thicken: 0.3, relax: 0 });
   const body = s.toPrint(out.mesh, out.pf.cut, out.pf.top, heightMM);
   const parts = s.colourParts(out.pf).map(p => ({ label: p.label, ...s.toPrint(p.mesh, out.pf.cut, out.pf.top, heightMM, body.centre), check: S.check(p.mesh.idx) }));
   const dir = path.join(outDir, name); fs.mkdirSync(dir, { recursive: true });

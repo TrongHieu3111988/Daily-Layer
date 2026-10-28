@@ -65,7 +65,7 @@
   // tool: add | carve | smooth | paint ; p = [x,y,z] world ; r radius ; color label ; strength 0..1
   P.dab = function (tool, p, r, color, strength) {
     const N = this.N, h = this.h, cl = this.clamp;
-    const R = r + 2 * h;
+    const R = r + Math.max(r * 0.35, 1.5 * h) + 2 * h;   // include the smooth-min blend zone (see below)
     const i0 = Math.max(1, Math.floor((p[0] - R + 1) / h)), i1 = Math.min(N - 2, Math.ceil((p[0] + R + 1) / h));
     const j0 = Math.max(1, Math.floor((p[1] - R + 1) / h)), j1 = Math.min(N - 2, Math.ceil((p[1] + R + 1) / h));
     const k0 = Math.max(1, Math.floor((p[2] - R + 1) / h)), k1 = Math.min(N - 2, Math.ceil((p[2] + R + 1) / h));
@@ -226,7 +226,7 @@
     const f = this.f.slice();
     if (opts.thicken) for (let n = 0; n < f.length; n++) f[n] -= opts.thicken * h;
     // a light blur removes one-voxel pinches (saddles) that would make non-manifold edges
-    const passes = opts.relax == null ? 1 : opts.relax;
+    const passes = opts.relax == null ? 0 : opts.relax;  // the tet mesher needs no relaxing; blurring here adds ripples
     for (let p = 0; p < passes; p++) { const b = blur3(f, N); f.set(b); }
     // find vertical extent (y is up)
     let ymin = 1e9, ymax = -1e9;

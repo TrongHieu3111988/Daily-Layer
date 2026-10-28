@@ -143,12 +143,18 @@ def render(parts, path, size=900, bg=(226, 229, 226), elev=28, azim=-55):
     for v, f, col in proj:
         tri = v[f]
         n = np.cross(tri[:, 1] - tri[:, 0], tri[:, 2] - tri[:, 0])
+        # smooth (per-vertex) shading so the render shows the true surface, not the triangulation
+        vn = np.zeros_like(v)
+        for k in range(3): np.add.at(vn, f[:, k], n)
+        vn /= np.maximum(np.linalg.norm(vn, axis=1, keepdims=True), 1e-12)
         n /= np.maximum(np.linalg.norm(n, axis=1, keepdims=True), 1e-12)
         keep = n[:, 1] < 0  # facing camera (camera at -y)
-        tri, n = tri[keep], n[keep]
-        shade = 0.32 + 0.58 * np.clip(n @ L1, 0, 1) + 0.18 * np.clip(n @ L2, 0, 1)
-        rim = 0.12 * np.clip(1 - np.abs(n[:, 1]), 0, 1) ** 2
-        c = np.clip(np.outer(shade + rim, np.asarray(col) / 255.0), 0, 1)
+        tri, n, fk = tri[keep], n[keep], f[keep]
+        def shade_of(nn):
+            return 0.32 + 0.58 * np.clip(nn @ L1, 0, 1) + 0.18 * np.clip(nn @ L2, 0, 1) + 0.12 * np.clip(1 - np.abs(nn[:, 1]), 0, 1) ** 2
+        vshade = shade_of(vn)
+        cvert = np.clip(vshade[:, None] * (np.asarray(col) / 255.0)[None, :], 0, 1)
+        c = cvert[fk]   # (T, 3 corners, rgb)
         sx = (tri[..., 0] / span + 0.5) * W
         sy = (0.5 - tri[..., 2] / span) * W
         depth = tri[..., 1].mean(1)
@@ -171,7 +177,8 @@ def render(parts, path, size=900, bg=(226, 229, 226), elev=28, azim=-55):
             zb = zbuf[y0:y1, x0:x1]
             upd = ins & (d < zb)
             zb[upd] = d[upd]
-            img[y0:y1, x0:x1][upd] = c[i]
+            pix = w0[..., None] * c[i, 0] + w1[..., None] * c[i, 1] + w2[..., None] * c[i, 2]
+            img[y0:y1, x0:x1][upd] = pix[upd]
             mask[y0:y1, x0:x1] |= upd
     out = np.empty((W, W, 3), np.float32); out[:] = np.asarray(bg) / 255.0
     # soft ground shadow

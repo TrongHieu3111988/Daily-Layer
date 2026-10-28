@@ -3,6 +3,531 @@
  "started": "2026-10-28",
  "products": [
   {
+   "slug": "sculpt-axolotl",
+   "title": "Smiley Axolotl",
+   "price": 2.99,
+   "blurb": "Smiling axolotl with feathery gills and a curled tail. Prints as one piece with no loose parts.",
+   "tags": [
+    "figure",
+    "cute",
+    "animal",
+    "kids",
+    "multicolor"
+   ],
+   "line": "figure",
+   "print_hint": "Sculpted in Sculpt Studio. Single-colour STL plus colour-split 3MF; 0.12-0.16 mm layers, no supports for most printers.",
+   "parts": [
+    {
+     "name": "body",
+     "triangles": 170348,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 118.49,
+     "size_mm": [
+      89.6,
+      74.6,
+      70.3
+     ],
+     "min_z": 0.0
+    }
+   ],
+   "colour_parts": [
+    {
+     "name": "rose",
+     "triangles": 162996,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 3,
+     "volume_cm3": 111.15,
+     "size_mm": [
+      51.4,
+      74.6,
+      70.3
+     ],
+     "min_z": -0.05
+    },
+    {
+     "name": "magenta",
+     "triangles": 33480,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 5,
+     "volume_cm3": 5.24,
+     "size_mm": [
+      89.6,
+      64.8,
+      42.2
+     ],
+     "min_z": 23.66
+    },
+    {
+     "name": "cream",
+     "triangles": 11984,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 1.49,
+     "size_mm": [
+      16.8,
+      11.0,
+      33.6
+     ],
+     "min_z": 4.71
+    },
+    {
+     "name": "ink",
+     "triangles": 4456,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 2,
+     "volume_cm3": 0.4,
+     "size_mm": [
+      27.7,
+      7.1,
+      7.6
+     ],
+     "min_z": 46.97
+    },
+    {
+     "name": "white",
+     "triangles": 984,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 2,
+     "volume_cm3": 0.04,
+     "size_mm": [
+      26.0,
+      3.1,
+      3.9
+     ],
+     "min_z": 49.78
+    }
+   ],
+   "watertight": true,
+   "web": [
+    {
+     "file": "products/sculpt-axolotl/web_rose.bin",
+     "color": "#F7A9C4",
+     "name": "rose"
+    },
+    {
+     "file": "products/sculpt-axolotl/web_magenta.bin",
+     "color": "#E0609A",
+     "name": "magenta"
+    },
+    {
+     "file": "products/sculpt-axolotl/web_cream.bin",
+     "color": "#F4E9D4",
+     "name": "cream"
+    },
+    {
+     "file": "products/sculpt-axolotl/web_ink.bin",
+     "color": "#24283A",
+     "name": "ink"
+    },
+    {
+     "file": "products/sculpt-axolotl/web_white.bin",
+     "color": "#FBFBF8",
+     "name": "white"
+    }
+   ],
+   "download": "",
+   "cover": "products/sculpt-axolotl/cover.jpg",
+   "build_seconds": 0,
+   "download_bytes": 6426184,
+   "dropped": "2026-10-28"
+  },
+  {
+   "slug": "sculpt-fox",
+   "title": "Fox Cub",
+   "price": 2.99,
+   "blurb": "Fox cub with a fluffy white-tipped tail, dark ear tips and a tiny smile. Sculpted at high resolution in Sculpt Studio.",
+   "tags": [
+    "figure",
+    "cute",
+    "animal",
+    "kids",
+    "multicolor"
+   ],
+   "line": "figure",
+   "print_hint": "Sculpted in Sculpt Studio. Single-colour STL plus colour-split 3MF; 0.12-0.16 mm layers, no supports for most printers.",
+   "parts": [
+    {
+     "name": "body",
+     "triangles": 198504,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 68.26,
+     "size_mm": [
+      58.6,
+      48.5,
+      70.7
+     ],
+     "min_z": 0.0
+    }
+   ],
+   "colour_parts": [
+    {
+     "name": "orange",
+     "triangles": 211772,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 18,
+     "volume_cm3": 65.23,
+     "size_mm": [
+      58.6,
+      45.7,
+      70.7
+     ],
+     "min_z": -0.05
+    },
+    {
+     "name": "ink",
+     "triangles": 12304,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 5,
+     "volume_cm3": 0.5,
+     "size_mm": [
+      31.7,
+      28.7,
+      33.0
+     ],
+     "min_z": 33.87
+    },
+    {
+     "name": "white",
+     "triangles": 31988,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 5,
+     "volume_cm3": 2.3,
+     "size_mm": [
+      37.8,
+      16.4,
+      37.6
+     ],
+     "min_z": 8.88
+    },
+    {
+     "name": "brown",
+     "triangles": 3424,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 2,
+     "volume_cm3": 0.12,
+     "size_mm": [
+      24.0,
+      3.9,
+      5.4
+     ],
+     "min_z": -0.06
+    }
+   ],
+   "watertight": true,
+   "web": [
+    {
+     "file": "products/sculpt-fox/web_orange.bin",
+     "color": "#F28C3A",
+     "name": "orange"
+    },
+    {
+     "file": "products/sculpt-fox/web_ink.bin",
+     "color": "#24283A",
+     "name": "ink"
+    },
+    {
+     "file": "products/sculpt-fox/web_white.bin",
+     "color": "#FBFBF8",
+     "name": "white"
+    },
+    {
+     "file": "products/sculpt-fox/web_brown.bin",
+     "color": "#7A4E33",
+     "name": "brown"
+    }
+   ],
+   "download": "",
+   "cover": "products/sculpt-fox/cover.jpg",
+   "build_seconds": 0,
+   "download_bytes": 7613124,
+   "dropped": "2026-10-28"
+  },
+  {
+   "slug": "sculpt-frog",
+   "title": "Grinning Frog",
+   "price": 2.49,
+   "blurb": "Grinning frog with big glossy eyes, rosy cheeks and a pale belly. One solid piece, colour-split 3MF included.",
+   "tags": [
+    "figure",
+    "cute",
+    "animal",
+    "kids",
+    "multicolor"
+   ],
+   "line": "figure",
+   "print_hint": "Sculpted in Sculpt Studio. Single-colour STL plus colour-split 3MF; 0.12-0.16 mm layers, no supports for most printers.",
+   "parts": [
+    {
+     "name": "body",
+     "triangles": 174440,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 137.71,
+     "size_mm": [
+      60.9,
+      58.6,
+      70.7
+     ],
+     "min_z": 0.0
+    }
+   ],
+   "colour_parts": [
+    {
+     "name": "green",
+     "triangles": 180368,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 132.52,
+     "size_mm": [
+      60.9,
+      58.6,
+      70.7
+     ],
+     "min_z": -0.04
+    },
+    {
+     "name": "white",
+     "triangles": 14388,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 4,
+     "volume_cm3": 1.91,
+     "size_mm": [
+      36.1,
+      15.4,
+      13.2
+     ],
+     "min_z": 52.57
+    },
+    {
+     "name": "lime",
+     "triangles": 20172,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 2.49,
+     "size_mm": [
+      25.4,
+      14.1,
+      41.2
+     ],
+     "min_z": 2.58
+    },
+    {
+     "name": "pink",
+     "triangles": 2620,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 2,
+     "volume_cm3": 0.17,
+     "size_mm": [
+      39.6,
+      5.7,
+      6.0
+     ],
+     "min_z": 41.31
+    },
+    {
+     "name": "ink",
+     "triangles": 5084,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 2,
+     "volume_cm3": 0.52,
+     "size_mm": [
+      32.7,
+      8.0,
+      8.5
+     ],
+     "min_z": 55.8
+    }
+   ],
+   "watertight": true,
+   "web": [
+    {
+     "file": "products/sculpt-frog/web_green.bin",
+     "color": "#7CC56B",
+     "name": "green"
+    },
+    {
+     "file": "products/sculpt-frog/web_white.bin",
+     "color": "#FBFBF8",
+     "name": "white"
+    },
+    {
+     "file": "products/sculpt-frog/web_lime.bin",
+     "color": "#D9F0B5",
+     "name": "lime"
+    },
+    {
+     "file": "products/sculpt-frog/web_pink.bin",
+     "color": "#F7A1B5",
+     "name": "pink"
+    },
+    {
+     "file": "products/sculpt-frog/web_ink.bin",
+     "color": "#24283A",
+     "name": "ink"
+    }
+   ],
+   "download": "",
+   "cover": "products/sculpt-frog/cover.jpg",
+   "build_seconds": 0,
+   "download_bytes": 6605984,
+   "dropped": "2026-10-28"
+  },
+  {
+   "slug": "sculpt-kitten",
+   "title": "Tabby Kitten",
+   "price": 2.99,
+   "blurb": "Tabby kitten with pink ears, a white muzzle and its tail wrapped round its paws. Colour-split for AMS.",
+   "tags": [
+    "figure",
+    "cute",
+    "animal",
+    "kids",
+    "multicolor"
+   ],
+   "line": "figure",
+   "print_hint": "Sculpted in Sculpt Studio. Single-colour STL plus colour-split 3MF; 0.12-0.16 mm layers, no supports for most printers.",
+   "parts": [
+    {
+     "name": "body",
+     "triangles": 175152,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 70.19,
+     "size_mm": [
+      50.8,
+      45.7,
+      70.5
+     ],
+     "min_z": 0.0
+    }
+   ],
+   "colour_parts": [
+    {
+     "name": "grey",
+     "triangles": 179980,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 3,
+     "volume_cm3": 68.29,
+     "size_mm": [
+      50.8,
+      43.3,
+      70.5
+     ],
+     "min_z": -0.06
+    },
+    {
+     "name": "slate",
+     "triangles": 5052,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 8,
+     "volume_cm3": 0.1,
+     "size_mm": [
+      22.4,
+      32.5,
+      48.9
+     ],
+     "min_z": 11.27
+    },
+    {
+     "name": "pink",
+     "triangles": 3212,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 3,
+     "volume_cm3": 0.1,
+     "size_mm": [
+      28.2,
+      19.0,
+      24.7
+     ],
+     "min_z": 38.97
+    },
+    {
+     "name": "ink",
+     "triangles": 5592,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 2,
+     "volume_cm3": 0.31,
+     "size_mm": [
+      22.9,
+      6.6,
+      6.9
+     ],
+     "min_z": 42.73
+    },
+    {
+     "name": "white",
+     "triangles": 20320,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 6,
+     "volume_cm3": 1.31,
+     "size_mm": [
+      25.6,
+      8.2,
+      48.9
+     ],
+     "min_z": -0.06
+    }
+   ],
+   "watertight": true,
+   "web": [
+    {
+     "file": "products/sculpt-kitten/web_grey.bin",
+     "color": "#A9AFBF",
+     "name": "grey"
+    },
+    {
+     "file": "products/sculpt-kitten/web_slate.bin",
+     "color": "#7C8396",
+     "name": "slate"
+    },
+    {
+     "file": "products/sculpt-kitten/web_pink.bin",
+     "color": "#F7A1B5",
+     "name": "pink"
+    },
+    {
+     "file": "products/sculpt-kitten/web_ink.bin",
+     "color": "#24283A",
+     "name": "ink"
+    },
+    {
+     "file": "products/sculpt-kitten/web_white.bin",
+     "color": "#FBFBF8",
+     "name": "white"
+    }
+   ],
+   "download": "",
+   "cover": "products/sculpt-kitten/cover.jpg",
+   "build_seconds": 0,
+   "download_bytes": 6534079,
+   "dropped": "2026-10-28"
+  },
+  {
    "slug": "sculpt-chick",
    "title": "Chubby Chick",
    "price": 2.49,
@@ -19,47 +544,47 @@
    "parts": [
     {
      "name": "body",
-     "triangles": 97512,
+     "triangles": 98152,
      "watertight": true,
      "bad_edges": 0,
      "shells": 1,
-     "volume_cm3": 82.55,
+     "volume_cm3": 82.75,
      "size_mm": [
-      59.6,
-      50.2,
-      70.4
+      59.8,
+      50.4,
+      70.6
      ],
-     "min_z": -0.0
+     "min_z": 0.0
     }
    ],
    "colour_parts": [
     {
      "name": "yellow",
-     "triangles": 99508,
-     "watertight": true,
-     "bad_edges": 0,
-     "shells": 2,
-     "volume_cm3": 80.65,
-     "size_mm": [
-      59.6,
-      48.5,
-      70.4
-     ],
-     "min_z": -0.0
-    },
-    {
-     "name": "orange",
-     "triangles": 8920,
+     "triangles": 99684,
      "watertight": true,
      "bad_edges": 0,
      "shells": 3,
-     "volume_cm3": 1.29,
+     "volume_cm3": 80.81,
      "size_mm": [
-      24.1,
-      17.3,
-      48.0
+      59.8,
+      48.5,
+      70.6
      ],
-     "min_z": -0.0
+     "min_z": -0.04
+    },
+    {
+     "name": "orange",
+     "triangles": 9040,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 3,
+     "volume_cm3": 1.32,
+     "size_mm": [
+      24.3,
+      17.4,
+      48.2
+     ],
+     "min_z": -0.08
     },
     {
      "name": "pink",
@@ -69,11 +594,11 @@
      "shells": 2,
      "volume_cm3": 0.21,
      "size_mm": [
-      30.6,
-      6.1,
+      30.4,
+      5.9,
       6.7
      ],
-     "min_z": 37.86
+     "min_z": 37.83
     },
     {
      "name": "ink",
@@ -84,24 +609,24 @@
      "volume_cm3": 0.26,
      "size_mm": [
       21.1,
-      6.3,
+      6.4,
       6.7
      ],
      "min_z": 45.33
     },
     {
      "name": "white",
-     "triangles": 788,
+     "triangles": 820,
      "watertight": true,
      "bad_edges": 0,
      "shells": 2,
      "volume_cm3": 0.04,
      "size_mm": [
       19.3,
-      3.1,
-      3.9
+      3.3,
+      3.7
      ],
-     "min_z": 47.39
+     "min_z": 47.55
     }
    ],
    "watertight": true,
@@ -135,7 +660,7 @@
    "download": "",
    "cover": "products/sculpt-chick/cover.jpg",
    "build_seconds": 0,
-   "download_bytes": 3155413,
+   "download_bytes": 3627155,
    "dropped": "2026-10-28"
   },
   {
@@ -155,61 +680,61 @@
    "parts": [
     {
      "name": "body",
-     "triangles": 102844,
+     "triangles": 103400,
      "watertight": true,
      "bad_edges": 0,
      "shells": 1,
-     "volume_cm3": 44.94,
+     "volume_cm3": 43.6,
      "size_mm": [
-      39.0,
-      44.2,
-      70.8
+      38.6,
+      43.8,
+      70.1
      ],
-     "min_z": -0.0
+     "min_z": 0.0
     }
    ],
    "colour_parts": [
     {
      "name": "white",
-     "triangles": 14776,
+     "triangles": 14848,
      "watertight": true,
      "bad_edges": 0,
      "shells": 4,
-     "volume_cm3": 1.53,
+     "volume_cm3": 1.5,
      "size_mm": [
-      17.8,
-      44.2,
-      30.3
+      17.5,
+      43.8,
+      30.0
      ],
-     "min_z": 9.17
+     "min_z": 8.96
     },
     {
      "name": "cream",
-     "triangles": 108312,
+     "triangles": 108804,
      "watertight": true,
      "bad_edges": 0,
      "shells": 2,
-     "volume_cm3": 42.71,
+     "volume_cm3": 41.41,
      "size_mm": [
-      39.0,
-      37.9,
-      70.8
+      38.6,
+      37.4,
+      70.1
      ],
-     "min_z": -0.0
+     "min_z": -0.05
     },
     {
      "name": "pink",
-     "triangles": 9064,
+     "triangles": 9092,
      "watertight": true,
      "bad_edges": 0,
      "shells": 5,
-     "volume_cm3": 0.49,
+     "volume_cm3": 0.48,
      "size_mm": [
-      23.6,
+      23.5,
       19.8,
-      36.9
+      36.6
      ],
-     "min_z": 29.09
+     "min_z": 28.72
     },
     {
      "name": "ink",
@@ -220,10 +745,10 @@
      "volume_cm3": 0.12,
      "size_mm": [
       17.1,
-      4.9,
+      4.7,
       5.0
      ],
-     "min_z": 34.58
+     "min_z": 34.17
     }
    ],
    "watertight": true,
@@ -252,7 +777,7 @@
    "download": "",
    "cover": "products/sculpt-bunny/cover.jpg",
    "build_seconds": 0,
-   "download_bytes": 3422659,
+   "download_bytes": 3945492,
    "dropped": "2026-10-28"
   },
   {
@@ -272,15 +797,15 @@
    "parts": [
     {
      "name": "body",
-     "triangles": 105216,
+     "triangles": 105740,
      "watertight": true,
      "bad_edges": 0,
      "shells": 1,
-     "volume_cm3": 97.82,
+     "volume_cm3": 98.05,
      "size_mm": [
       50.5,
-      51.1,
-      70.9
+      51.4,
+      71.0
      ],
      "min_z": 0.0
     }
@@ -288,59 +813,59 @@
    "colour_parts": [
     {
      "name": "brown",
-     "triangles": 113436,
+     "triangles": 113916,
      "watertight": true,
      "bad_edges": 0,
      "shells": 6,
-     "volume_cm3": 92.59,
+     "volume_cm3": 92.76,
      "size_mm": [
       50.5,
       50.0,
-      70.9
+      71.0
      ],
-     "min_z": 0.0
+     "min_z": -0.07
     },
     {
      "name": "tan",
-     "triangles": 22864,
+     "triangles": 22912,
      "watertight": true,
      "bad_edges": 0,
      "shells": 5,
-     "volume_cm3": 4.7,
+     "volume_cm3": 4.73,
      "size_mm": [
-      39.6,
+      39.5,
       23.7,
-      66.3
+      66.4
      ],
-     "min_z": 1.73
+     "min_z": 1.67
     },
     {
      "name": "ink",
-     "triangles": 3544,
+     "triangles": 3572,
      "watertight": true,
      "bad_edges": 0,
      "shells": 3,
-     "volume_cm3": 0.35,
+     "volume_cm3": 0.37,
      "size_mm": [
       21.9,
-      12.5,
-      12.5
+      12.8,
+      12.6
      ],
-     "min_z": 43.95
+     "min_z": 43.87
     },
     {
      "name": "white",
-     "triangles": 572,
+     "triangles": 600,
      "watertight": true,
      "bad_edges": 0,
      "shells": 2,
      "volume_cm3": 0.03,
      "size_mm": [
-      20.1,
-      2.8,
-      3.4
+      19.9,
+      2.7,
+      3.1
      ],
-     "min_z": 52.45
+     "min_z": 52.56
     }
    ],
    "watertight": true,
@@ -369,7 +894,7 @@
    "download": "",
    "cover": "products/sculpt-bear/cover.jpg",
    "build_seconds": 0,
-   "download_bytes": 3548608,
+   "download_bytes": 4100295,
    "dropped": "2026-10-28"
   },
   {
@@ -389,15 +914,15 @@
    "parts": [
     {
      "name": "body",
-     "triangles": 102560,
+     "triangles": 104404,
      "watertight": true,
      "bad_edges": 0,
      "shells": 1,
-     "volume_cm3": 109.56,
+     "volume_cm3": 108.47,
      "size_mm": [
-      57.2,
-      51.9,
-      71.0
+      56.7,
+      53.1,
+      70.8
      ],
      "min_z": 0.0
     }
@@ -405,45 +930,45 @@
    "colour_parts": [
     {
      "name": "black",
-     "triangles": 102332,
+     "triangles": 103580,
      "watertight": true,
      "bad_edges": 0,
      "shells": 1,
-     "volume_cm3": 101.84,
+     "volume_cm3": 100.26,
      "size_mm": [
-      57.2,
-      47.2,
-      71.0
+      56.7,
+      48.2,
+      70.8
      ],
-     "min_z": 0.0
+     "min_z": -0.08
     },
     {
      "name": "orange",
-     "triangles": 10788,
+     "triangles": 10844,
      "watertight": true,
      "bad_edges": 0,
      "shells": 3,
-     "volume_cm3": 1.76,
+     "volume_cm3": 1.71,
      "size_mm": [
-      26.6,
-      22.9,
-      53.4
+      26.2,
+      22.8,
+      52.8
      ],
-     "min_z": 0.0
+     "min_z": -0.07
     },
     {
      "name": "white",
-     "triangles": 33368,
+     "triangles": 33948,
      "watertight": true,
      "bad_edges": 0,
-     "shells": 5,
-     "volume_cm3": 5.35,
+     "shells": 3,
+     "volume_cm3": 5.91,
      "size_mm": [
-      28.4,
-      16.3,
-      64.0
+      28.0,
+      17.7,
+      63.2
      ],
-     "min_z": 0.0
+     "min_z": -0.06
     },
     {
      "name": "pink",
@@ -453,25 +978,25 @@
      "shells": 2,
      "volume_cm3": 0.04,
      "size_mm": [
-      28.1,
-      3.0,
-      4.5
+      27.7,
+      2.9,
+      4.1
      ],
-     "min_z": 45.19
+     "min_z": 44.72
     },
     {
      "name": "ink",
-     "triangles": 3240,
+     "triangles": 3276,
      "watertight": true,
      "bad_edges": 0,
      "shells": 2,
      "volume_cm3": 0.37,
      "size_mm": [
-      21.9,
-      7.2,
-      7.9
+      21.4,
+      7.1,
+      7.8
      ],
-     "min_z": 52.25
+     "min_z": 51.48
     }
    ],
    "watertight": true,
@@ -505,7 +1030,7 @@
    "download": "",
    "cover": "products/sculpt-penguin/cover.jpg",
    "build_seconds": 0,
-   "download_bytes": 3588566,
+   "download_bytes": 4175565,
    "dropped": "2026-10-28"
   },
   {
@@ -606,210 +1131,6 @@
    "cover": "products/xmas-flat-ornaments-4/cover.jpg",
    "build_seconds": 63.4,
    "download_bytes": 8459993,
-   "dropped": "2026-10-28"
-  },
-  {
-   "slug": "flexi-fishbone",
-   "title": "Flexi Fishbone",
-   "price": 1.99,
-   "blurb": "Eight-segment fish skeleton that prints in one piece and wiggles straight off the bed. No supports, no assembly. Great for Halloween.",
-   "tags": [
-    "flexi",
-    "print-in-place",
-    "fidget",
-    "halloween"
-   ],
-   "line": "print-in-place",
-   "print_hint": "Print-in-place, no supports, no assembly. 0.2 mm layer, 0.5 mm joint clearance; flex gently after printing. Looks great in silk orange/white or multi-colour layer swaps.",
-   "parts": [
-    {
-     "name": "fishbone",
-     "triangles": 403808,
-     "watertight": true,
-     "bad_edges": 0,
-     "shells": 8,
-     "volume_cm3": 10.59,
-     "size_mm": [
-      109.0,
-      40.0,
-      8.0
-     ],
-     "min_z": -0.0
-    }
-   ],
-   "watertight": true,
-   "web": [
-    {
-     "file": "products/flexi-fishbone/web_fishbone.bin",
-     "color": "#E6DFCC",
-     "name": "fishbone"
-    }
-   ],
-   "download": "",
-   "cover": "products/flexi-fishbone/cover.jpg",
-   "build_seconds": 35.1,
-   "download_bytes": 5072551,
-   "dropped": "2026-10-28"
-  },
-  {
-   "slug": "gridfinity-starter-3x3",
-   "title": "Gridfinity Starter Set 3\u00d73",
-   "price": 0.0,
-   "blurb": "Open-bottom 3\u00d73 baseplate plus four bins (1\u00d71, 2\u00d71, 1\u00d72, 2\u00d72). Drops into any Gridfinity drawer system.",
-   "tags": [
-    "gridfinity",
-    "organizer",
-    "storage"
-   ],
-   "line": "functional",
-   "print_hint": "Gridfinity-compatible (42 mm grid, 7 mm units), lite profile without stacking lip. 0.2 mm layer, 2 walls, no supports. Baseplate is open-bottom to save filament.",
-   "parts": [
-    {
-     "name": "baseplate_3x3",
-     "triangles": 197408,
-     "watertight": true,
-     "bad_edges": 0,
-     "shells": 1,
-     "volume_cm3": 11.49,
-     "size_mm": [
-      126.0,
-      126.0,
-      4.7
-     ],
-     "min_z": 0.0
-    },
-    {
-     "name": "bin_1x1",
-     "triangles": 103848,
-     "watertight": true,
-     "bad_edges": 0,
-     "shells": 1,
-     "volume_cm3": 13.32,
-     "size_mm": [
-      41.5,
-      41.5,
-      21.0
-     ],
-     "min_z": 0.0
-    },
-    {
-     "name": "bin_2x1",
-     "triangles": 181384,
-     "watertight": true,
-     "bad_edges": 0,
-     "shells": 1,
-     "volume_cm3": 25.51,
-     "size_mm": [
-      83.5,
-      41.5,
-      21.0
-     ],
-     "min_z": 0.0
-    },
-    {
-     "name": "bin_1x2",
-     "triangles": 181384,
-     "watertight": true,
-     "bad_edges": 0,
-     "shells": 1,
-     "volume_cm3": 25.51,
-     "size_mm": [
-      41.5,
-      83.5,
-      21.0
-     ],
-     "min_z": 0.0
-    },
-    {
-     "name": "bin_2x2",
-     "triangles": 307656,
-     "watertight": true,
-     "bad_edges": 0,
-     "shells": 1,
-     "volume_cm3": 48.54,
-     "size_mm": [
-      83.5,
-      83.5,
-      21.0
-     ],
-     "min_z": 0.0
-    }
-   ],
-   "watertight": true,
-   "web": [
-    {
-     "file": "products/gridfinity-starter-3x3/web_baseplate_3x3.bin",
-     "color": "#3A4750",
-     "name": "baseplate_3x3"
-    },
-    {
-     "file": "products/gridfinity-starter-3x3/web_bin_1x1.bin",
-     "color": "#F2B705",
-     "name": "bin_1x1"
-    },
-    {
-     "file": "products/gridfinity-starter-3x3/web_bin_2x1.bin",
-     "color": "#0E7C6B",
-     "name": "bin_2x1"
-    },
-    {
-     "file": "products/gridfinity-starter-3x3/web_bin_1x2.bin",
-     "color": "#E07A5F",
-     "name": "bin_1x2"
-    },
-    {
-     "file": "products/gridfinity-starter-3x3/web_bin_2x2.bin",
-     "color": "#E9E4D8",
-     "name": "bin_2x2"
-    }
-   ],
-   "download": "products/gridfinity-starter-3x3/gridfinity-starter-3x3_files.zip",
-   "cover": "products/gridfinity-starter-3x3/cover.jpg",
-   "build_seconds": 35.2,
-   "download_bytes": 6661092,
-   "dropped": "2026-10-28"
-  },
-  {
-   "slug": "airtag-collar-holder",
-   "title": "AirTag Collar Holder",
-   "price": 1.49,
-   "blurb": "Snap-in AirTag case that slides onto pet collars up to 25 mm wide. Print in TPU for a secure, soft fit.",
-   "tags": [
-    "pet",
-    "airtag",
-    "dog",
-    "cat"
-   ],
-   "line": "functional",
-   "print_hint": "Print in TPU 95A so the AirTag snaps in through the front window. Fits collars up to 25 mm wide. 0.2 mm layer, 3 walls, no supports.",
-   "parts": [
-    {
-     "name": "holder",
-     "triangles": 258088,
-     "watertight": true,
-     "bad_edges": 0,
-     "shells": 1,
-     "volume_cm3": 6.87,
-     "size_mm": [
-      38.4,
-      38.4,
-      15.0
-     ],
-     "min_z": 0.0
-    }
-   ],
-   "watertight": true,
-   "web": [
-    {
-     "file": "products/airtag-collar-holder/web_holder.bin",
-     "color": "#D9534F",
-     "name": "holder"
-    }
-   ],
-   "download": "",
-   "cover": "products/airtag-collar-holder/cover.jpg",
-   "build_seconds": 12.5,
-   "download_bytes": 1905460,
    "dropped": "2026-10-28"
   },
   {
@@ -1076,6 +1397,167 @@
    "dropped": "2026-10-28"
   },
   {
+   "slug": "gridfinity-starter-3x3",
+   "title": "Gridfinity Starter Set 3\u00d73",
+   "price": 0.0,
+   "blurb": "Open-bottom 3\u00d73 baseplate plus four bins (1\u00d71, 2\u00d71, 1\u00d72, 2\u00d72). Drops into any Gridfinity drawer system.",
+   "tags": [
+    "gridfinity",
+    "organizer",
+    "storage"
+   ],
+   "line": "functional",
+   "print_hint": "Gridfinity-compatible (42 mm grid, 7 mm units), lite profile without stacking lip. 0.2 mm layer, 2 walls, no supports. Baseplate is open-bottom to save filament.",
+   "parts": [
+    {
+     "name": "baseplate_3x3",
+     "triangles": 197408,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 11.49,
+     "size_mm": [
+      126.0,
+      126.0,
+      4.7
+     ],
+     "min_z": 0.0
+    },
+    {
+     "name": "bin_1x1",
+     "triangles": 103848,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 13.32,
+     "size_mm": [
+      41.5,
+      41.5,
+      21.0
+     ],
+     "min_z": 0.0
+    },
+    {
+     "name": "bin_2x1",
+     "triangles": 181384,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 25.51,
+     "size_mm": [
+      83.5,
+      41.5,
+      21.0
+     ],
+     "min_z": 0.0
+    },
+    {
+     "name": "bin_1x2",
+     "triangles": 181384,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 25.51,
+     "size_mm": [
+      41.5,
+      83.5,
+      21.0
+     ],
+     "min_z": 0.0
+    },
+    {
+     "name": "bin_2x2",
+     "triangles": 307656,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 48.54,
+     "size_mm": [
+      83.5,
+      83.5,
+      21.0
+     ],
+     "min_z": 0.0
+    }
+   ],
+   "watertight": true,
+   "web": [
+    {
+     "file": "products/gridfinity-starter-3x3/web_baseplate_3x3.bin",
+     "color": "#3A4750",
+     "name": "baseplate_3x3"
+    },
+    {
+     "file": "products/gridfinity-starter-3x3/web_bin_1x1.bin",
+     "color": "#F2B705",
+     "name": "bin_1x1"
+    },
+    {
+     "file": "products/gridfinity-starter-3x3/web_bin_2x1.bin",
+     "color": "#0E7C6B",
+     "name": "bin_2x1"
+    },
+    {
+     "file": "products/gridfinity-starter-3x3/web_bin_1x2.bin",
+     "color": "#E07A5F",
+     "name": "bin_1x2"
+    },
+    {
+     "file": "products/gridfinity-starter-3x3/web_bin_2x2.bin",
+     "color": "#E9E4D8",
+     "name": "bin_2x2"
+    }
+   ],
+   "download": "products/gridfinity-starter-3x3/gridfinity-starter-3x3_files.zip",
+   "cover": "products/gridfinity-starter-3x3/cover.jpg",
+   "build_seconds": 35.2,
+   "download_bytes": 6661092,
+   "dropped": "2026-10-28"
+  },
+  {
+   "slug": "flexi-fishbone",
+   "title": "Flexi Fishbone",
+   "price": 1.99,
+   "blurb": "Eight-segment fish skeleton that prints in one piece and wiggles straight off the bed. No supports, no assembly. Great for Halloween.",
+   "tags": [
+    "flexi",
+    "print-in-place",
+    "fidget",
+    "halloween"
+   ],
+   "line": "print-in-place",
+   "print_hint": "Print-in-place, no supports, no assembly. 0.2 mm layer, 0.5 mm joint clearance; flex gently after printing. Looks great in silk orange/white or multi-colour layer swaps.",
+   "parts": [
+    {
+     "name": "fishbone",
+     "triangles": 403808,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 8,
+     "volume_cm3": 10.59,
+     "size_mm": [
+      109.0,
+      40.0,
+      8.0
+     ],
+     "min_z": -0.0
+    }
+   ],
+   "watertight": true,
+   "web": [
+    {
+     "file": "products/flexi-fishbone/web_fishbone.bin",
+     "color": "#E6DFCC",
+     "name": "fishbone"
+    }
+   ],
+   "download": "",
+   "cover": "products/flexi-fishbone/cover.jpg",
+   "build_seconds": 35.1,
+   "download_bytes": 5072551,
+   "dropped": "2026-10-28"
+  },
+  {
    "slug": "desk-bin-3cell",
    "title": "Tri-Cell Desk Bin",
    "price": 1.99,
@@ -1215,6 +1697,49 @@
    "build_seconds": 10.1,
    "download_bytes": 5158213,
    "dropped": "2026-10-28"
+  },
+  {
+   "slug": "airtag-collar-holder",
+   "title": "AirTag Collar Holder",
+   "price": 1.49,
+   "blurb": "Snap-in AirTag case that slides onto pet collars up to 25 mm wide. Print in TPU for a secure, soft fit.",
+   "tags": [
+    "pet",
+    "airtag",
+    "dog",
+    "cat"
+   ],
+   "line": "functional",
+   "print_hint": "Print in TPU 95A so the AirTag snaps in through the front window. Fits collars up to 25 mm wide. 0.2 mm layer, 3 walls, no supports.",
+   "parts": [
+    {
+     "name": "holder",
+     "triangles": 258088,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 6.87,
+     "size_mm": [
+      38.4,
+      38.4,
+      15.0
+     ],
+     "min_z": 0.0
+    }
+   ],
+   "watertight": true,
+   "web": [
+    {
+     "file": "products/airtag-collar-holder/web_holder.bin",
+     "color": "#D9534F",
+     "name": "holder"
+    }
+   ],
+   "download": "",
+   "cover": "products/airtag-collar-holder/cover.jpg",
+   "build_seconds": 12.5,
+   "download_bytes": 1905460,
+   "dropped": "2026-10-28"
   }
  ],
  "checkout": {
@@ -1228,6 +1753,6 @@
   "members": 0,
   "costs_usd": 0.0
  },
- "updated": "2026-10-28 19:22",
- "featured": "sculpt-chick"
+ "updated": "2026-10-28 23:03",
+ "featured": "sculpt-axolotl"
 }

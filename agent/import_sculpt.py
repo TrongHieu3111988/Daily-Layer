@@ -3,8 +3,23 @@ usage: python import_sculpt.py <sculpted_dir> <out_dir> <slug>:<name>:<title>:<p
 """
 import sys, os, json, zipfile, struct
 import numpy as np
-from forge import check, write_3mf, render
+from forge import check, write_3mf, render, write_stl
 from build import write_webmesh, hex2rgb
+
+def taubin(v, f, iters=12, lam=0.5, mu=-0.53):
+    """Volume-preserving smoothing: removes the voxel stair pattern without shrinking the figure."""
+    import scipy.sparse as sp
+    n = len(v)
+    e = np.concatenate([f[:, [0, 1]], f[:, [1, 2]], f[:, [2, 0]]])
+    e = np.concatenate([e, e[:, ::-1]])
+    A = sp.coo_matrix((np.ones(len(e)), (e[:, 0], e[:, 1])), shape=(n, n)).tocsr()
+    A.data[:] = 1.0
+    deg = np.asarray(A.sum(1)).ravel(); deg[deg == 0] = 1
+    v = v.astype(np.float64)
+    for _ in range(iters):
+        for k in (lam, mu):
+            v = v + k * (A @ v / deg[:, None] - v)
+    return v.astype(np.float32)
 
 def read_stl(p):
     b = open(p, "rb").read(); n = struct.unpack("<I", b[80:84])[0]
@@ -18,6 +33,10 @@ BLURB = {
     "bunny": "Soft bunny with tall ears, pink nose and a fluffy tail. One solid piece, colour-split 3MF included.",
     "bear": "Chubby bear cub with a tan muzzle and belly. Prints as one piece with no loose parts.",
     "penguin": "Little penguin with a white tummy, orange beak and feet. Colour-split for multi-material printers.",
+    "fox": "Fox cub with a fluffy white-tipped tail, dark ear tips and a tiny smile. Sculpted at high resolution in Sculpt Studio.",
+    "frog": "Grinning frog with big glossy eyes, rosy cheeks and a pale belly. One solid piece, colour-split 3MF included.",
+    "axolotl": "Smiling axolotl with feathery gills and a curled tail. Prints as one piece with no loose parts.",
+    "kitten": "Tabby kitten with pink ears, a white muzzle and its tail wrapped round its paws. Colour-split for AMS.",
 }
 
 def main():
@@ -27,9 +46,11 @@ def main():
         meta = json.load(open(os.path.join(src, name, "meta.json")))
         d = os.path.join(out, slug); os.makedirs(d, exist_ok=True)
         bv, bf = read_stl(os.path.join(src, name, "body.stl"))
+        bv = taubin(bv, bf); bv[:, 2] -= bv[:, 2].min()
         parts = []
         for p in meta["parts"]:
             v, f = read_stl(os.path.join(src, name, f"part_{p['colour']}.stl"))
+            v = taubin(v, f)
             parts.append((p["colour"], v, f, p["hex"]))
         rep_body = check(bv, bf)
         reps = {c: check(v, f) for c, v, f, _ in parts}
@@ -37,7 +58,8 @@ def main():
         write_3mf(os.path.join(d, f"{slug}_colours.3mf"), parts)
         zp = os.path.join(d, f"{slug}_files.zip")
         with zipfile.ZipFile(zp, "w", zipfile.ZIP_DEFLATED, compresslevel=9) as z:
-            z.write(os.path.join(src, name, "body.stl"), f"{slug}.stl")
+            write_stl(os.path.join(d, f"{slug}.stl"), bv, bf, slug)
+            z.write(os.path.join(d, f"{slug}.stl"), f"{slug}.stl")
             z.write(os.path.join(d, f"{slug}_colours.3mf"), f"{slug}_colours.3mf")
             z.writestr("README.txt", f"{title}\n\n{slug}.stl: one solid piece for single-colour printing.\n{slug}_colours.3mf: one part per colour for AMS/MMU (load as one object with multiple parts).\n\nPrint: 0.12-0.16 mm layers, 3 walls, 10-15% infill, no supports for the body; tree supports only if your slicer flags the chin.\n\nSafety: for ages 3+, adult supervision. Prints come out as one solid piece. Not for mouthing or chewing.\n\nLicense: personal use. Commercial sale of prints requires a Pro Seller membership.\n")
         web = []

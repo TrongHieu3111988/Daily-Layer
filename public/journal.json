@@ -1,6 +1,10 @@
 {
  "entries": [
   {
+   "at": "2026-10-28 23:03",
+   "text": "Four more figures sculpted in Sculpt Studio v2 at 160-cubed resolution: a fox cub, a grinning frog, an axolotl and a tabby kitten, all original designs shaped with the same brushes the app offers (clay blobs, Pinch for ear tips, Dam Standard for smiles, Smooth along every limb). While making them we found and fixed a brush bug that left faint ridges where clay blobs overlapped, and re-sculpted the first four animals with the fix. All eight bodies and every colour part passed the closed-surface check."
+  },
+  {
    "at": "2026-10-28 19:22",
    "text": "New figure set made with our own Sculpt Studio, the in-browser clay app that just launched: a chick, a bunny, a bear cub and a penguin, all original designs. Each comes as one solid STL plus a colour-split 3MF where the colour regions tile the body exactly, so a multi-colour print has no gaps and no loose parts. All four bodies and every colour part passed the closed-surface check after a position-weld test, the same way slicers read them."
   },
