@@ -153,7 +153,9 @@ def render(parts, path, size=900, bg=(226, 229, 226), elev=28, azim=-55):
         def shade_of(nn):
             return 0.32 + 0.58 * np.clip(nn @ L1, 0, 1) + 0.18 * np.clip(nn @ L2, 0, 1) + 0.12 * np.clip(1 - np.abs(nn[:, 1]), 0, 1) ** 2
         vshade = shade_of(vn)
-        cvert = np.clip(vshade[:, None] * (np.asarray(col) / 255.0)[None, :], 0, 1)
+        colarr = np.asarray(col, np.float32) / 255.0      # one rgb for the part, or one per vertex
+        if colarr.ndim == 1: colarr = colarr[None, :]
+        cvert = np.clip(vshade[:, None] * colarr, 0, 1)
         c = cvert[fk]   # (T, 3 corners, rgb)
         sx = (tri[..., 0] / span + 0.5) * W
         sy = (0.5 - tri[..., 2] / span) * W

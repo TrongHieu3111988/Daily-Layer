@@ -198,6 +198,7 @@ button{font:inherit;color:inherit;cursor:pointer}
     this.undo = []; this.redo = [];
   }
   const P = Sculpt.prototype;
+  const Base0 = Sculpt;
   P.idx = function (i, j, k) { return i + this.N * (j + this.N * k); };
   P.pos = function (i) { return -1 + i * this.h; };
 
@@ -452,17 +453,14 @@ button{font:inherit;color:inherit;cursor:pointer}
   };
 
   // one closed mesh per colour label, for multi-material 3MF
-  P.colourParts = function (pf) {
+  // opts.web: also return a surface-nets mesh per colour (cleaner triangles for on-screen previews)
+  P.colourParts = function (pf, opts) {
+    opts = opts || {};
     const N = this.N, h = this.h, used = new Set();
     for (let n = 0; n < pf.f.length; n++) if (pf.f[n] < 0) used.add(this.c[n]);
     // smoothed indicator per colour; each colour's region is where its indicator beats every other one.
     // The regions tile the solid exactly (shared interfaces, no gaps), so no colour can leave a hole.
-    const labs = [...used], n3 = pf.f.length, bls = [];
-    for (const lab of labs) {
-      const ind = new Float32Array(n3);
-      for (let n = 0; n < n3; n++) ind[n] = this.c[n] === lab ? 1 : 0;
-      bls.push(blur3(ind, N));
-    }
+    const labs = [...used], n3 = pf.f.length, bls = colourShares(this.c, pf.f, labs, N, 3);
     const parts = [];
     for (let li = 0; li < labs.length; li++) {
       const lab = labs[li], bl = bls[li];
@@ -474,10 +472,78 @@ button{font:inherit;color:inherit;cursor:pointer}
       for (let k = 0; k < N; k++) for (let j = 0; j < N; j++) for (let i = 0; i < N; i++)
         if (i === 0 || j === 0 || k === 0 || i === N - 1 || j === N - 1 || k === N - 1) g[this.idx(i, j, k)] = this.clamp;
       const m = this.meshTet(g);
-      if (m.idx.length) parts.push({ label: lab, mesh: m });
+      if (m.idx.length) parts.push({ label: lab, mesh: m, web: opts.web ? Base0.prototype.mesh.call(this, g, this.c) : null });
     }
     return parts;
   };
+  // One seamless preview surface (surface nets) with a colour per vertex, taken from whichever
+  // smoothed colour region is strongest at that point. No separate colour shells, so no seams or cracks.
+  P.previewMesh = function (pf, palette) {
+    const N = this.N, n3 = pf.f.length, used = new Set();
+    for (let n = 0; n < n3; n++) if (pf.f[n] < 0) used.add(this.c[n]);
+    const labs = [...used], bls = colourShares(this.c, pf.f, labs, N, 3);   // same as the print parts
+    const cols = labs.map(l => { const c = parseInt((palette[l] || "#cccccc").slice(1), 16); return [c >> 16 & 255, c >> 8 & 255, c & 255]; });
+    const m = Base0.prototype.mesh.call(this, pf.f, this.c);
+    const nv = m.pos.length / 3, rgb = new Uint8Array(nv * 3), g = (N - 1) / 2, L = labs.length;
+    let sh = new Float32Array(nv * L);
+    for (let v = 0; v < nv; v++) {
+      const gx = (m.pos[3 * v] + 1) * g, gy = (m.pos[3 * v + 1] + 1) * g, gz = (m.pos[3 * v + 2] + 1) * g;
+      for (let li = 0; li < L; li++) sh[v * L + li] = triSample(bls[li], N, gx, gy, gz);
+    }
+    // relax the colour shares along the surface: borders follow smooth curves instead of the voxel grid
+    const nb = new Float32Array(nv * L), cnt = new Uint16Array(nv), idx = m.idx;
+    for (let it = 0; it < 4; it++) {
+      nb.fill(0); cnt.fill(0);
+      for (let t = 0; t < idx.length; t += 3) for (let e = 0; e < 3; e++) {
+        const a = idx[t + e], b = idx[t + (e + 1) % 3];
+        for (let li = 0; li < L; li++) { nb[a * L + li] += sh[b * L + li]; nb[b * L + li] += sh[a * L + li]; }
+        cnt[a]++; cnt[b]++;
+      }
+      for (let v = 0; v < nv; v++) if (cnt[v]) for (let li = 0; li < L; li++) sh[v * L + li] = 0.5 * sh[v * L + li] + 0.5 * nb[v * L + li] / cnt[v];
+    }
+    for (let v = 0; v < nv; v++) {
+      // winner colour, softened into the runner-up right at the border (anti-aliased edge, no stair steps)
+      let best = 0, bv = -1, sec = 0, sv = -1;
+      for (let li = 0; li < L; li++) {
+        const val = sh[v * L + li];
+        if (val > bv) { sec = best; sv = bv; best = li; bv = val; } else if (val > sv) { sec = li; sv = val; }
+      }
+      const t = sv < 0 ? 1 : 0.5 + 0.5 * Math.min(1, (bv - sv) / 0.12);
+      for (let k = 0; k < 3; k++) rgb[3 * v + k] = Math.round(cols[best][k] * t + cols[sv < 0 ? best : sec][k] * (1 - t));
+    }
+    return { pos: m.pos, idx: m.idx, rgb };
+  };
+  function triSample(f, N, gx, gy, gz) {
+    const i = Math.min(Math.max(Math.floor(gx), 0), N - 2), j = Math.min(Math.max(Math.floor(gy), 0), N - 2), k = Math.min(Math.max(Math.floor(gz), 0), N - 2);
+    const u = gx - i, v = gy - j, w = gz - k, a = i + N * (j + N * k), s = N, s2 = N * N;
+    const c00 = f[a] * (1 - u) + f[a + 1] * u, c10 = f[a + s] * (1 - u) + f[a + s + 1] * u;
+    const c01 = f[a + s2] * (1 - u) + f[a + s2 + 1] * u, c11 = f[a + s2 + s] * (1 - u) + f[a + s2 + s + 1] * u;
+    return (c00 * (1 - v) + c10 * v) * (1 - w) + (c01 * (1 - v) + c11 * v) * w;
+  }
+  // raw preview file: u32 nv, u32 nf, f32 pos[nv*3], u32 idx[nf*3], u8 rgb[nv*3]
+  Sculpt.previewBin = function (pos, idx, rgb) {
+    const nv = pos.length / 3, nf = idx.length / 3, buf = new ArrayBuffer(8 + pos.length * 4 + idx.length * 4 + rgb.length);
+    const dv = new DataView(buf); dv.setUint32(0, nv, true); dv.setUint32(4, nf, true);
+    new Float32Array(buf, 8, pos.length).set(pos); new Uint32Array(buf, 8 + pos.length * 4, idx.length).set(idx);
+    new Uint8Array(buf, 8 + pos.length * 4 + idx.length * 4).set(rgb);
+    return new Uint8Array(buf);
+  };
+
+  // smoothed share of colour `lab` among the solid voxels near each point (normalised blur:
+  // air voxels outside the clay keep the base colour label, so they must not vote).
+  function colourShares(c, f, labs, N, passes) {
+    const n3 = f.length, inside = new Float32Array(n3);
+    for (let n = 0; n < n3; n++) inside[n] = f[n] < 0 ? 1 : 0;
+    let den = inside; for (let p = 0; p < passes; p++) den = blur3(den, N);
+    return labs.map(lab => {
+      let ind = new Float32Array(n3);
+      for (let n = 0; n < n3; n++) ind[n] = f[n] < 0 && c[n] === lab ? 1 : 0;
+      for (let p = 0; p < passes; p++) ind = blur3(ind, N);
+      for (let n = 0; n < n3; n++) ind[n] = den[n] > 1e-4 ? ind[n] / den[n] : 0;
+      return ind;
+    });
+  }
+
   function blur3(a, N) {
     let src = a, dst = new Float32Array(a.length);
     for (let axis = 0; axis < 3; axis++) {
@@ -592,7 +658,7 @@ button{font:inherit;color:inherit;cursor:pointer}
   function Sculpt2(N) { this.alloc(N); this.undo = []; this.redo = []; this.rec = null; }
   const P = Sculpt2.prototype;
   // borrow exporters and helpers from v1
-  for (const k of ["printField", "meshTet", "colourParts", "toPrint", "printable", "idx", "pos"]) P[k] = Base.prototype[k];
+  for (const k of ["printField", "meshTet", "colourParts", "previewMesh", "toPrint", "printable", "idx", "pos"]) P[k] = Base.prototype[k];
 
   P.alloc = function (N) {
     this.N = N; this.h = 2 / (N - 1); this.clamp = 0.25;

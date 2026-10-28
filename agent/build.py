@@ -6,6 +6,15 @@ import numpy as np
 from forge import check, write_stl, write_3mf, render
 import struct, gzip
 
+def write_webmesh_vc(path, v, f, rgb):
+    """gzip( u32 nv, u32 nf, f32 min[3], f32 max[3], u16 xyz*nv, u32 abc*nf, u8 rgb*nv ) -- one seamless mesh, colour per vertex"""
+    lo, hi = v.min(0), v.max(0)
+    q = np.round((v - lo) / np.maximum(hi - lo, 1e-6) * 65535).astype(np.uint16)
+    uq, first, inv = np.unique(q, axis=0, return_index=True, return_inverse=True)
+    ff = inv.reshape(-1)[f].astype(np.uint32)
+    raw = struct.pack('<II', len(uq), len(ff)) + np.asarray(lo, '<f4').tobytes() + np.asarray(hi, '<f4').tobytes() + uq.astype('<u2').tobytes() + ff.astype('<u4').tobytes() + np.asarray(rgb, np.uint8)[first].tobytes()
+    open(path, 'wb').write(gzip.compress(raw, 9))
+
 def write_webmesh(path, v, f):
     """gzip( u32 nv, u32 nf, f32 min[3], f32 max[3], u16 xyz*nv, u32 abc*nf ) -- quantized indexed mesh for the web viewer"""
     # weld duplicate vertices (STL-style meshes) before quantizing

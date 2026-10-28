@@ -15,6 +15,9 @@ for p in cat["products"]:
         src = os.path.join(site, w["file"]); w["file"] = w["file"][:-4] if w["file"].endswith(".txt") else w["file"]
         dst = os.path.join(repo, w["file"]); os.makedirs(os.path.dirname(dst), exist_ok=True)
         open(dst, "wb").write(base64.b64decode(open(src).read()))
+    if p.get("preview"):
+        src = os.path.join(site, p["preview"]); p["preview"] = p["preview"][:-4] if p["preview"].endswith(".txt") else p["preview"]
+        open(os.path.join(repo, p["preview"]), "wb").write(base64.b64decode(open(src).read()))
     shutil.copy2(os.path.join(site, p["cover"]), os.path.join(repo, p["cover"]))
     zsrc = os.path.join(site, p["download"]); zname = p["download"][:-4] if p["download"].endswith(".txt") else p["download"]
     data = base64.b64decode(open(zsrc).read())

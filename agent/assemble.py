@@ -30,7 +30,7 @@ def main():
         import base64
         shutil.copy2(os.path.join(out, slug, e["cover"]), os.path.join(dst, e["cover"]))
         # binaries ride as base64 text: the host serves .txt but not .zip/.bin
-        for f in [e["download"]] + [w["file"] for w in e["web"]]:
+        for f in [e["download"]] + [w["file"] for w in e["web"]] + ([e["preview"]] if e.get("preview") else []):
             open(os.path.join(dst, f + ".txt"), "w").write(base64.b64encode(open(os.path.join(out, slug, f), "rb").read()).decode())
         e["download"] += ".txt"
         for w in e["web"]: w["file"] += ".txt"
@@ -38,6 +38,7 @@ def main():
         e["cover"] = base + e["cover"]; e["download"] = base + e["download"]
         e["download_bytes"] = os.path.getsize(os.path.join(out, slug, os.path.basename(e["download"])[:-4]))
         for w in e["web"]: w["file"] = base + w["file"]
+        if e.get("preview"): e["preview"] = base + e["preview"] + ".txt"
         e["dropped"] = drops.get(slug, known.get(slug, {}).get("dropped", cat["started"]))
         known[slug] = e
     cat["products"] = sorted(known.values(), key=lambda p: (p["dropped"], p["slug"]), reverse=True)

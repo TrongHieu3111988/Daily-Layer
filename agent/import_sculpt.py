@@ -4,7 +4,7 @@ usage: python import_sculpt.py <sculpted_dir> <out_dir> <slug>:<name>:<title>:<p
 import sys, os, json, zipfile, struct
 import numpy as np
 from forge import check, write_3mf, render, write_stl
-from build import write_webmesh, hex2rgb
+from build import write_webmesh, write_webmesh_vc, hex2rgb
 
 def taubin(v, f, iters=12, lam=0.5, mu=-0.53):
     """Volume-preserving smoothing: removes the voxel stair pattern without shrinking the figure."""
@@ -72,11 +72,22 @@ def main():
                 wv, wf = v, f
             wparts.append((c, wv, wf, hx))
             fn = f"web_{c}.bin"; write_webmesh(os.path.join(d, fn), wv, wf); web.append(dict(file=fn, color=hx, name=c))
-        render([(v, f, hex2rgb(hx)) for c, v, f, hx in wparts], os.path.join(d, "cover.jpg"), size=720, elev=12, azim=-20)
+        # one seamless vertex-coloured preview mesh (no seams between colours) when the sculpt exported it
+        pvp, preview = os.path.join(src, name, "preview.bin"), None
+        if os.path.exists(pvp):
+            raw = open(pvp, "rb").read(); nv, nf = struct.unpack("<II", raw[:8])
+            pv = np.frombuffer(raw, "<f4", nv * 3, 8).reshape(-1, 3).astype(np.float64)
+            pf = np.frombuffer(raw, "<u4", nf * 3, 8 + nv * 12).reshape(-1, 3).astype(np.int64)
+            pc = np.frombuffer(raw, np.uint8, nv * 3, 8 + nv * 12 + nf * 12).reshape(-1, 3)
+            pv = taubin(pv, pf, iters=10)
+            write_webmesh_vc(os.path.join(d, "preview_vc.bin"), pv, pf, pc); preview = "preview_vc.bin"
+            render([(pv, pf, pc)], os.path.join(d, "cover.jpg"), size=720, elev=12, azim=-20)
+        else:
+            render([(v, f, hex2rgb(hx)) for c, v, f, hx in wparts], os.path.join(d, "cover.jpg"), size=720, elev=12, azim=-20)
         entry = dict(slug=slug, title=title, price=float(price), blurb=BLURB[name], tags=["figure", "cute", "animal", "kids", "multicolor"],
                      line="figure", print_hint="Sculpted in Sculpt Studio. Single-colour STL plus colour-split 3MF; 0.12-0.16 mm layers, no supports for most printers.",
                      parts=[dict(name="body", **rep_body)], colour_parts=[dict(name=c, **reps[c]) for c, *_ in parts],
-                     watertight=ok, smooth=True, web=web, download=f"{slug}_files.zip", cover="cover.jpg", build_seconds=0)
+                     watertight=ok, smooth=True, web=web, preview=preview, download=f"{slug}_files.zip", cover="cover.jpg", build_seconds=0)
         json.dump(entry, open(os.path.join(d, "entry.json"), "w"), indent=1)
         print(slug, "OK" if ok else "NOT WATERTIGHT", rep_body["triangles"], rep_body["size_mm"], round(os.path.getsize(zp) / 1e6, 1), "MB")
 
