@@ -40,9 +40,13 @@ const ANIMALS = {
     k.mirror(sx => k.line([0.17 * sx, 0.3, 0.0], [0.27 * sx, 0.6, -0.04], 0.12, 0.03, "orange", 16)); // ears
     k.mirror(sx => k.stroke("pinch", [[0.25 * sx, 0.55]], 0.08, 0.8, { from: [0, 0.2, 1] }));
     k.line([0, 0.0, 0.3], [0, -0.03, 0.42], 0.11, 0.06, "white", 10);      // muzzle
+    // repaint the muzzle surface so carving the smile cannot expose orange underneath
+    const muzzle = []; for (let x = -0.1; x <= 0.1001; x += 0.025) for (let y = -0.1; y <= 0.06; y += 0.025) muzzle.push([x, y]);
+    k.stroke("paint", muzzle, 0.045, 1, { color: "white" });
     k.blob([0, 0.0, 0.47], 0.04, "ink");                          // nose
     k.mirror(sx => k.eye(0.13 * sx, 0.14, 0.32, 0.045));
     k.stroke("dam", k.arc(0, -0.08, 0.05, 0.03, Math.PI * 0.15, Math.PI * 0.85, 8), 0.02, 0.6);   // smile
+    k.stroke("paint", muzzle.filter(([x, y]) => y < -0.02), 0.04, 1, { color: "white" });
     k.mirror(sx => { for (let t = 0; t <= 1; t += 0.2) k.paint([0.25 * sx, 0.55 - 0.18 * t, 0.06 - 0.04 * t], 0.06, "ink"); });  // dark ear tips
     k.mirror(sx => { for (let t = 0; t <= 1.01; t += 0.25) k.paint([0.14 * sx * (1 - t), 0.03 - 0.06 * t, 0.36], 0.08, "white"); });
     k.paint([0, -0.3, 0.36], 0.2, "white");                       // chest
@@ -107,13 +111,16 @@ function exportAnimal(name, outDir, N, heightMM) {
   ANIMALS[name](s, k);
   const out = s.printable({ heightMM, baseFrac: 0.04, thicken: 0.4, relax: 0 });
   const body = s.toPrint(out.mesh, out.pf.cut, out.pf.top, heightMM);
-  const parts = s.colourParts(out.pf).map(p => ({ label: p.label, ...s.toPrint(p.mesh, out.pf.cut, out.pf.top, heightMM, body.centre), check: S1.check(p.mesh.idx) }));
+  const raw = s.colourParts(out.pf, { web: true });
+  const parts = raw.map(p => ({ label: p.label, ...s.toPrint(p.mesh, out.pf.cut, out.pf.top, heightMM, body.centre), check: S1.check(p.mesh.idx),
+                                web: s.toPrint(p.web, out.pf.cut, out.pf.top, heightMM, body.centre) }));
   const dir = path.join(outDir, name); fs.mkdirSync(dir, { recursive: true });
   fs.writeFileSync(path.join(dir, "body.stl"), S1.stl(body.pos, body.idx, name));
   const meta = { name, resolution: N, body: out.check, parts: [] };
   for (const p of parts) {
     const cname = NAMES[p.label];
     fs.writeFileSync(path.join(dir, `part_${cname}.stl`), S1.stl(p.pos, p.idx, cname));
+    fs.writeFileSync(path.join(dir, `web_${cname}.stl`), S1.stl(p.web.pos, p.web.idx, cname));
     meta.parts.push({ colour: cname, hex: COL[cname], check: p.check });
   }
   fs.writeFileSync(path.join(dir, "meta.json"), JSON.stringify(meta, null, 1));

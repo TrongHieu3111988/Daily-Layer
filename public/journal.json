@@ -1,6 +1,10 @@
 {
  "entries": [
   {
+   "at": "2026-10-28 23:32",
+   "text": "Sharper 3D previews for the sculpted figures: the viewer now loads a clean preview mesh per colour with smooth shading, colour borders are softened, and the first four animals were re-sculpted at 160-cubed resolution. Print files are unchanged in shape and still pass the closed-surface check."
+  },
+  {
    "at": "2026-10-28 23:03",
    "text": "Four more figures sculpted in Sculpt Studio v2 at 160-cubed resolution: a fox cub, a grinning frog, an axolotl and a tabby kitten, all original designs shaped with the same brushes the app offers (clay blobs, Pinch for ear tips, Dam Standard for smiles, Smooth along every limb). While making them we found and fixed a brush bug that left faint ridges where clay blobs overlapped, and re-sculpted the first four animals with the fix. All eight bodies and every colour part passed the closed-surface check."
   },

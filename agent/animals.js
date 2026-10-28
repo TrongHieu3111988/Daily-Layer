@@ -82,13 +82,15 @@ function exportAnimal(name, outDir, N, heightMM) {
   // gentle overall smoothing pass so blobs read as one soft figure
   const out = s.printable({ heightMM, baseFrac: 0.04, thicken: 0.3, relax: 0 });
   const body = s.toPrint(out.mesh, out.pf.cut, out.pf.top, heightMM);
-  const parts = s.colourParts(out.pf).map(p => ({ label: p.label, ...s.toPrint(p.mesh, out.pf.cut, out.pf.top, heightMM, body.centre), check: S.check(p.mesh.idx) }));
+  const parts = s.colourParts(out.pf, { web: true }).map(p => ({ label: p.label, ...s.toPrint(p.mesh, out.pf.cut, out.pf.top, heightMM, body.centre), check: S.check(p.mesh.idx),
+                                                              web: s.toPrint(p.web, out.pf.cut, out.pf.top, heightMM, body.centre) }));
   const dir = path.join(outDir, name); fs.mkdirSync(dir, { recursive: true });
   fs.writeFileSync(path.join(dir, "body.stl"), S.stl(body.pos, body.idx, name));
   const meta = { name, body: out.check, parts: [] };
   for (const p of parts) {
     const cname = NAMES[p.label];
     fs.writeFileSync(path.join(dir, `part_${cname}.stl`), S.stl(p.pos, p.idx, cname));
+    fs.writeFileSync(path.join(dir, `web_${cname}.stl`), S.stl(p.web.pos, p.web.idx, cname));
     meta.parts.push({ colour: cname, hex: COL[cname], check: p.check });
   }
   fs.writeFileSync(path.join(dir, "meta.json"), JSON.stringify(meta, null, 1));
@@ -98,7 +100,7 @@ function exportAnimal(name, outDir, N, heightMM) {
 if (require.main === module) {
   const outDir = process.argv[2], names = process.argv.slice(3).length ? process.argv.slice(3) : Object.keys(ANIMALS);
   for (const n of names) {
-    const t0 = Date.now(); const m = exportAnimal(n, outDir, 120, 70);
+    const t0 = Date.now(); const m = exportAnimal(n, outDir, 160, 70);
     console.log(n, (Date.now() - t0) + "ms", "body", m.body.watertight, m.body.triangles, "parts", m.parts.map(p => p.colour + (p.check.watertight ? "" : "!")).join(","));
   }
 }

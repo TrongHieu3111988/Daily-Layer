@@ -13,6 +13,7 @@
     this.undo = []; this.redo = [];
   }
   const P = Sculpt.prototype;
+  const Base0 = Sculpt;
   P.idx = function (i, j, k) { return i + this.N * (j + this.N * k); };
   P.pos = function (i) { return -1 + i * this.h; };
 
@@ -267,7 +268,9 @@
   };
 
   // one closed mesh per colour label, for multi-material 3MF
-  P.colourParts = function (pf) {
+  // opts.web: also return a surface-nets mesh per colour (cleaner triangles for on-screen previews)
+  P.colourParts = function (pf, opts) {
+    opts = opts || {};
     const N = this.N, h = this.h, used = new Set();
     for (let n = 0; n < pf.f.length; n++) if (pf.f[n] < 0) used.add(this.c[n]);
     // smoothed indicator per colour; each colour's region is where its indicator beats every other one.
@@ -276,7 +279,7 @@
     for (const lab of labs) {
       const ind = new Float32Array(n3);
       for (let n = 0; n < n3; n++) ind[n] = this.c[n] === lab ? 1 : 0;
-      bls.push(blur3(ind, N));
+      bls.push(blur3(blur3(ind, N), N));   // two passes: smoother colour borders
     }
     const parts = [];
     for (let li = 0; li < labs.length; li++) {
@@ -289,7 +292,7 @@
       for (let k = 0; k < N; k++) for (let j = 0; j < N; j++) for (let i = 0; i < N; i++)
         if (i === 0 || j === 0 || k === 0 || i === N - 1 || j === N - 1 || k === N - 1) g[this.idx(i, j, k)] = this.clamp;
       const m = this.meshTet(g);
-      if (m.idx.length) parts.push({ label: lab, mesh: m });
+      if (m.idx.length) parts.push({ label: lab, mesh: m, web: opts.web ? Base0.prototype.mesh.call(this, g, this.c) : null });
     }
     return parts;
   };

@@ -297,7 +297,7 @@ async function fetchB64(url) {
   for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
   return out;
 }
-async function loadMesh(url) {
+async function loadMesh(url, smooth) {
   if (typeof DecompressionStream === "undefined") throw new Error("no gzip");
   const res = await fetch(url);
   if (!res.ok) throw new Error("mesh " + res.status);
@@ -313,6 +313,7 @@ async function loadMesh(url) {
   g.setAttribute("position", new THREE.BufferAttribute(pos, 3));
   g.setIndex(new THREE.BufferAttribute(idx, 1));
   g.rotateX(-Math.PI / 2); // Z-up print space -> Y-up scene
+  if (smooth) { g.computeVertexNormals(); return g; }   // organic sculpts: fully smooth shading
   return toCreasedNormals(g, Math.PI / 5);
 }
 function makeViewer(stageEl) {
@@ -338,7 +339,7 @@ function makeViewer(stageEl) {
     async show(p) {
       group.clear();
       const meshes = await Promise.all(p.web.map(async w => {
-        const g = await loadMesh(w.file);
+        const g = await loadMesh(w.file, p.smooth);
         const m = new THREE.Mesh(g, new THREE.MeshStandardMaterial({ color: new THREE.Color(w.color), roughness: .62, metalness: 0 }));
         return m;
       }));
