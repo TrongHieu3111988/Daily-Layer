@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://dailylayer.funny3dprint.workers.dev/sitemap.xml

@@ -53,6 +53,7 @@ The shop's generator code lives inside the artifact under `agent/` as `.txt` fil
 - Call the `add_repo` tool with owner `TrongHieu3111988`, repo `Daily-Layer`, access `push`, then `git clone --depth 1 https://github.com/TrongHieu3111988/Daily-Layer repo` (generous timeout).
 - The deployed site lives in `repo/public/` (Cloudflare serves only that folder; `repo/agent/` holds code). Run `python3 gen/make_cf.py site repo/public deliverables /tmp/cf.zip` — rebuilds `repo/public/products`, `catalog.json`, `journal.json` from `site/` (paid zips go to `deliverables/`, never into the repo) and keeps `repo/public/index.html` and `repo/public/sculpt/` as they are.
 - After pushing, confirm the build: `gh api repos/TrongHieu3111988/Daily-Layer/commits/<sha>/check-runs` until the "Workers Builds: dailylayer" run is `completed`; report `success` or `failure`.
+- SEO, always the last step before committing: `cd repo && python3 agent/build_seo.py public && cd ..` — rebuilds `public/toys/` (one search page per toy), the meta tags on the home and game pages, `sitemap.xml` and `robots.txt`. It must run after `make_cf.py`, `build_shop.py` and `build_games.py`, since those rewrite pages it tags. When a new game ships, add its path, name and one-line description to `GAMES` in `agent/build_seo.py`.
 - Copy `gen/*.py` into `repo/agent/`, then commit as "Daily drop <YYYY-MM-DD>: <title>" and `git push origin main`.
 - If the push is refused, say so in the report; the claude.ai shop is still updated.
 
