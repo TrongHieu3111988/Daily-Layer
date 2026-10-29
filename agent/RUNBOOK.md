@@ -1,6 +1,7 @@
 # Daily Layer — daily drop runbook
 
 ## Order of work (the owner's rule, 2026-10-29)
+0. **English first**: the shop sells abroad. Write every page, game, title and journal in English first, then Vietnamese. Pages open in English unless the device is Vietnamese or the visitor picked Vietnamese; the choice is one shared setting (`dl-lang`) across the shop, the games, Doodle Puff and Sculpt Studio.
 1. **Research first**: what can sell now and in the next 2–6 weeks (agent/RESEARCH.md + fresh searches with numbers).
 2. **Then the print file**: build that model, checked and assembled.
 3. **Then games that reuse the model library**: the library is `toys.json` (every figure the shop made, with its 3D game mesh, cover, icon sticker, body colour, Vietnamese name and 2D look, written by `gen/game_assets.py`). Every game, old and new, reads it at start, so a new model appears in every game by itself.
