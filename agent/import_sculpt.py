@@ -37,6 +37,7 @@ BLURB = {
     "fox": "Fox cub with a fluffy white-tipped tail, dark ear tips and a tiny smile. Sculpted at high resolution in Sculpt Studio.",
     "frog": "Grinning frog with big glossy eyes, rosy cheeks and a pale belly. One solid piece, colour-split 3MF included.",
     "axolotl": "Smiling axolotl with feathery gills and a curled tail. Prints as one piece with no loose parts.",
+    "gingerbread": "Chubby gingerbread buddy with white icing trim, gumdrop buttons and a knitted scarf. One solid piece, colour-split for AMS.",
     "kitten": "Tabby kitten with pink ears, a white muzzle and its tail wrapped round its paws. Colour-split for AMS.",
 }
 

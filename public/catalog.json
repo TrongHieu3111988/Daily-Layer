@@ -3,6 +3,145 @@
  "started": "2026-10-28",
  "products": [
   {
+   "slug": "sculpt-gingerbread",
+   "title": "Gingerbread Buddy",
+   "price": 2.49,
+   "blurb": "Chubby gingerbread buddy with white icing trim, gumdrop buttons and a knitted scarf. One solid piece, colour-split for AMS.",
+   "tags": [
+    "figure",
+    "cute",
+    "animal",
+    "kids",
+    "multicolor"
+   ],
+   "line": "figure",
+   "print_hint": "Sculpted in Sculpt Studio. Painted OBJ/3MF (Bambu Studio maps the colours to your filaments on import), colour-split 3MF and single-colour STL; 0.12-0.16 mm layers.",
+   "parts": [
+    {
+     "name": "body",
+     "triangles": 174488,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 52.78,
+     "size_mm": [
+      61.9,
+      35.3,
+      70.2
+     ],
+     "min_z": 0.0
+    }
+   ],
+   "colour_parts": [
+    {
+     "name": "ginger",
+     "triangles": 194480,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 46.51,
+     "size_mm": [
+      61.9,
+      33.5,
+      70.2
+     ],
+     "min_z": -0.03
+    },
+    {
+     "name": "pine",
+     "triangles": 49096,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 5.4,
+     "size_mm": [
+      34.0,
+      33.5,
+      18.5
+     ],
+     "min_z": 27.71
+    },
+    {
+     "name": "white",
+     "triangles": 15328,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 20,
+     "volume_cm3": 0.22,
+     "size_mm": [
+      49.2,
+      10.9,
+      63.9
+     ],
+     "min_z": 4.3
+    },
+    {
+     "name": "red",
+     "triangles": 7212,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 5,
+     "volume_cm3": 0.3,
+     "size_mm": [
+      22.6,
+      8.5,
+      36.4
+     ],
+     "min_z": 15.49
+    },
+    {
+     "name": "ink",
+     "triangles": 4832,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 2,
+     "volume_cm3": 0.22,
+     "size_mm": [
+      17.3,
+      5.9,
+      6.1
+     ],
+     "min_z": 53.04
+    }
+   ],
+   "watertight": true,
+   "smooth": true,
+   "web": [
+    {
+     "file": null,
+     "color": "#C27C43",
+     "name": "ginger"
+    },
+    {
+     "file": null,
+     "color": "#2F8A57",
+     "name": "pine"
+    },
+    {
+     "file": null,
+     "color": "#FBFBF8",
+     "name": "white"
+    },
+    {
+     "file": null,
+     "color": "#D9443F",
+     "name": "red"
+    },
+    {
+     "file": null,
+     "color": "#24283A",
+     "name": "ink"
+    }
+   ],
+   "preview": "products/sculpt-gingerbread/preview_fc.bin",
+   "preview_face": true,
+   "download": "",
+   "cover": "products/sculpt-gingerbread/cover.jpg",
+   "build_seconds": 0,
+   "download_bytes": 10710714,
+   "dropped": "2026-10-29"
+  },
+  {
    "slug": "xmas-flat-ornaments-4",
    "title": "Nordic Flat Ornaments (set of 4)",
    "price": 2.99,
@@ -1777,6 +1916,6 @@
   "members": 0,
   "costs_usd": 0.0
  },
- "updated": "2026-10-29 01:27",
- "featured": "sculpt-axolotl"
+ "updated": "2026-10-29 08:48",
+ "featured": "sculpt-gingerbread"
 }

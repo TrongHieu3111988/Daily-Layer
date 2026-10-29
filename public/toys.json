@@ -1,7 +1,17 @@
 {
- "updated": "2026-10-29 01:27",
- "featured": "sculpt-axolotl",
+ "updated": "2026-10-29 08:48",
+ "featured": "sculpt-gingerbread",
  "toys": [
+  {
+   "slug": "sculpt-gingerbread",
+   "title": "Gingerbread Buddy",
+   "price": 2.49,
+   "dropped": "2026-10-29",
+   "height_mm": 70.2,
+   "game": "products/sculpt-gingerbread/game.bin",
+   "cover": "products/sculpt-gingerbread/cover.jpg",
+   "featured": true
+  },
   {
    "slug": "sculpt-penguin",
    "title": "Little Penguin",
@@ -80,7 +90,7 @@
    "height_mm": 70.4,
    "game": "products/sculpt-axolotl/game.bin",
    "cover": "products/sculpt-axolotl/cover.jpg",
-   "featured": true
+   "featured": false
   },
   {
    "slug": "chibi-whale-4part",

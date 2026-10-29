@@ -1,0 +1,522 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Whose Shadow?</title>
+<meta name="theme-color" content="#FFC93C">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/icons/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@500;600;700;800&display=swap">
+<style>
+/* Daily Layer game kit: the same chunky toy-block look as the shop. One-screen apps: bar on top, stage fills the rest. */
+:root{
+  --sky:#DCF0FF; --sky2:#C9E8FF; --paper:#FFFFFF; --ink:#1B2547; --muted:#55608A; --outline:#1B2547;
+  --sun:#FFC93C; --coral:#FF6B57; --grass:#3FBF7F; --grape:#8C6BF2; --bubble:#5DB8FF; --pink:#FF8FB8; --wood:#E9B97A; --wood2:#C98E4F;
+  --good:#1C9A5E; --bad:#E04A3A; --pop:0 5px 0 var(--outline); --pop-sm:0 3px 0 var(--outline);
+  --f-display:"Baloo 2","Nunito",ui-rounded,system-ui,sans-serif;
+  --f-body:"Nunito",ui-rounded,system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --sky:#101A3A; --sky2:#14204A; --paper:#1A2550; --ink:#EEF2FF; --muted:#AAB4DA; --outline:#070B1F;
+  --sun:#FFCF4D; --coral:#FF7A66; --grass:#4FD08F; --grape:#A487FF; --bubble:#6CC2FF; --pink:#FF9DC3; --wood:#B98A55; --wood2:#8E6234;
+  --good:#4FD08F; --bad:#FF7A66; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --sky:#101A3A; --sky2:#14204A; --paper:#1A2550; --ink:#EEF2FF; --muted:#AAB4DA; --outline:#070B1F;
+  --sun:#FFCF4D; --coral:#FF7A66; --grass:#4FD08F; --grape:#A487FF; --bubble:#6CC2FF; --pink:#FF9DC3; --wood:#B98A55; --wood2:#8E6234;
+  --good:#4FD08F; --bad:#FF7A66; color-scheme:dark}
+body{margin:0}[hidden]{display:none!important}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--sky);color:var(--ink);font-family:var(--f-body);font-size:16px;overflow:hidden;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--grape);outline-offset:3px}
+.app{height:100%;display:flex;flex-direction:column}
+.bar{display:flex;align-items:center;gap:8px;padding-block:8px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.bar h1{font-family:var(--f-display);font-weight:800;font-size:22px;margin:0 auto 0 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.ibtn{width:44px;height:44px;flex:none;border-radius:14px;border:2.5px solid var(--outline);background:var(--paper);display:grid;place-items:center;box-shadow:var(--pop-sm);text-decoration:none;color:var(--ink);font-family:var(--f-display);font-weight:800;font-size:14px}
+.ibtn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--outline)}
+.ibtn svg{width:22px;height:22px}
+.score{flex:none;display:flex;align-items:center;gap:6px;background:var(--sun);color:#3A2A00;border:2.5px solid var(--outline);border-radius:14px;padding:4px 12px;font-family:var(--f-display);font-weight:800;font-size:18px;box-shadow:var(--pop-sm);font-variant-numeric:tabular-nums}
+.score svg{width:20px;height:20px}
+.stage{position:relative;flex:1;min-height:0;margin:0 max(16px,env(safe-area-inset-right,0px)) 12px max(16px,env(safe-area-inset-left,0px));border:3px solid var(--outline);border-radius:26px;overflow:hidden;box-shadow:0 6px 0 var(--outline);background:var(--paper)}
+.btn{text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:9px;border:2.5px solid var(--outline);border-radius:18px;padding:12px 22px;font-family:var(--f-display);font-weight:800;font-size:20px;line-height:1;background:var(--paper);color:var(--ink);box-shadow:var(--pop);transition:transform .12s,box-shadow .12s}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 var(--outline)}
+.btn.coral{background:var(--coral);color:#fff}.btn.grass{background:var(--grass);color:#06301B}.btn.sun{background:var(--sun);color:#3A2A00}
+.btn svg{width:24px;height:24px}
+.overlay{position:fixed;inset:0;z-index:30;display:grid;place-items:center;background:rgba(9,14,34,.45);padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.card{background:var(--paper);border:3px solid var(--outline);border-radius:28px;box-shadow:0 8px 0 var(--outline);padding:22px 22px 24px;max-width:420px;width:100%;display:grid;gap:14px;text-align:center;justify-items:center;animation:popin .35s cubic-bezier(.34,1.56,.64,1)}
+.card h2{font-family:var(--f-display);font-weight:800;font-size:32px;line-height:1.05;margin:0}
+.card p{margin:0;color:var(--muted);font-weight:700;line-height:1.45}
+.card canvas.hero{width:200px;height:140px}
+.card .row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.stars{display:flex;gap:6px}
+.stars svg{width:44px;height:44px}
+@keyframes popin{0%{transform:scale(.7);opacity:0}100%{transform:scale(1);opacity:1}}
+.toast{position:absolute;left:50%;top:14px;transform:translateX(-50%);z-index:5;background:var(--paper);border:2.5px solid var(--outline);border-radius:16px;padding:6px 14px;font-family:var(--f-display);font-weight:800;font-size:18px;box-shadow:var(--pop-sm);white-space:nowrap;pointer-events:none;transition:opacity .3s,transform .3s}
+.toast[hidden]{display:block!important;opacity:0;transform:translate(-50%,-10px)}
+canvas#confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:40}
+@media (max-width:420px){.bar h1{font-size:18px}.ibtn{width:40px;height:40px}.score{font-size:16px;padding:3px 10px}}
+@media (prefers-reduced-motion:reduce){.card{animation:none}.btn,.ibtn{transition:none}}
+
+/* Whose Shadow?: one of the shop's real 3D toys turns slowly as a dark shadow. Tap the friend it belongs to and the lights come on. */
+.stage{background:#2B2F5C;display:flex;flex-direction:column}
+.spot{position:relative;flex:1;min-height:0}
+#view{display:block;width:100%;height:100%;touch-action:manipulation}
+.dots{position:absolute;left:0;right:0;top:12px;z-index:3;display:flex;gap:6px;justify-content:center;pointer-events:none}
+.dots i{width:14px;height:14px;border-radius:50%;border:2.5px solid #070B1F;background:rgba(255,255,255,.25)}
+.dots i.on{background:var(--sun)}
+.dots i.now{background:#fff;transform:scale(1.25)}
+.ask{position:absolute;left:0;right:0;bottom:10px;z-index:3;text-align:center;font-family:var(--f-display);font-weight:800;font-size:clamp(20px,6vw,28px);color:#fff;text-shadow:0 3px 0 #070B1F;pointer-events:none;padding:0 12px}
+.picks{display:grid;gap:12px;padding:14px 14px 18px;background:#3A3F78;border-top:3px solid #070B1F}
+.picks.n3{grid-template-columns:repeat(3,1fr)}
+.picks.n4{grid-template-columns:repeat(4,1fr);gap:8px;padding:12px 10px 16px}
+.picks.n4 .pick{font-size:13px;border-radius:18px;padding:5px}
+.pick{appearance:none;border:3px solid var(--outline);border-radius:22px;background:#FFF7E6;padding:6px;box-shadow:var(--pop);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;font:800 15px/1.1 var(--f-display);color:#1B2547;min-height:96px;transition:transform .15s,opacity .3s}
+.pick img{width:100%;max-width:120px;aspect-ratio:1;object-fit:cover;border-radius:16px;background:#E2E5E2}
+.picks.n4 .pick img{max-width:96px;border-radius:12px}
+.pick:active{transform:translateY(3px);box-shadow:var(--pop-sm)}
+.pick.no{opacity:.35;pointer-events:none;filter:grayscale(1)}
+.pick.yes{background:var(--sun);transform:scale(1.06)}
+.pick.hint{animation:wig .6s ease-in-out 3}
+.pick.shake{animation:shake .4s}
+@keyframes wig{0%,100%{transform:rotate(0)}25%{transform:rotate(-6deg) scale(1.05)}75%{transform:rotate(6deg) scale(1.05)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.loading{position:absolute;inset:0;display:grid;place-items:center;z-index:5;font-family:var(--f-display);font-weight:800;font-size:20px;background:#2B2F5C;color:#fff;text-align:center;padding:20px}
+@media (prefers-reduced-motion:reduce){.pick.hint,.pick.shake{animation:none}.pick.hint{outline:5px solid var(--sun)}}
+</style>
+
+</head>
+<body>
+<div class="app">
+  <header class="bar">
+    <a class="ibtn" id="back" href="/" data-t-label="back" aria-label="Back"></a>
+    <h1 data-t="title">Whose Shadow?</h1>
+    <span class="score" aria-live="polite"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 15.8 6.8 18.6l1-5.8-4.3-4.1 5.9-.8z" fill="#FFC93C" stroke="#1B2547" stroke-width="2" stroke-linejoin="round"/></svg><span id="total">0</span></span>
+    <button class="ibtn" id="soundBtn" type="button" data-t-label="sound" aria-label="Sound"></button>
+    <button class="ibtn" id="langBtn" type="button" aria-label="Language">VI</button>
+  </header>
+  <main class="stage" id="stage">
+    <div class="spot">
+      <canvas id="view" aria-label="A toy's shadow"></canvas>
+      <div class="dots" id="dots"></div>
+      <div class="ask" id="ask" data-t="ask">Who is this?</div>
+      <div class="toast" id="toast" hidden></div>
+    </div>
+    <div class="picks n3" id="picks"></div>
+    <div class="loading" id="loading" data-t="loading">Turning the lights off…</div>
+  </main>
+</div>
+
+<div class="overlay" id="intro">
+  <div class="card">
+    <canvas class="hero" id="introArt" width="400" height="280"></canvas>
+    <h2 data-t="introH">Whose Shadow?</h2>
+    <p data-t="introP">The lights are off and a toy friend is hiding in the dark. Look at the shadow, then tap the friend it belongs to. Guess right and the lights come on!</p>
+    <button class="btn coral" type="button" id="startBtn"><span data-t="start">Lights off!</span></button>
+  </div>
+</div>
+<div class="overlay" id="over" hidden>
+  <div class="card">
+    <div class="stars" id="stars"></div>
+    <h2 id="overH"></h2>
+    <p id="overP"></p>
+    <div class="row"><button class="btn coral" type="button" id="againBtn"><span data-t="again">Play again</span></button><a class="btn" id="homeBtn" href="/" data-t="home">More games</a></div>
+  </div>
+</div>
+
+<script>
+/* Daily Layer game kit: words, sound, confetti and the "toy friends" every game draws. */
+(function () {
+  "use strict";
+  const K = {};
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+  };
+  K.store = store;
+  K.CALM = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---------- words ---------- */
+  K.lang = store.get("dl-lang", /^vi/i.test(navigator.language || "") ? "vi" : "en");
+  K.words = { en: {}, vi: {} };
+  K.t = (k, ...a) => { const v = K.words[K.lang][k] ?? K.words.en[k] ?? k; return typeof v === "function" ? v(...a) : v; };
+  K.applyWords = () => {
+    document.documentElement.lang = K.lang;
+    document.querySelectorAll("[data-t]").forEach(el => { el.textContent = K.t(el.dataset.t); });
+    document.querySelectorAll("[data-t-label]").forEach(el => { el.setAttribute("aria-label", K.t(el.dataset.tLabel)); });
+    const b = document.getElementById("langBtn"); if (b) b.textContent = K.lang === "vi" ? "EN" : "VI";
+    K.onLang && K.onLang();
+  };
+  K.toggleLang = () => { K.lang = K.lang === "vi" ? "en" : "vi"; store.set("dl-lang", K.lang); K.applyWords(); };
+
+  /* ---------- sound: tiny synth blips, only after the child has touched the screen ---------- */
+  let ac = null; K.muted = store.get("dl-muted", false);
+  function ctx() { if (K.muted) return null; if (!ac) { try { ac = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return null; } } if (ac.state === "suspended") ac.resume(); return ac; }
+  function tone(f0, f1, dur, type = "sine", vol = 0.18, delay = 0) {
+    const a = ctx(); if (!a) return;
+    const t0 = a.currentTime + delay, o = a.createOscillator(), g = a.createGain();
+    o.type = type; o.frequency.setValueAtTime(f0, t0); o.frequency.exponentialRampToValueAtTime(Math.max(30, f1), t0 + dur);
+    g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(vol, t0 + 0.015); g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    o.connect(g).connect(a.destination); o.start(t0); o.stop(t0 + dur + 0.02);
+  }
+  K.sfx = {
+    pop: () => tone(520, 880, 0.12, "triangle", 0.16),
+    thud: () => tone(180, 90, 0.14, "sine", 0.22),
+    boing: () => { tone(300, 120, 0.25, "square", 0.06); tone(150, 260, 0.2, "sine", 0.12, 0.05); },
+    chime: () => { [660, 880, 1320].forEach((f, i) => tone(f, f * 1.01, 0.22, "triangle", 0.12, i * 0.07)); },
+    tada: () => { [523, 659, 784, 1046].forEach((f, i) => tone(f, f, 0.3, "triangle", 0.14, i * 0.09)); },
+    tick: () => tone(1200, 900, 0.04, "square", 0.04)
+  };
+  K.setMuted = m => { K.muted = m; store.set("dl-muted", m); const b = document.getElementById("soundBtn"); if (b) b.innerHTML = m ? K.ICON.mute : K.ICON.sound; };
+
+  /* ---------- confetti ---------- */
+  let cc = null, cg = null, bits = [], craf = 0;
+  const CONF = ["#FF6B57", "#FFC93C", "#3FBF7F", "#5DB8FF", "#8C6BF2", "#FF8FB8"];
+  K.confetti = (x, y, n = 60) => {
+    if (K.CALM) return;
+    if (!cc) { cc = document.createElement("canvas"); cc.id = "confetti"; document.body.appendChild(cc); cg = cc.getContext("2d"); }
+    const d = Math.min(devicePixelRatio || 1, 2); cc.width = innerWidth * d; cc.height = innerHeight * d;
+    x = x ?? innerWidth / 2; y = y ?? innerHeight / 3;
+    for (let i = 0; i < n; i++) { const a = Math.random() * Math.PI * 2, s = 4 + Math.random() * 7;
+      bits.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s - 5, r: Math.random() * 6, vr: (Math.random() - .5) * .4, w: 6 + Math.random() * 6, h: 4 + Math.random() * 4, c: CONF[i % CONF.length], life: 0 }); }
+    if (!craf) craf = requestAnimationFrame(step);
+    function step() {
+      const d = cc.width / innerWidth; cg.clearRect(0, 0, cc.width, cc.height);
+      for (let i = bits.length - 1; i >= 0; i--) { const b = bits[i]; b.life++; b.vy += 0.25; b.vx *= 0.99; b.x += b.vx; b.y += b.vy; b.r += b.vr;
+        if (b.y > innerHeight + 20 || b.life > 240) { bits.splice(i, 1); continue; }
+        cg.save(); cg.translate(b.x * d, b.y * d); cg.rotate(b.r); cg.fillStyle = b.c; cg.fillRect(-b.w * d / 2, -b.h * d / 2, b.w * d, b.h * d); cg.restore(); }
+      craf = bits.length ? requestAnimationFrame(step) : 0;
+    }
+  };
+
+  /* ---------- toy friends: our own little characters, drawn with canvas ---------- */
+  K.COLS = { coral: "#FF6B57", sun: "#FFC93C", grass: "#3FBF7F", sky: "#5DB8FF", grape: "#8C6BF2", pink: "#FF8FB8", orange: "#FF9B3D", mint: "#7FE0C2" };
+  K.INK = "#1B2547";
+  function shapePath(g, shape, w, h) {
+    g.beginPath();
+    const r = Math.min(w, h) * 0.22;
+    if (shape === "ball") { g.ellipse(0, 0, w / 2, h / 2, 0, 0, Math.PI * 2); }
+    else if (shape === "tri") { g.moveTo(0, -h / 2); g.lineTo(w / 2, h / 2); g.lineTo(-w / 2, h / 2); g.closePath(); }
+    else if (shape === "dome") { g.moveTo(-w / 2, h / 2); g.lineTo(-w / 2, 0); g.ellipse(0, 0, w / 2, h / 2, 0, Math.PI, 0); g.lineTo(w / 2, h / 2); g.closePath(); }
+    else if (shape === "star") { for (let k = 0; k < 10; k++) { const a = -Math.PI / 2 + k * Math.PI / 5, rr = k % 2 ? 0.42 : 1; g.lineTo(Math.cos(a) * w / 2 * rr, Math.sin(a) * h / 2 * rr * 1.05 + h * 0.04); } g.closePath(); }
+    else if (shape === "heart") { const s = w / 2; g.moveTo(0, h * 0.42); g.bezierCurveTo(-s * 1.4, -h * 0.05, -s * 0.55, -h * 0.62, 0, -h * 0.2); g.bezierCurveTo(s * 0.55, -h * 0.62, s * 1.4, -h * 0.05, 0, h * 0.42); }
+    else { g.roundRect ? g.roundRect(-w / 2, -h / 2, w, h, r) : g.rect(-w / 2, -h / 2, w, h); }
+  }
+  K.shapePath = shapePath;
+  /* Each block colour belongs to one of the shop's animals, so a colour still means the same friend in every puzzle.
+     The block keeps its shape (the physics and the puzzles use it); the animal is painted on: ears, patches, nose, beak. */
+  K.ANIMALS = {
+    fox: { ears: "point", tip: "#1B2547", inner: "#FFE3D6", muzzle: "#FFFFFF", nose: true },
+    chick: { tuft: true, belly: "#FFE58A", beak: "#FF9B3D" },
+    frog: { bumps: true, belly: "#BFF0C9", wide: true },
+    whale: { spout: true, belly: "#D6EEFF", lines: true },
+    penguin: { mask: "#FFFFFF", beak: "#FFB13D" },
+    axolotl: { gills: "#E0457B", spots: "#FF6FA0" },
+    kitten: { ears: "point", inner: "#FFC4D6", stripes: "rgba(27,37,71,.32)", nose: "#FF8FB8", whiskers: true },
+    bear: { ears: "round", inner: "#E8C9A0", muzzle: "#E8C9A0", nose: true },
+    bunny: { ears: "long", inner: "#FFC4D6", nose: "#FF8FB8", whiskers: true }
+  };
+  K.ANIMAL_OF = { "#ff6b57": "fox", "#ffc93c": "chick", "#3fbf7f": "frog", "#5db8ff": "whale", "#8c6bf2": "penguin", "#ff8fb8": "axolotl",
+    "#ff9b3d": "kitten", "#b8834f": "bear", "#f4effa": "bunny", "#7fe0c2": "frog" };
+  // y of the top edge of a shape at x (for ears and bumps); null where there is no flat-ish top
+  function topAt(shape, w, h, x) {
+    const u = Math.min(1, Math.abs(x) / (w / 2));
+    if (shape === "ball" || shape === "dome") return -(h / 2) * Math.sqrt(1 - u * u);
+    if (shape === "tri") return -h / 2 + h * u;
+    if (shape === "star" || shape === "heart") return null;
+    return -h / 2;
+  }
+  function blob(g, x, y, rx, ry, rot, fill, lw) { g.beginPath(); g.ellipse(x, y, rx, ry, rot || 0, 0, Math.PI * 2); g.fillStyle = fill; g.fill(); if (lw) { g.lineWidth = lw; g.strokeStyle = K.INK; g.stroke(); } }
+  // behind the body: ears, gills, bumps, tuft, spout
+  function animalBack(g, a, o, w, h, s, lw, colour) {
+    const sh = o.shape, tri = sh === "tri", ex = tri ? w * 0.15 : Math.min(w * 0.3, w / 2 - s * 0.14), ear = s * (tri ? 0.18 : 0.22);
+    const T = x => topAt(sh, w, h, x);
+    if (a.ears && T(ex) !== null) for (const sx of [-1, 1]) {
+      const x = sx * ex, y = T(x) + ear * 0.25;
+      g.save(); g.translate(x, y); g.rotate(sx * (tri ? 0.75 : a.ears === "long" ? 0.12 : 0.28));
+      if (a.ears === "point") {
+        g.beginPath(); g.moveTo(-ear * 0.62, ear * 0.3); g.lineTo(0, -ear * 1.05); g.lineTo(ear * 0.62, ear * 0.3); g.closePath(); g.fillStyle = colour; g.fill(); g.lineWidth = lw; g.strokeStyle = K.INK; g.lineJoin = "round"; g.stroke();
+        g.beginPath(); g.moveTo(-ear * 0.3, ear * 0.15); g.lineTo(0, -ear * 0.6); g.lineTo(ear * 0.3, ear * 0.15); g.closePath(); g.fillStyle = a.inner; g.fill();
+        if (a.tip) { g.save(); g.beginPath(); g.moveTo(-ear * 0.62, ear * 0.3); g.lineTo(0, -ear * 1.05); g.lineTo(ear * 0.62, ear * 0.3); g.closePath(); g.clip(); g.fillStyle = a.tip; g.fillRect(-ear, -ear * 1.2, ear * 2, ear * 0.55); g.restore(); }
+      } else if (a.ears === "round") { blob(g, 0, -ear * 0.2, ear * 0.55, ear * 0.55, 0, colour, lw); blob(g, 0, -ear * 0.2, ear * 0.28, ear * 0.28, 0, a.inner); }
+      else { blob(g, 0, -ear * 1.0, ear * 0.42, ear * 1.25, 0, colour, lw); blob(g, 0, -ear * 0.95, ear * 0.2, ear * 0.85, 0, a.inner); }
+      g.restore();
+    }
+    if (a.gills) for (const sx of [-1, 1]) {
+      const bx = sx * (sh === "tri" ? w * 0.3 : w / 2), by = sh === "tri" ? h * 0.12 : -h * 0.12;
+      for (let k = -1; k <= 1; k++) { g.save(); g.translate(bx, by + k * s * 0.13); g.rotate(sx * (Math.PI / 2 + k * 0.5) - Math.PI / 2 * sx + sx * 0.0); blob(g, sx * s * 0.11, 0, s * 0.13, s * 0.055, k * 0.45 * sx, a.gills, lw * 0.8); g.restore(); }
+    }
+    if (a.tuft && T(0) !== null) { g.lineWidth = lw; g.strokeStyle = K.INK; g.lineCap = "round"; const y = T(0);
+      for (const k of [-1, 0, 1]) { g.beginPath(); g.moveTo(k * s * 0.05, y + 1); g.quadraticCurveTo(k * s * 0.12, y - s * 0.12, k * s * 0.09 + s * 0.04, y - s * 0.17); g.stroke(); } }
+    if (a.spout && T(0) !== null) { const y = T(0) - s * 0.05; g.lineWidth = lw * 0.9; g.strokeStyle = K.INK; g.fillStyle = "#BDE6FF";
+      for (const sx of [-1, 1]) { g.beginPath(); g.moveTo(0, y); g.quadraticCurveTo(sx * s * 0.05, y - s * 0.2, sx * s * 0.17, y - s * 0.17); g.stroke(); }
+      for (const sx of [-1, 0, 1]) blob(g, sx * s * 0.19, y - s * (sx ? 0.15 : 0.26), s * 0.045, s * 0.055, 0, "#BDE6FF", lw * 0.6); }
+  }
+  // inside the body (clipped): patches, belly, stripes
+  function animalPatches(g, a, o, w, h, s, fy, ey, ex) {
+    if (a.belly) blob(g, 0, h / 2, w * (a.wide ? 0.42 : 0.34), h * 0.4, 0, a.belly);
+    if (a.lines) { g.strokeStyle = "rgba(27,37,71,.18)"; g.lineWidth = Math.max(1, s * 0.025); for (const k of [-1, 0, 1]) { g.beginPath(); g.moveTo(k * w * 0.12, h * 0.2); g.lineTo(k * w * 0.12, h / 2); g.stroke(); } }
+    if (a.mask) { blob(g, -ex * 0.95, ey + s * 0.02, s * 0.2, s * 0.22, 0, a.mask); blob(g, ex * 0.95, ey + s * 0.02, s * 0.2, s * 0.22, 0, a.mask); blob(g, 0, ey + s * 0.16, s * 0.24, s * 0.16, 0, a.mask); blob(g, 0, h / 2, w * 0.32, h * 0.36, 0, a.mask); }
+    if (a.muzzle) blob(g, 0, ey + s * 0.13, s * 0.21, s * 0.13, 0, a.muzzle);
+    if (a.stripes) { g.strokeStyle = a.stripes; g.lineWidth = Math.max(1.5, s * 0.05); g.lineCap = "round"; const y = ey - s * 0.2;
+      for (const k of [-1, 0, 1]) { g.beginPath(); g.moveTo(k * s * 0.1, y - s * 0.06 + Math.abs(k) * s * 0.03); g.lineTo(k * s * 0.1, y + s * 0.04); g.stroke(); }
+      for (const sx of [-1, 1]) for (const k of [0, 1]) { g.beginPath(); g.moveTo(sx * w / 2, ey + k * s * 0.12); g.lineTo(sx * (w / 2 - s * 0.12), ey + k * s * 0.12 + s * 0.02); g.stroke(); } }
+    if (a.spots) for (const [x, y, r] of [[-0.3, -0.25, 0.05], [0.32, -0.18, 0.04], [0.25, 0.3, 0.05], [-0.28, 0.28, 0.035]]) blob(g, x * w, y * h + fy, s * r, s * r, 0, a.spots);
+  }
+  // draw a friend centred at (0,0); opts: shape, colour, w, h, mood ("happy" | "wow" | "sleepy" | "sad"), lw, animal (defaults from the colour)
+  K.friend = (g, o) => {
+    const { shape = "square", colour = "#FFC93C", w = 60, h = 60, mood = "happy" } = o, lw = o.lw ?? Math.max(2, Math.min(w, h) * 0.07);
+    const name = o.animal === undefined ? K.ANIMAL_OF[String(colour).toLowerCase()] : o.animal, a = name ? K.ANIMALS[name] : null;
+    const s = Math.min(w, h), fy = shape === "tri" ? h * 0.18 : shape === "dome" ? h * 0.08 : 0, ex = s * 0.17, ey = fy - s * 0.04, er = Math.max(1.6, s * 0.065);
+    g.save();
+    if (a) animalBack(g, a, o, w, h, s, lw, colour);
+    shapePath(g, shape, w, h); g.fillStyle = colour; g.fill();
+    // soft highlight, animal patches and a little shade, all inside the shape
+    g.save(); shapePath(g, shape, w, h); g.clip();
+    if (a) animalPatches(g, a, o, w, h, s, fy, ey, ex);
+    g.fillStyle = "rgba(255,255,255,.28)"; g.beginPath(); g.ellipse(-w * 0.22, -h * 0.28, w * 0.28, h * 0.16, -0.5, 0, Math.PI * 2); g.fill();
+    g.fillStyle = "rgba(0,0,0,.08)"; g.fillRect(-w, h * 0.22, w * 2, h); g.restore();
+    shapePath(g, shape, w, h); g.lineWidth = lw; g.strokeStyle = K.INK; g.lineJoin = "round"; g.stroke();
+    // frog eyes sit on bumps on top of the head
+    let eY = ey; const T0 = topAt(shape, w, h, ex);
+    if (a && a.bumps && T0 !== null && shape !== "tri") { eY = T0 + s * 0.02; for (const sx of [-1, 1]) blob(g, sx * ex, eY, s * 0.15, s * 0.14, 0, colour, lw);
+      g.save(); g.beginPath(); g.rect(-w, T0 + lw / 2, w * 2, h); g.clip(); for (const sx of [-1, 1]) blob(g, sx * ex, eY, s * 0.15 - lw / 2, s * 0.14 - lw / 2, 0, colour); g.restore();
+      for (const sx of [-1, 1]) blob(g, sx * ex, eY - s * 0.01, s * 0.1, s * 0.1, 0, "#FFFFFF"); }
+    // face
+    g.fillStyle = K.INK; g.strokeStyle = K.INK; g.lineCap = "round"; g.lineWidth = Math.max(1.5, s * 0.05);
+    if (mood === "sleepy") { for (const sx of [-1, 1]) { g.beginPath(); g.arc(sx * ex, eY, er, 0.1 * Math.PI, 0.9 * Math.PI); g.stroke(); } }
+    else for (const sx of [-1, 1]) { g.beginPath(); g.ellipse(sx * ex, eY, er, er * (mood === "wow" ? 1.35 : 1.15), 0, 0, Math.PI * 2); g.fill();
+      g.fillStyle = "#fff"; g.beginPath(); g.arc(sx * ex - er * 0.3, eY - er * 0.35, er * 0.38, 0, Math.PI * 2); g.fill(); g.fillStyle = K.INK; }
+    g.fillStyle = "rgba(255,120,150,.55)";
+    for (const sx of [-1, 1]) { g.beginPath(); g.ellipse(sx * ex * 1.75, ey + s * 0.1, s * 0.07, s * 0.045, 0, 0, Math.PI * 2); g.fill(); }
+    let my = ey + s * 0.07;
+    if (a && a.beak) { my = ey + s * 0.16; g.beginPath(); g.moveTo(-s * 0.075, ey + s * 0.05); g.lineTo(s * 0.075, ey + s * 0.05); g.lineTo(0, ey + s * 0.14); g.closePath(); g.fillStyle = a.beak; g.fill(); g.lineWidth = Math.max(1.2, s * 0.03); g.stroke(); g.lineWidth = Math.max(1.5, s * 0.05); }
+    if (a && a.nose) { my = ey + s * 0.1; blob(g, 0, ey + s * 0.065, s * 0.045, s * 0.032, 0, a.nose === true ? K.INK : a.nose); }
+    if (a && a.whiskers) { g.lineWidth = Math.max(1, s * 0.022); for (const sx of [-1, 1]) for (const k of [-1, 1]) { g.beginPath(); g.moveTo(sx * s * 0.13, ey + s * 0.11); g.lineTo(sx * s * 0.3, ey + s * 0.11 + k * s * 0.04); g.stroke(); } g.lineWidth = Math.max(1.5, s * 0.05); }
+    g.fillStyle = K.INK; g.beginPath();
+    const mr = a && a.wide ? s * 0.15 : s * 0.09;
+    if (mood === "wow") { g.ellipse(0, my + s * 0.08, s * 0.05, s * 0.065, 0, 0, Math.PI * 2); g.fill(); }
+    else if (mood === "sad") { g.arc(0, my + s * 0.15, s * 0.08, 1.15 * Math.PI, 1.85 * Math.PI); g.stroke(); }
+    else { g.arc(0, my - (a && a.wide ? s * 0.06 : 0), mr, 0.15 * Math.PI, 0.85 * Math.PI); g.stroke(); }
+    g.restore();
+  };
+  K.star = (g, x, y, r, fill = "#FFC93C") => {
+    g.save(); g.beginPath();
+    for (let k = 0; k < 10; k++) { const a = -Math.PI / 2 + k * Math.PI / 5, rr = k % 2 ? r * 0.45 : r; g.lineTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr); }
+    g.closePath(); g.fillStyle = fill; g.fill(); g.lineWidth = Math.max(2, r * 0.18); g.strokeStyle = K.INK; g.lineJoin = "round"; g.stroke(); g.restore();
+  };
+  K.starSVG = on => `<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M20 3l5 10.3 11.3 1.5-8.3 7.8 2.1 11.2L20 28.3 9.9 33.8 12 22.6 3.7 14.8 15 13.3z" fill="${on ? "#FFC93C" : "rgba(127,140,180,.25)"}" stroke="#1B2547" stroke-width="3" stroke-linejoin="round"/></svg>`;
+
+  /* ---------- canvas helper: crisp at any pixel density ---------- */
+  K.fit = (canvas, onSize) => {
+    const ro = new ResizeObserver(() => { const r = canvas.getBoundingClientRect(), d = Math.min(devicePixelRatio || 1, 2.5);
+      if (!r.width) return; canvas.width = Math.round(r.width * d); canvas.height = Math.round(r.height * d); onSize && onSize(r.width, r.height, d); });
+    ro.observe(canvas);
+  };
+
+  K.ICON = {
+    back: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>',
+    sound: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor" fill-opacity=".2"/><path d="M16.5 9a4 4 0 010 6M19 6.5a7.5 7.5 0 010 11"/></svg>',
+    mute: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor" fill-opacity=".2"/><path d="M17 9l5 6M22 9l-5 6"/></svg>',
+    star: '<svg viewBox="0 0 24 24"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z" fill="#fff" stroke="#1B2547" stroke-width="2" stroke-linejoin="round"/></svg>',
+    replay: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 108-8H8"/><path d="M8 1L5 4l3 3"/></svg>',
+    play: '<svg viewBox="0 0 24 24"><path d="M7 4.5v15l12.5-7.5z" fill="currentColor"/></svg>'
+  };
+  // shared bar wiring: back link, sound, language
+  K.initBar = () => {
+    const back = document.getElementById("back"); if (back) { back.innerHTML = K.ICON.back; back.href = window.SHOP_URL || "/"; }
+    const s = document.getElementById("soundBtn"); if (s) { s.innerHTML = K.muted ? K.ICON.mute : K.ICON.sound; s.onclick = () => { K.setMuted(!K.muted); if (!K.muted) K.sfx.pop(); }; }
+    const l = document.getElementById("langBtn"); if (l) l.onclick = K.toggleLang;
+  };
+  window.K = K;
+})();
+
+</script>
+<script>
+K.words.en = { title: "Whose Shadow?", back: "Back", sound: "Sound on or off", ask: "Who is this?", loading: "Turning the lights off…", introH: "Whose Shadow?",
+  introP: "The lights are off and a toy friend is hiding in the dark. Look at the shadow, then tap the friend it belongs to. Guess right and the lights come on!", start: "Lights off!",
+  again: "Play again", home: "More games", yes: t => "It's the " + t + "!", tryAgain: "Not this one. Look again!",
+  overH: n => n >= 7 ? "Shadow detective!" : n >= 4 ? "Great looking!" : "Well done!", overP: (n, r) => "You found all " + r + " friends, " + n + " on the first try.",
+  noLoad: "The game couldn't load. Check the connection and try again." };
+K.words.vi = { title: "Bóng Của Ai?", back: "Quay lại", sound: "Bật hoặc tắt âm thanh", ask: "Đây là ai nhỉ?", loading: "Đang tắt đèn…", introH: "Bóng Của Ai?",
+  introP: "Đèn tắt rồi, một bạn đồ chơi đang trốn trong bóng tối. Bé nhìn cái bóng rồi chạm vào bạn đúng nhé. Đoán đúng là đèn bật sáng!", start: "Tắt đèn nào!",
+  again: "Chơi lại", home: "Trò khác", yes: t => "Đúng rồi, " + t + "!", tryAgain: "Chưa phải bạn này. Nhìn lại nhé!",
+  overH: n => n >= 7 ? "Thám tử bóng đêm!" : n >= 4 ? "Bé tinh mắt quá!" : "Giỏi lắm!", overP: (n, r) => "Bé đã tìm ra cả " + r + " bạn, " + n + " bạn đúng ngay lần đầu.",
+  noLoad: "Chưa tải được trò chơi. Kiểm tra mạng rồi thử lại." };
+// short Vietnamese names for the friends (titles in toys.json are English)
+const VI_NAME = { "sculpt-gingerbread": "Bánh Gừng", "sculpt-penguin": "Chim Cánh Cụt", "sculpt-kitten": "Mèo Mướp", "sculpt-frog": "Ếch Cười", "sculpt-fox": "Cáo Con",
+  "sculpt-chick": "Gà Con", "sculpt-bunny": "Thỏ Tròn", "sculpt-bear": "Gấu Con", "sculpt-axolotl": "Kỳ Giông", "chibi-whale-4part": "Cá Voi" };
+const nameOf = t => K.lang === "vi" && VI_NAME[t.slug] ? VI_NAME[t.slug] : t.title.replace(/\s*\(.*\)\s*/, "");
+K.initBar(); K.applyWords();
+let toastT = 0;
+function toast(m) { const e = document.getElementById("toast"); e.textContent = m; e.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => (e.hidden = true), 1600); }
+</script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/","cannon-es":"https://cdn.jsdelivr.net/npm/cannon-es@0.20.0/dist/cannon-es.js"}}</script>
+<script type="module">
+import * as THREE from "three";
+/* ---------- Daily Layer 3D kit: loads the shop's real figures as light game toys (inlined into module scripts) ---------- */
+const ASSETS = window.ASSETS || "/";
+async function fetchBytes(url) {
+  const res = await fetch(url); if (!res.ok) throw new Error("fetch " + res.status + " " + url);
+  if (!url.endsWith(".txt")) return new Uint8Array(await res.arrayBuffer());
+  const bin = atob((await res.text()).trim()), out = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+  return out;
+}
+async function loadToyList() { const r = await fetch(ASSETS + "toys.json"); if (!r.ok) throw new Error("toys"); return r.json(); }
+const geoCache = new Map();
+// a toy is 1 unit tall, standing on y = 0, centred on x/z, one colour per triangle
+async function toyGeometry(t) {
+  if (geoCache.has(t.slug)) return geoCache.get(t.slug);
+  const p = (async () => {
+    const gz = await fetchBytes(ASSETS + t.game);
+    const buf = await new Response(new Blob([gz]).stream().pipeThrough(new DecompressionStream("gzip"))).arrayBuffer();
+    const dv = new DataView(buf), nv = dv.getUint32(0, true), nf = dv.getUint32(4, true);
+    const lo = [0, 1, 2].map(i => dv.getFloat32(8 + 4 * i, true)), hi = [0, 1, 2].map(i => dv.getFloat32(20 + 4 * i, true));
+    const q = new Uint16Array(buf.slice(32, 32 + nv * 6)), pos = new Float32Array(nv * 3);
+    for (let i = 0; i < nv; i++) for (let k = 0; k < 3; k++) pos[3 * i + k] = lo[k] + q[3 * i + k] / 65535 * (hi[k] - lo[k]);
+    const fo = 32 + nv * 6, idx = new Uint32Array(buf.slice(fo, fo + nf * 12)), rgb = new Uint8Array(buf, fo + nf * 12, nf * 3);
+    const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.BufferAttribute(pos, 3)); g.setIndex(new THREE.BufferAttribute(idx, 1));
+    g.computeVertexNormals();
+    const ng = g.toNonIndexed(), col = new Float32Array(nf * 9), c = new THREE.Color();
+    for (let f = 0; f < nf; f++) { c.setRGB(rgb[3 * f] / 255, rgb[3 * f + 1] / 255, rgb[3 * f + 2] / 255, THREE.SRGBColorSpace); for (let k = 0; k < 3; k++) col.set([c.r, c.g, c.b], 9 * f + 3 * k); }
+    ng.setAttribute("color", new THREE.BufferAttribute(col, 3)); ng.computeBoundingBox(); g.dispose();
+    return ng;
+  })();
+  geoCache.set(t.slug, p); return p;
+}
+const toyMat = () => new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.55, metalness: 0 });
+async function toyMesh(t) { const m = new THREE.Mesh(await toyGeometry(t), toyMat()); m.castShadow = true; m.receiveShadow = true; m.userData.toy = t; return m; }
+// the child's collection is kept on this device only
+const collection = {
+  get() { return K.store.get("dl-collection", {}); },
+  add(slug) { const c = collection.get(); c[slug] = (c[slug] || 0) + 1; K.store.set("dl-collection", c); return c[slug]; }
+};
+const shopLink = slug => (window.SHOP_URL || "/") + "#m-" + slug;
+const assetURL = p => ASSETS + p;
+
+
+/* ---------- scene: a little round stage under a spotlight ---------- */
+const cv = document.getElementById("view");
+const renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2)); renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+const scene = new THREE.Scene();
+const DARK = new THREE.Color("#2B2F5C"), LIT = new THREE.Color("#FFE7A8");
+scene.background = DARK.clone();
+const cam = new THREE.PerspectiveCamera(36, 1, 0.1, 50); cam.position.set(0, 1.25, 4.2); cam.lookAt(0, 0.62, 0);
+const hemi = new THREE.HemisphereLight(0xffffff, 0x8C6BF2, 0.25); scene.add(hemi);
+const sun = new THREE.DirectionalLight(0xffffff, 0.4); sun.position.set(2.5, 5, 4); sun.castShadow = true; sun.shadow.mapSize.set(1024, 1024);
+Object.assign(sun.shadow.camera, { left: -2, right: 2, top: 2, bottom: -2, near: 1, far: 15 }); scene.add(sun);
+// glowing back disc (the "light" the shadow stands in front of)
+const glow = new THREE.Mesh(new THREE.CircleGeometry(1.25, 64), new THREE.MeshBasicMaterial({ color: "#FFF1C2" }));
+glow.position.set(0, 0.75, -1.1); scene.add(glow);
+const stageTop = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 1.3, 0.16, 64), new THREE.MeshStandardMaterial({ color: "#8C6BF2", roughness: 0.6 }));
+stageTop.position.y = -0.08; stageTop.receiveShadow = true; scene.add(stageTop);
+const rim = new THREE.Mesh(new THREE.TorusGeometry(1.25, 0.04, 8, 64), new THREE.MeshStandardMaterial({ color: "#FFC93C", roughness: 0.4 }));
+rim.rotation.x = Math.PI / 2; rim.position.y = 0.0; scene.add(rim);
+// little stars twinkling around (original decoration)
+const starMat = new THREE.MeshBasicMaterial({ color: "#FFE58A" }), stars = [];
+for (let i = 0; i < 14; i++) { const s = new THREE.Mesh(new THREE.OctahedronGeometry(0.035 + Math.random() * 0.03), starMat); s.position.set((Math.random() - 0.5) * 5, 0.3 + Math.random() * 2.2, -1.6 - Math.random()); s.userData.ph = Math.random() * 6; scene.add(s); stars.push(s); }
+const shadowMat = new THREE.MeshBasicMaterial({ color: "#14162E" });
+
+/* ---------- rounds ---------- */
+const ROUNDS = 8;
+let toys = [], order = [], round = 0, cur = null, mesh = null, holder = new THREE.Group(), lit = 0, litTarget = 0, firstTry = 0, misses = 0, busy = false, hop = 0;
+scene.add(holder);
+const shuffle = a => a.map(v => [Math.random(), v]).sort((x, y) => x[0] - y[0]).map(v => v[1]);
+function dots() { document.getElementById("dots").innerHTML = Array.from({ length: ROUNDS }, (_, i) => `<i class="${i < round ? "on" : i === round ? "now" : ""}"></i>`).join(""); }
+async function showRound() {
+  busy = false; misses = 0; litTarget = 0; lit = 0; hop = 0;
+  cur = order[round % order.length];
+  if (mesh) { holder.remove(mesh); }
+  mesh = await toyMesh(cur); mesh.material = shadowMat; mesh.castShadow = true;
+  const bb = mesh.geometry.boundingBox, s = Math.min(1.35 / (bb.max.y - bb.min.y), 1.7 / Math.max(bb.max.x - bb.min.x, bb.max.z - bb.min.z));   // wide toys (the whale) fit the stage too
+  mesh.scale.setScalar(s); mesh.position.set(0, 0, 0);
+  holder.rotation.y = K.CALM ? -0.5 : Math.random() * 6.28; holder.add(mesh);
+  // 3 friends to pick from for the first rounds, then 4
+  const n = Math.min(round < 3 ? 3 : 4, toys.length), others = shuffle(toys.filter(t => t !== cur)).slice(0, n - 1), picks = shuffle([cur, ...others]);
+  const box = document.getElementById("picks"); box.className = "picks n" + (n === 4 ? 4 : 3);
+  box.innerHTML = picks.map((t, i) => `<button class="pick" type="button" data-slug="${t.slug}" data-i="${i}"><img alt="" src="${assetURL(t.cover)}"><span>${nameOf(t)}</span></button>`).join("");
+  box.querySelectorAll(".pick").forEach(b => b.onclick = () => choose(b));
+  document.getElementById("ask").textContent = K.t("ask"); dots();
+}
+function choose(b) {
+  if (busy) return;
+  if (b.dataset.slug === cur.slug) {
+    busy = true; if (!misses) firstTry++;
+    b.classList.add("yes"); mesh.material = toyMat(); litTarget = 1; hop = 1;
+    document.getElementById("total").textContent = round + 1;
+    document.getElementById("ask").textContent = K.t("yes", nameOf(cur));
+    K.sfx.chime(); const r = b.getBoundingClientRect(); K.confetti(r.left + r.width / 2, r.top, 40);
+    setTimeout(next, 1900);
+  } else {
+    misses++; K.sfx.boing(); b.classList.add("shake", "no"); toast(K.t("tryAgain"));
+    if (misses >= 2) document.querySelector(`.pick[data-slug="${cur.slug}"]`).classList.add("hint");   // gentle help, never a fail screen
+  }
+}
+async function next() {
+  round++;
+  if (round >= ROUNDS) return gameOver();
+  await showRound();
+}
+async function newGame() {
+  round = 0; firstTry = 0; document.getElementById("total").textContent = 0; document.getElementById("over").hidden = true;
+  const featured = toys.find(t => t.featured), rest = shuffle(toys.filter(t => t !== featured));
+  order = featured ? [featured, ...rest] : rest;
+  await showRound();
+}
+function gameOver() {
+  dots();
+  const st = firstTry >= 7 ? 3 : firstTry >= 4 ? 2 : 1;   // everyone who finishes gets at least one star
+  document.getElementById("stars").innerHTML = [0, 1, 2].map(i => K.starSVG(i < st)).join("");
+  document.getElementById("overH").textContent = K.t("overH", firstTry); document.getElementById("overP").textContent = K.t("overP", firstTry, ROUNDS);
+  document.getElementById("over").hidden = false; K.sfx.tada(); K.confetti();
+}
+
+/* ---------- loop ---------- */
+function resize() { const r = cv.getBoundingClientRect(); if (!r.width) return; renderer.setSize(r.width, r.height, false); cam.aspect = r.width / r.height;
+  cam.fov = cam.aspect < 0.9 ? 36 / Math.max(0.55, cam.aspect / 0.9) : 36; cam.updateProjectionMatrix(); }
+new ResizeObserver(resize).observe(cv); resize();
+let last = performance.now();
+(function loop(now) {
+  requestAnimationFrame(loop);
+  const dt = Math.min(0.05, (now - last) / 1000); last = now;
+  if (litTarget) { const front = Math.round(holder.rotation.y / 6.2832) * 6.2832; holder.rotation.y += (front - holder.rotation.y) * Math.min(1, dt * 3); }   // turn to face the child
+  else if (!K.CALM) holder.rotation.y += dt * 0.55;
+  lit += (litTarget - lit) * Math.min(1, dt * (K.CALM ? 30 : 4));
+  scene.background.copy(DARK).lerp(LIT, lit);
+  hemi.intensity = 0.25 + 1.35 * lit; sun.intensity = 0.4 + 1.8 * lit;
+  glow.material.color.set("#FFF1C2").lerp(new THREE.Color("#FFFFFF"), lit);
+  if (hop > 0 && !K.CALM) { hop = Math.max(0, hop - dt * 1.4); holder.position.y = Math.abs(Math.sin((1 - hop) * Math.PI * 2)) * 0.25 * hop; } else holder.position.y = 0;
+  for (const s of stars) s.scale.setScalar(K.CALM ? 1 : 0.7 + 0.4 * Math.sin(now / 400 + s.userData.ph));
+  renderer.render(scene, cam);
+})(performance.now());
+
+/* ---------- boot ---------- */
+document.getElementById("homeBtn").href = window.SHOP_URL ? window.SHOP_URL : "/#play";
+document.getElementById("back").href = window.SHOP_URL || "/";
+document.getElementById("langBtn").addEventListener("click", () => { document.querySelectorAll(".pick").forEach(b => { const t = toys.find(x => x.slug === b.dataset.slug); if (t) b.querySelector("span").textContent = nameOf(t); });
+  if (!busy) document.getElementById("ask").textContent = K.t("ask"); });
+(async () => {
+  try { toys = (await loadToyList()).toys; await Promise.all(toys.map(toyGeometry)); }
+  catch (e) { document.getElementById("loading").textContent = K.t("noLoad"); return; }
+  document.getElementById("loading").hidden = true;
+  await newGame();
+  // intro art: three friends as dark shadows, the middle one lit up
+  const c = document.getElementById("introArt"), x = c.getContext("2d");
+  x.fillStyle = "#2B2F5C"; x.fillRect(0, 0, 400, 280); x.fillStyle = "#FFF1C2"; x.beginPath(); x.arc(200, 140, 105, 0, 7); x.fill();
+  const imgs = await Promise.all(toys.slice(0, 3).map(t => new Promise(r => { const im = new Image(); im.onload = () => r(im); im.onerror = () => r(null); im.src = assetURL(t.cover); })));
+  [[80, 150, 1], [200, 140, 0], [320, 150, 1]].forEach(([px, py, dark], i) => { const im = imgs[i]; if (!im) return; x.save(); x.beginPath(); x.arc(px, py, 58, 0, 7); x.clip(); x.drawImage(im, px - 58, py - 58, 116, 116);
+    if (dark) { x.globalCompositeOperation = "multiply"; x.fillStyle = "#3A3F78"; x.fillRect(px - 58, py - 58, 116, 116); } x.restore(); x.lineWidth = 5; x.strokeStyle = "#1B2547"; x.beginPath(); x.arc(px, py, 58, 0, 7); x.stroke(); });
+})();
+document.getElementById("startBtn").onclick = () => { K.sfx.pop(); document.getElementById("intro").hidden = true; };
+document.getElementById("againBtn").onclick = () => { K.sfx.pop(); newGame(); };
+window.__game = { answer: () => cur && cur.slug, round: () => round, firstTry: () => firstTry, ready: () => !!mesh };   // used by automated play tests
+</script>
+</body>
+</html>

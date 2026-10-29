@@ -5,9 +5,9 @@ const S2 = require("./core2.js");
 const fs = require("fs"), path = require("path");
 
 const COL = { orange: "#F28C3A", white: "#FBFBF8", ink: "#24283A", pink: "#F7A1B5", cream: "#F4E9D4",
-              green: "#7CC56B", lime: "#D9F0B5", rose: "#F7A9C4", magenta: "#E0609A", grey: "#A9AFBF", slate: "#7C8396", brown: "#7A4E33" };
+              green: "#7CC56B", lime: "#D9F0B5", rose: "#F7A9C4", magenta: "#E0609A", grey: "#A9AFBF", slate: "#7C8396", brown: "#7A4E33", ginger: "#C27C43", red: "#D9443F", pine: "#2F8A57" };
 const NAMES = Object.keys(COL), L = n => NAMES.indexOf(n);
-const BASE = { fox: "orange", frog: "green", axolotl: "rose", kitten: "grey" };
+const BASE = { fox: "orange", frog: "green", axolotl: "rose", kitten: "grey", gingerbread: "ginger" };
 
 function kit(s) {
   const k = {
@@ -39,6 +39,31 @@ function kit(s) {
 }
 
 const ANIMALS = {
+  gingerbread(s, k) {
+    // chubby gingerbread buddy (our own design): round head, stubby limbs, white icing trim, gumdrop buttons, knitted scarf
+    k.blob([0, -0.24, 0], 0.31, "ginger");                        // body
+    k.blob([0, -0.06, 0.0], 0.27, "ginger");
+    k.blob([0, 0.27, 0.0], 0.3, "ginger");                        // head
+    k.mirror(sx => k.line([0.2 * sx, -0.1, 0.0], [0.46 * sx, -0.02, 0.04], 0.13, 0.115, "ginger", 12));   // arms
+    k.mirror(sx => k.line([0.13 * sx, -0.42, 0.0], [0.19 * sx, -0.66, 0.03], 0.15, 0.135, "ginger", 12)); // legs
+    k.smoothAll(2, [[0, -0.1, 0], 0.9]);
+    // icing squiggles across wrists and ankles (painted zig-zags)
+    k.mirror(sx => { const pts = []; for (let i = 0; i <= 6; i++) pts.push([0.4 * sx + (i % 2 ? 0.04 : -0.04) * sx, 0.06 - 0.03 * i]); k.stroke("paint", pts, 0.04, 1, { color: "white" }); });
+    k.mirror(sx => { const pts = []; for (let i = 0; i <= 6; i++) pts.push([0.09 * sx + 0.033 * i * sx, -0.6 + (i % 2 ? 0.04 : -0.04)]); k.stroke("paint", pts, 0.04, 1, { color: "white" }); });
+    // icing wave around the top of the head
+    k.stroke("paint", k.arc(0, 0.27, 0.235, 0.235, Math.PI * 0.2, Math.PI * 0.8, 18).map(([x, y], i) => [x, y + (i % 2 ? 0.025 : -0.025)]), 0.036, 1, { color: "white" });
+    k.mirror(sx => k.eye(0.1 * sx, 0.31, 0.25, 0.048));
+    k.mirror(sx => k.paint([0.19 * sx, 0.2, 0.22], 0.05, "red"));               // rosy cheeks
+    // icing smile: carve a soft groove, then fill it white
+    const sm = k.arc(0, 0.2, 0.1, 0.06, Math.PI * 1.12, Math.PI * 1.88, 14), dense = [];
+    for (let i = 0; i < sm.length - 1; i++) for (let t = 0; t < 1; t += 0.25) dense.push([sm[i][0] + (sm[i + 1][0] - sm[i][0]) * t, sm[i][1] + (sm[i + 1][1] - sm[i][1]) * t]);
+    k.stroke("dam", dense, 0.026, 0.6); k.stroke("paint", dense, 0.028, 1, { color: "white" });
+    // knitted scarf round the neck with a tail hanging down the front
+    for (let a = 0; a < 24; a++) { const t = a / 24 * Math.PI * 2; k.blob([0.235 * Math.sin(t), 0.02 + 0.015 * Math.cos(2 * t), 0.235 * Math.cos(t)], 0.075, "pine"); }
+    k.line([0.13, 0.0, 0.22], [0.2, -0.15, 0.24], 0.07, 0.06, "pine", 10);   // scarf stripe dots
+    // three gumdrop buttons
+    for (const y of [-0.1, -0.25, -0.4]) { const h = k.hit(-0.03, y); if (h) k.blob([h.p[0], h.p[1], h.p[2] - 0.01], 0.045, "red"); }
+  },
   fox(s, k) {
     k.blob([0, -0.32, 0], 0.38, "orange");                       // body
     k.blob([0, 0.08, 0.04], 0.33, "orange");                     // head

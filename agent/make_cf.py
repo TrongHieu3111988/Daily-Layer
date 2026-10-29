@@ -21,6 +21,8 @@ for p in cat["products"]:
         os.makedirs(os.path.dirname(os.path.join(repo, p["preview"])), exist_ok=True); open(os.path.join(repo, p["preview"]), "wb").write(base64.b64decode(open(src).read()))
     shutil.copy2(os.path.join(site, p["cover"]), os.path.join(repo, p["cover"]))
     zsrc = os.path.join(site, p["download"]); zname = p["download"][:-4] if p["download"].endswith(".txt") else p["download"]
+    if p["price"] > 0 and not os.path.exists(zsrc):   # paid zip delivered on an earlier run and not restored locally
+        p["download"] = ""; continue
     data = base64.b64decode(open(zsrc).read())
     if p["price"] > 0:
         open(os.path.join(deliv, os.path.basename(zname)), "wb").write(data); p["download"] = ""
