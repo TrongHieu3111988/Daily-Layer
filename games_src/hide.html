@@ -383,7 +383,7 @@ new ResizeObserver(resize).observe(cv); resize();
   renderer.render(scene, cam);
 })(performance.now());
 document.getElementById("starCount").textContent = K.store.get("hide-stars", 0);
-window.__game = { hidden: () => hidden, cam, THREE, controls, newRoom, spots: () => SPOTS };   // used by automated play tests
+window.__game = { hidden: () => hidden, cam, THREE, controls, newRoom, spots: () => SPOTS, solids: () => solids, found: () => foundN };   // used by automated play tests
 
 /* ---------- boot ---------- */
 (async () => {
