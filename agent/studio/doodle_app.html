@@ -267,7 +267,7 @@ const T = {
         clearTitle: "Start a new drawing?", clearText: "The paper will be wiped clean. You can undo.", cancel: "Cancel", wipe: "Wipe the paper",
         tpls: ["Fish", "Star", "Cat"], cols: ["Ink", "Red", "Orange", "Sun", "Leaf", "Sky", "Lilac", "Pink", "Brown", "White", "Indigo"], rainbow: "Rainbow crayon", sizeLbl: "Line size", sizeNames: ["Thin", "Medium", "Thick"] }
 };
-const LANG = /^vi/i.test(navigator.language || "") || /lang=vi/.test(location.hash) ? "vi" : "en";
+const LANG = (() => { if (/lang=vi/.test(location.hash)) return "vi"; if (/lang=en/.test(location.hash)) return "en"; try { const s = (localStorage.getItem("dl-lang") || "").replace(/"/g, ""); if (s === "vi" || s === "en") return s; } catch (e) {} return /^vi/i.test(navigator.language || "") ? "vi" : "en"; })();   // English first; follows the language picked in the shop
 const t = k => T[LANG][k];
 
 /* ---------- palette (label 0 = paper) ---------- */

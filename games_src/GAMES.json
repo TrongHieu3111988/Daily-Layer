@@ -1,11 +1,35 @@
 {
  "about": "Every game and whether it reads the shop's model library (toys.json). When a model is added, every game with library=true picks it up: the website by itself, each artifact by publishing the new toy's assets to it.",
  "games": [
-  {"id": "stack", "artifact": "https://claude.ai/artifact/5ELRqRw3UhEdrhw7jZgH1z", "library": "2d"},
-  {"id": "shelf", "artifact": "https://claude.ai/artifact/HBKDhzdkkK5bUefDzYffwf", "library": "2d"},
-  {"id": "hide", "artifact": "https://claude.ai/artifact/Q3idBaN6tiht1SzcC2wrVK", "library": "3d"},
-  {"id": "bowl", "artifact": "https://claude.ai/artifact/8wVbSSvujjEp4qp44eUKoa", "library": "3d"},
-  {"id": "shadow", "artifact": "https://claude.ai/artifact/A2WdpL6ztBRyJCbU2moABm", "library": "3d"},
-  {"id": "spot", "artifact": "https://claude.ai/artifact/JbcssAnpkXChMTvtktXmkv", "library": null, "note": "about print defects, draws its own prints"}
+  {
+   "id": "stack",
+   "artifact": "https://claude.ai/artifact/5ELRqRw3UhEdrhw7jZgH1z",
+   "library": "2d"
+  },
+  {
+   "id": "shelf",
+   "artifact": "https://claude.ai/artifact/HBKDhzdkkK5bUefDzYffwf",
+   "library": "2d"
+  },
+  {
+   "id": "hide",
+   "artifact": "https://claude.ai/artifact/Q3idBaN6tiht1SzcC2wrVK",
+   "library": "3d"
+  },
+  {
+   "id": "bowl",
+   "artifact": "https://claude.ai/artifact/8wVbSSvujjEp4qp44eUKoa",
+   "library": "3d"
+  },
+  {
+   "id": "shadow",
+   "artifact": "https://claude.ai/artifact/A2WdpL6ztBRyJCbU2moABm",
+   "library": "3d"
+  },
+  {
+   "id": "spot",
+   "artifact": "https://claude.ai/artifact/JbcssAnpkXChMTvtktXmkv",
+   "library": "2d"
+  }
  ]
 }

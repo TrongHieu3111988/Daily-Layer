@@ -125,7 +125,8 @@ canvas#confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:non
   K.CALM = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   /* ---------- words ---------- */
-  K.lang = store.get("dl-lang", /^vi/i.test(navigator.language || "") ? "vi" : "en");
+  // English first; Vietnamese on Vietnamese devices, or whatever was last picked in the shop or any game (one shared setting)
+  K.lang = (() => { let v = ""; try { v = (localStorage.getItem("dl-lang") || "").replace(/"/g, ""); } catch (e) {} return v === "vi" || v === "en" ? v : /^vi/i.test(navigator.language || "") ? "vi" : "en"; })();
   K.words = { en: {}, vi: {} };
   K.t = (k, ...a) => { const v = K.words[K.lang][k] ?? K.words.en[k] ?? k; return typeof v === "function" ? v(...a) : v; };
   K.applyWords = () => {

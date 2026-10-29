@@ -1056,8 +1056,7 @@ const T = {
         noSave:"This viewer can't save files.", tooSmall:"Under 40 mm may give small details. Print bigger for little hands.",
         colours:["Cream","Sky","Leaf","Sun","Coral","Lilac","White","Ink","Brown","Pink"] }
 };
-let lang = (navigator.language || "vi").toLowerCase().startsWith("vi") ? "vi" : "en";
-try { lang = localStorage.getItem("ss-lang") || lang; } catch (e) {}
+let lang = (() => { try { const s = (localStorage.getItem("dl-lang") || "").replace(/"/g, ""); if (s === "vi" || s === "en") return s; } catch (e) {} return /^vi/i.test(navigator.language || "") ? "vi" : "en"; })();   // English first; Vietnamese for Vietnamese devices or when chosen in the shop
 const t = k => T[lang][k];
 
 /* ---------- brushes ---------- */
@@ -1391,7 +1390,7 @@ $("#download").onclick = () => {
 };
 
 /* ---------- boot ---------- */
-$("#lang").onclick = () => { lang = lang === "vi" ? "en" : "vi"; try { localStorage.setItem("ss-lang", lang); } catch (e) {} applyLang(); };
+$("#lang").onclick = () => { lang = lang === "vi" ? "en" : "vi"; try { localStorage.setItem("dl-lang", JSON.stringify(lang)); } catch (e) {} applyLang(); };
 $("#back").href = window.SHOP_URL || "/";
 applyLang(); setTool("standard");
 (async () => {

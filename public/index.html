@@ -438,7 +438,7 @@ const $ = (s, el = document) => el.querySelector(s);
 const HOST = window.HOST || "artifact";
 const TOOLS = window.TOOLS || { doodle: "/doodle/", sculpt: "/sculpt/", stack: "/games/stack/", spot: "/games/spot/", shelf: "/games/shelf/", hide: "/games/hide/", bowl: "/games/bowl/", shadow: "/games/shadow/" };
 let LANG = "en";
-try { LANG = localStorage.getItem("dl-lang") || (/^vi/i.test(navigator.language || "") ? "vi" : "en"); } catch (e) { LANG = /^vi/i.test(navigator.language || "") ? "vi" : "en"; }
+try { const saved = (localStorage.getItem("dl-lang") || "").replace(/"/g, ""); LANG = saved === "vi" || saved === "en" ? saved : (/^vi/i.test(navigator.language || "") ? "vi" : "en"); /* the games store it as JSON, older shop visits as text: both read here */ } catch (e) { LANG = /^vi/i.test(navigator.language || "") ? "vi" : "en"; }
 const t = k => T[LANG][k];
 const fmtUSD = n => "$" + Number(n || 0).toFixed(2);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -661,7 +661,7 @@ function applyLang() {
   renderGames();
   if (CAT) { renderFilters(); renderGrid(); renderLog(); const f = bySlug(CAT.featured) || CAT.products[0]; $("#bubble").textContent = T[LANG].bubble(f.title); }
 }
-$("#lang").onclick = () => { LANG = LANG === "vi" ? "en" : "vi"; try { localStorage.setItem("dl-lang", LANG); } catch (e) {} applyLang(); };
+$("#lang").onclick = () => { LANG = LANG === "vi" ? "en" : "vi"; try { localStorage.setItem("dl-lang", JSON.stringify(LANG)); } catch (e) {} applyLang(); };
 
 /* ---------- wiring ---------- */
 document.addEventListener("click", e => {
