@@ -2,8 +2,9 @@
 
 One new game per daily run, top to bottom. Mark a line `[x]` with the date and the artifact URL when it ships.
 Every game: one simple mechanic, playable by a 4-year-old on a phone, Vietnamese + English, original art only,
-no ads, no text input, no data leaving the device. Prefer games that use the shop's real 3D toys (toys.json) so
-each new figure shows up in every game automatically.
+no ads, no text input, no data leaving the device. Every game reads the model library (toys.json: K.library() in 2D,
+loadToyList() in 3D) and never hard-codes toys, so each new model shows up in every game automatically. A new print
+model is made for a game only when the game needs a kind of model the library lacks, and it must be sellable too.
 
 - [x] 2026-10-29 Stack the Drop (stack) https://claude.ai/artifact/5ELRqRw3UhEdrhw7jZgH1z
 - [x] 2026-10-29 Spot the Oops (spot) https://claude.ai/artifact/JbcssAnpkXChMTvtktXmkv

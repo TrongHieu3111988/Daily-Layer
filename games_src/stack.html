@@ -69,7 +69,7 @@ K.words.vi = { title: "Xếp Tháp", back: "Quay lại", sound: "Bật hoặc t�
 const M = window.Matter;
 const VW = 360;                       // virtual width; everything is laid out in these units
 const TABLE_W = 190, FLOOR_Y = 150, CRANE_Y = 78, MAXH = 5;   // five hearts: kind to small hands   // table top is y = 0, grass floor below it
-const COLS = ["#FF6B57", "#FFC93C", "#3FBF7F", "#5DB8FF", "#8C6BF2", "#FF8FB8", "#FF9B3D", "#B8834F", "#F4EFFA"];   // each colour is one animal friend (K.ANIMAL_OF)
+let COLS = ["#FF6B57", "#FFC93C", "#3FBF7F", "#5DB8FF", "#8C6BF2", "#FF8FB8", "#FF9B3D", "#B8834F", "#F4EFFA"];   // each colour is one animal friend (K.ANIMAL_OF)
 const KINDS = [
   { shape: "square", w: 54, h: 54 }, { shape: "square", w: 96, h: 38 }, { shape: "square", w: 40, h: 70 },
   { shape: "tri", w: 66, h: 56 }, { shape: "dome", w: 64, h: 50 }, { shape: "square", w: 70, h: 46 }
@@ -212,6 +212,8 @@ function draw(now = performance.now()) {
 
 /* ---------- boot ---------- */
 K.initBar();
+// every model in the shop's library becomes a block friend (falls back to the painted animals offline)
+K.library().then(list => { if (list.length >= 3) { COLS = list.map(t => t.slug); if (!running) { nextKind = null; draw(); } } });
 K.onLang = () => { document.getElementById("bestLine").textContent = best ? K.t("best", best) : ""; };
 K.applyWords();
 (function introArt() {

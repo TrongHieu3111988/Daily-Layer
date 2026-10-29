@@ -251,10 +251,28 @@ canvas#confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:non
       for (const sx of [-1, 1]) for (const k of [0, 1]) { g.beginPath(); g.moveTo(sx * w / 2, ey + k * s * 0.12); g.lineTo(sx * (w / 2 - s * 0.12), ey + k * s * 0.12 + s * 0.02); g.stroke(); } }
     if (a.spots) for (const [x, y, r] of [[-0.3, -0.25, 0.05], [0.32, -0.18, 0.04], [0.25, 0.3, 0.05], [-0.28, 0.28, 0.035]]) blob(g, x * w, y * h + fy, s * r, s * r, 0, a.spots);
   }
-  // draw a friend centred at (0,0); opts: shape, colour, w, h, mood ("happy" | "wow" | "sleepy" | "sad"), lw, animal (defaults from the colour)
+  /* ---------- the toy library: every model the shop has made (toys.json), so games grow with the shop ----------
+     Each toy brings its body colour, a front-view sticker (icon.png), its Vietnamese name and, for known animals, a 2D look.
+     After K.library() resolves, K.TOYS[slug] is set and a slug can be passed anywhere a colour goes. */
+  K.TOYS = {};
+  K.library = (timeout = 5000) => K._lib || (K._lib = new Promise(res => {
+    const base = window.ASSETS || "/", done = list => res(list), timer = setTimeout(() => done([]), timeout);
+    fetch(base + "toys.json").then(r => r.ok ? r.json() : { toys: [] }).then(async j => {
+      const list = await Promise.all((j.toys || []).map(t => new Promise(r2 => {
+        const toy = { ...t, img: null }; K.TOYS[t.slug] = toy;
+        if (!t.icon) return r2(toy);
+        const im = new Image(); im.onload = () => { toy.img = im; r2(toy); }; im.onerror = () => r2(toy); im.src = base + t.icon;
+      })));
+      clearTimeout(timer); done(list);
+    }).catch(() => { clearTimeout(timer); done([]); });
+  }));
+  K.toyName = t => (K.lang === "vi" && t.title_vi ? t.title_vi : (t.title || "").replace(/\s*\(.*\)\s*/, ""));
+  // draw a friend centred at (0,0); opts: shape, colour (or a toy slug from the library), w, h, mood ("happy" | "wow" | "sleepy" | "sad"), lw, animal (defaults from the colour)
   K.friend = (g, o) => {
-    const { shape = "square", colour = "#FFC93C", w = 60, h = 60, mood = "happy" } = o, lw = o.lw ?? Math.max(2, Math.min(w, h) * 0.07);
-    const name = o.animal === undefined ? K.ANIMAL_OF[String(colour).toLowerCase()] : o.animal, a = name ? K.ANIMALS[name] : null;
+    const toy = o.toy || K.TOYS[o.colour];
+    const { shape = "square", w = 60, h = 60, mood = "happy" } = o, colour = toy ? toy.colour : (o.colour || "#FFC93C"), lw = o.lw ?? Math.max(2, Math.min(w, h) * 0.07);
+    const name = toy ? toy.look : o.animal === undefined ? K.ANIMAL_OF[String(colour).toLowerCase()] : o.animal, a = name ? K.ANIMALS[name] : null;
+    if (toy && !a && toy.img) return stickerFriend(g, toy, shape, colour, w, h, lw);
     const s = Math.min(w, h), fy = shape === "tri" ? h * 0.18 : shape === "dome" ? h * 0.08 : 0, ex = s * 0.17, ey = fy - s * 0.04, er = Math.max(1.6, s * 0.065);
     g.save();
     if (a) animalBack(g, a, o, w, h, s, lw, colour);
@@ -288,6 +306,18 @@ canvas#confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:non
     else { g.arc(0, my - (a && a.wide ? s * 0.06 : 0), mr, 0.15 * Math.PI, 0.85 * Math.PI); g.stroke(); }
     g.restore();
   };
+  // a toy without a painted 2D look (a new model) wears its own picture on the block
+  function stickerFriend(g, toy, shape, colour, w, h, lw) {
+    g.save();
+    shapePath(g, shape, w, h); g.fillStyle = colour; g.fill();
+    g.save(); shapePath(g, shape, w, h); g.clip();
+    g.fillStyle = "rgba(255,255,255,.55)"; g.beginPath(); g.ellipse(0, shape === "tri" ? h * 0.18 : 0, Math.min(w, h) * 0.44, Math.min(w, h) * 0.44, 0, 0, Math.PI * 2); g.fill();
+    const s = Math.min(w, h) * (shape === "tri" ? 0.62 : 0.86), cy = shape === "tri" ? h * 0.16 : shape === "dome" ? h * 0.06 : 0;
+    g.drawImage(toy.img, -s / 2, cy - s / 2, s, s);
+    g.fillStyle = "rgba(0,0,0,.08)"; g.fillRect(-w, h * 0.3, w * 2, h); g.restore();
+    shapePath(g, shape, w, h); g.lineWidth = lw; g.strokeStyle = K.INK; g.lineJoin = "round"; g.stroke();
+    g.restore();
+  }
   K.star = (g, x, y, r, fill = "#FFC93C") => {
     g.save(); g.beginPath();
     for (let k = 0; k < 10; k++) { const a = -Math.PI / 2 + k * Math.PI / 5, rr = k % 2 ? r * 0.45 : r; g.lineTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr); }
@@ -335,7 +365,7 @@ K.words.vi = { title: "Xếp Tháp", back: "Quay lại", sound: "Bật hoặc t�
 const M = window.Matter;
 const VW = 360;                       // virtual width; everything is laid out in these units
 const TABLE_W = 190, FLOOR_Y = 150, CRANE_Y = 78, MAXH = 5;   // five hearts: kind to small hands   // table top is y = 0, grass floor below it
-const COLS = ["#FF6B57", "#FFC93C", "#3FBF7F", "#5DB8FF", "#8C6BF2", "#FF8FB8", "#FF9B3D", "#B8834F", "#F4EFFA"];   // each colour is one animal friend (K.ANIMAL_OF)
+let COLS = ["#FF6B57", "#FFC93C", "#3FBF7F", "#5DB8FF", "#8C6BF2", "#FF8FB8", "#FF9B3D", "#B8834F", "#F4EFFA"];   // each colour is one animal friend (K.ANIMAL_OF)
 const KINDS = [
   { shape: "square", w: 54, h: 54 }, { shape: "square", w: 96, h: 38 }, { shape: "square", w: 40, h: 70 },
   { shape: "tri", w: 66, h: 56 }, { shape: "dome", w: 64, h: 50 }, { shape: "square", w: 70, h: 46 }
@@ -478,6 +508,8 @@ function draw(now = performance.now()) {
 
 /* ---------- boot ---------- */
 K.initBar();
+// every model in the shop's library becomes a block friend (falls back to the painted animals offline)
+K.library().then(list => { if (list.length >= 3) { COLS = list.map(t => t.slug); if (!running) { nextKind = null; draw(); } } });
 K.onLang = () => { document.getElementById("bestLine").textContent = best ? K.t("best", best) : ""; };
 K.applyWords();
 (function introArt() {

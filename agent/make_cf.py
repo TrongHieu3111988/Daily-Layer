@@ -33,6 +33,8 @@ for p in cat["products"]:
     gsrc = os.path.join(site, "products", p["slug"], "game.bin.txt")
     if os.path.exists(gsrc):
         open(os.path.join(repo, "products", p["slug"], "game.bin"), "wb").write(base64.b64decode(open(gsrc).read()))
+    isrc = os.path.join(site, "products", p["slug"], "icon.png")   # the toy's sticker for the 2D games
+    if os.path.exists(isrc): shutil.copy2(isrc, os.path.join(repo, "products", p["slug"], "icon.png"))
 if os.path.exists(os.path.join(site, "toys.json")): shutil.copy2(os.path.join(site, "toys.json"), os.path.join(repo, "toys.json"))
 json.dump(cat, open(os.path.join(repo, "catalog.json"), "w"), indent=1)
 shutil.copy2(os.path.join(site, "journal.json"), os.path.join(repo, "journal.json"))

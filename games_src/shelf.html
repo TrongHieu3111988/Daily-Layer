@@ -80,7 +80,7 @@ K.words.vi = { title: "Kệ Đồ Chơi", back: "Quay lại", sound: "Bật ho�
   cont: n => "Chơi tiếp: màn " + n, introH: "Xếp kệ đồ chơi nào!", introP: "Các bạn đồ chơi thích ngồi theo quy luật. Bé nhìn kệ, tìm bạn tiếp theo trong hộp đồ chơi rồi kéo hoặc chạm để đặt lên kệ nhé.",
   level: n => "Màn " + n, yay: ["Hoan hô!", "Giỏi quá!", "Bé tìm ra quy luật rồi!", "Tuyệt vời!", "Đúng rồi!"], oops: "Ừm, nhìn lại quy luật nhé", friend: "Bạn đồ chơi" };
 
-const COLS = ["#FF6B57", "#FFC93C", "#3FBF7F", "#5DB8FF", "#8C6BF2", "#FF8FB8"];
+let COLS = ["#FF6B57", "#FFC93C", "#3FBF7F", "#5DB8FF", "#8C6BF2", "#FF8FB8"];   // replaced by the shop's toys once the library loads
 const SHAPES = ["square", "ball", "tri", "dome", "star", "heart"];
 const SIZES = [0.62, 0.8, 1];
 const same = (a, b) => a.shape === b.shape && a.colour === b.colour && a.size === b.size;
@@ -218,7 +218,8 @@ K.applyWords();
   x.fillStyle = "#FF6B57"; x.font = "800 40px 'Baloo 2', sans-serif"; x.textAlign = "center"; x.fillText("?", 366, 182);
   K.star(x, 60, 60, 18); K.star(x, 330, 50, 13, "#FF8FB8");
 })();
-const begin = () => { K.sfx.pop(); document.getElementById("intro").hidden = true; newLevel(); };
+const libReady = K.library().then(list => { if (list.length >= 4) COLS = list.map(t => t.slug); });   // the shop's toys are the friends on the shelf
+const begin = async () => { K.sfx.pop(); document.getElementById("intro").hidden = true; await libReady; newLevel(); };
 document.getElementById("startBtn").onclick = begin;
 document.getElementById("restartBtn").onclick = () => { level = 1; stars = 0; K.store.set("shelf-level", 1); K.store.set("shelf-stars", 0); begin(); };
 </script>

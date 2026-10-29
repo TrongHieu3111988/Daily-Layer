@@ -84,7 +84,7 @@ K.words.vi = { title: "Bóng Của Ai?", back: "Quay lại", sound: "Bật hoặ
 // short Vietnamese names for the friends (titles in toys.json are English)
 const VI_NAME = { "sculpt-gingerbread": "Bánh Gừng", "sculpt-penguin": "Chim Cánh Cụt", "sculpt-kitten": "Mèo Mướp", "sculpt-frog": "Ếch Cười", "sculpt-fox": "Cáo Con",
   "sculpt-chick": "Gà Con", "sculpt-bunny": "Thỏ Tròn", "sculpt-bear": "Gấu Con", "sculpt-axolotl": "Kỳ Giông", "chibi-whale-4part": "Cá Voi" };
-const nameOf = t => K.lang === "vi" && VI_NAME[t.slug] ? VI_NAME[t.slug] : t.title.replace(/\s*\(.*\)\s*/, "");
+const nameOf = t => K.lang === "vi" && (t.title_vi || VI_NAME[t.slug]) ? (t.title_vi || VI_NAME[t.slug]) : t.title.replace(/\s*\(.*\)\s*/, "");   // title_vi comes with every toy in toys.json
 K.initBar(); K.applyWords();
 let toastT = 0;
 function toast(m) { const e = document.getElementById("toast"); e.textContent = m; e.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => (e.hidden = true), 1600); }
