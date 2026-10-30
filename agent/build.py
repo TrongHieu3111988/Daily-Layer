@@ -46,6 +46,9 @@ def build(slug, out):
         for name, *_ in pp: z.write(os.path.join(d, f"{slug}_{name}.stl"), f"{slug}_{name}.stl")
         if res["meta"]["line"] == "figure":  # 3MF carries the colour split; elsewhere STL is enough and keeps zips small
             z.write(os.path.join(d, f"{slug}.3mf"), f"{slug}.3mf")
+        elif res.get("colour_3mf"):   # print-in-place models with a ready colour split (one object per colour group)
+            write_3mf(os.path.join(d, f"{slug}_colours.3mf"), res["colour_3mf"])
+            z.write(os.path.join(d, f"{slug}_colours.3mf"), f"{slug}_colours.3mf")
         z.writestr("README.txt", f"{info['title']}\n\nPrint tips: {res['meta']['print_hint']}\n\nLicense: personal use. Commercial sale of prints requires a Pro membership.\n")
     # lighter preview mesh for the web viewer and render
     if "step" in inspect.signature(fn).parameters:

@@ -1,0 +1,625 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Magic Printer – free kids&#x27; game | Daily Layer</title>
+<!--seo-->
+<meta name="description" content="A real 3D toy is cut into layers like a 3D printer makes it. Tap them from the bottom up and the little printer builds it! A free browser game for kids.">
+<link rel="canonical" href="https://dailylayer.funny3dprint.workers.dev/games/layers/">
+<meta property="og:site_name" content="Daily Layer">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Magic Printer – free kids&#x27; game | Daily Layer">
+<meta property="og:description" content="A real 3D toy is cut into layers like a 3D printer makes it. Tap them from the bottom up and the little printer builds it! A free browser game for kids.">
+<meta property="og:url" content="https://dailylayer.funny3dprint.workers.dev/games/layers/">
+<meta property="og:image" content="https://dailylayer.funny3dprint.workers.dev/products/rainbow-wiggle-snake/cover.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "VideoGame", "name": "Magic Printer", "description": "A real 3D toy is cut into layers like a 3D printer makes it. Tap them from the bottom up and the little printer builds it! A free browser game for kids.", "url": "https://dailylayer.funny3dprint.workers.dev/games/layers/", "genre": "Educational", "gamePlatform": "Web browser", "applicationCategory": "Game", "audience": {"@type": "PeopleAudience", "suggestedMinAge": 3}, "isAccessibleForFree": true, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}}</script>
+<!--/seo-->
+<meta name="theme-color" content="#FFC93C">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/icons/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@500;600;700;800&display=swap">
+<style>
+/* Daily Layer game kit: the same chunky toy-block look as the shop. One-screen apps: bar on top, stage fills the rest. */
+:root{
+  --sky:#DCF0FF; --sky2:#C9E8FF; --paper:#FFFFFF; --ink:#1B2547; --muted:#55608A; --outline:#1B2547;
+  --sun:#FFC93C; --coral:#FF6B57; --grass:#3FBF7F; --grape:#8C6BF2; --bubble:#5DB8FF; --pink:#FF8FB8; --wood:#E9B97A; --wood2:#C98E4F;
+  --good:#1C9A5E; --bad:#E04A3A; --pop:0 5px 0 var(--outline); --pop-sm:0 3px 0 var(--outline);
+  --f-display:"Baloo 2","Nunito",ui-rounded,system-ui,sans-serif;
+  --f-body:"Nunito",ui-rounded,system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --sky:#101A3A; --sky2:#14204A; --paper:#1A2550; --ink:#EEF2FF; --muted:#AAB4DA; --outline:#070B1F;
+  --sun:#FFCF4D; --coral:#FF7A66; --grass:#4FD08F; --grape:#A487FF; --bubble:#6CC2FF; --pink:#FF9DC3; --wood:#B98A55; --wood2:#8E6234;
+  --good:#4FD08F; --bad:#FF7A66; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --sky:#101A3A; --sky2:#14204A; --paper:#1A2550; --ink:#EEF2FF; --muted:#AAB4DA; --outline:#070B1F;
+  --sun:#FFCF4D; --coral:#FF7A66; --grass:#4FD08F; --grape:#A487FF; --bubble:#6CC2FF; --pink:#FF9DC3; --wood:#B98A55; --wood2:#8E6234;
+  --good:#4FD08F; --bad:#FF7A66; color-scheme:dark}
+body{margin:0}[hidden]{display:none!important}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--sky);color:var(--ink);font-family:var(--f-body);font-size:16px;overflow:hidden;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--grape);outline-offset:3px}
+.app{height:100%;display:flex;flex-direction:column}
+.bar{display:flex;align-items:center;gap:8px;padding-block:8px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.bar h1{font-family:var(--f-display);font-weight:800;font-size:22px;margin:0 auto 0 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.ibtn{width:44px;height:44px;flex:none;border-radius:14px;border:2.5px solid var(--outline);background:var(--paper);display:grid;place-items:center;box-shadow:var(--pop-sm);text-decoration:none;color:var(--ink);font-family:var(--f-display);font-weight:800;font-size:14px}
+.ibtn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--outline)}
+.ibtn svg{width:22px;height:22px}
+.score{flex:none;display:flex;align-items:center;gap:6px;background:var(--sun);color:#3A2A00;border:2.5px solid var(--outline);border-radius:14px;padding:4px 12px;font-family:var(--f-display);font-weight:800;font-size:18px;box-shadow:var(--pop-sm);font-variant-numeric:tabular-nums}
+.score svg{width:20px;height:20px}
+.stage{position:relative;flex:1;min-height:0;margin:0 max(16px,env(safe-area-inset-right,0px)) 12px max(16px,env(safe-area-inset-left,0px));border:3px solid var(--outline);border-radius:26px;overflow:hidden;box-shadow:0 6px 0 var(--outline);background:var(--paper)}
+.btn{text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:9px;border:2.5px solid var(--outline);border-radius:18px;padding:12px 22px;font-family:var(--f-display);font-weight:800;font-size:20px;line-height:1;background:var(--paper);color:var(--ink);box-shadow:var(--pop);transition:transform .12s,box-shadow .12s}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 var(--outline)}
+.btn.coral{background:var(--coral);color:#fff}.btn.grass{background:var(--grass);color:#06301B}.btn.sun{background:var(--sun);color:#3A2A00}
+.btn svg{width:24px;height:24px}
+.overlay{position:fixed;inset:0;z-index:30;display:grid;place-items:center;background:rgba(9,14,34,.45);padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.card{background:var(--paper);border:3px solid var(--outline);border-radius:28px;box-shadow:0 8px 0 var(--outline);padding:22px 22px 24px;max-width:420px;width:100%;display:grid;gap:14px;text-align:center;justify-items:center;animation:popin .35s cubic-bezier(.34,1.56,.64,1)}
+.card h2{font-family:var(--f-display);font-weight:800;font-size:32px;line-height:1.05;margin:0}
+.card p{margin:0;color:var(--muted);font-weight:700;line-height:1.45}
+.card canvas.hero{width:200px;height:140px}
+.card .row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.stars{display:flex;gap:6px}
+.stars svg{width:44px;height:44px}
+@keyframes popin{0%{transform:scale(.7);opacity:0}100%{transform:scale(1);opacity:1}}
+.toast{position:absolute;left:50%;top:14px;transform:translateX(-50%);z-index:5;background:var(--paper);border:2.5px solid var(--outline);border-radius:16px;padding:6px 14px;font-family:var(--f-display);font-weight:800;font-size:18px;box-shadow:var(--pop-sm);white-space:nowrap;pointer-events:none;transition:opacity .3s,transform .3s}
+.toast[hidden]{display:block!important;opacity:0;transform:translate(-50%,-10px)}
+canvas#confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:40}
+@media (max-width:420px){.bar h1{font-size:18px}.ibtn{width:40px;height:40px}.score{font-size:16px;padding:3px 10px}}
+@media (prefers-reduced-motion:reduce){.card{animation:none}.btn,.ibtn{transition:none}}
+
+/* Magic Printer: one of the shop's real 3D toys is cut into layers, the way a 3D printer builds it. Tap the layers from the bottom up and the printer puts the toy together. */
+.stage{background:#DDF3FF;display:flex;flex-direction:column}
+.spot{position:relative;flex:1;min-height:0}
+#view{display:block;width:100%;height:100%;touch-action:manipulation}
+.dots{position:absolute;left:0;right:0;top:12px;z-index:3;display:flex;gap:6px;justify-content:center;pointer-events:none}
+.dots i{width:14px;height:14px;border-radius:50%;border:2.5px solid var(--outline);background:rgba(255,255,255,.7)}
+.dots i.on{background:var(--sun)}
+.dots i.now{background:var(--coral);transform:scale(1.25)}
+.ask{position:absolute;left:0;right:0;top:36px;z-index:3;text-align:center;font-family:var(--f-display);font-weight:800;font-size:clamp(19px,5.6vw,26px);color:#1B2547;text-shadow:0 2px 0 #fff;pointer-events:none;padding:0 14px}
+.loading{position:absolute;inset:0;display:grid;place-items:center;z-index:5;font-family:var(--f-display);font-weight:800;font-size:20px;background:#DDF3FF;color:#1B2547;text-align:center;padding:20px}
+</style>
+
+</head>
+<body>
+<div class="app">
+  <header class="bar">
+    <a class="ibtn" id="back" href="/" data-t-label="back" aria-label="Back"></a>
+    <h1 data-t="title">Magic Printer</h1>
+    <span class="score" aria-live="polite"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 15.8 6.8 18.6l1-5.8-4.3-4.1 5.9-.8z" fill="#FFC93C" stroke="#1B2547" stroke-width="2" stroke-linejoin="round"/></svg><span id="total">0</span></span>
+    <button class="ibtn" id="soundBtn" type="button" data-t-label="sound" aria-label="Sound"></button>
+    <button class="ibtn" id="langBtn" type="button" aria-label="Language">VI</button>
+  </header>
+  <main class="stage" id="stage">
+    <div class="spot">
+      <canvas id="view" aria-label="A 3D printer and the layers of a toy"></canvas>
+      <div class="dots" id="dots"></div>
+      <div class="ask" id="ask" data-t="ask">Tap the bottom layer first!</div>
+      <div class="toast" id="toast" hidden></div>
+    </div>
+    <div class="loading" id="loading" data-t="loading">Warming up the printer…</div>
+  </main>
+</div>
+
+<div class="overlay" id="intro">
+  <div class="card">
+    <canvas class="hero" id="introArt" width="400" height="280"></canvas>
+    <h2 data-t="introH">Magic Printer</h2>
+    <p data-t="introP">A 3D printer builds a toy one layer at a time, from the bottom up. Tap the layers in order, bottom first, and watch your toy appear!</p>
+    <button class="btn coral" type="button" id="startBtn"><span data-t="start">Start printing!</span></button>
+  </div>
+</div>
+<div class="overlay" id="over" hidden>
+  <div class="card">
+    <div class="stars" id="stars"></div>
+    <h2 id="overH"></h2>
+    <p id="overP"></p>
+    <div class="row"><button class="btn coral" type="button" id="againBtn"><span data-t="again">Print more</span></button><a class="btn" id="homeBtn" href="/" data-t="home">More games</a></div>
+  </div>
+</div>
+
+<script>
+/* Daily Layer game kit: words, sound, confetti and the "toy friends" every game draws. */
+(function () {
+  "use strict";
+  const K = {};
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+  };
+  K.store = store;
+  K.CALM = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---------- words ---------- */
+  // English first; Vietnamese on Vietnamese devices, or whatever was last picked in the shop or any game (one shared setting)
+  K.lang = (() => { let v = ""; try { v = (localStorage.getItem("dl-lang") || "").replace(/"/g, ""); } catch (e) {} return v === "vi" || v === "en" ? v : /^vi/i.test(navigator.language || "") ? "vi" : "en"; })();
+  K.words = { en: {}, vi: {} };
+  K.t = (k, ...a) => { const v = K.words[K.lang][k] ?? K.words.en[k] ?? k; return typeof v === "function" ? v(...a) : v; };
+  K.applyWords = () => {
+    document.documentElement.lang = K.lang;
+    document.querySelectorAll("[data-t]").forEach(el => { el.textContent = K.t(el.dataset.t); });
+    document.querySelectorAll("[data-t-label]").forEach(el => { el.setAttribute("aria-label", K.t(el.dataset.tLabel)); });
+    const b = document.getElementById("langBtn"); if (b) b.textContent = K.lang === "vi" ? "EN" : "VI";
+    K.onLang && K.onLang();
+  };
+  K.toggleLang = () => { K.lang = K.lang === "vi" ? "en" : "vi"; store.set("dl-lang", K.lang); K.applyWords(); };
+
+  /* ---------- sound: tiny synth blips, only after the child has touched the screen ---------- */
+  let ac = null; K.muted = store.get("dl-muted", false);
+  function ctx() { if (K.muted) return null; if (!ac) { try { ac = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return null; } } if (ac.state === "suspended") ac.resume(); return ac; }
+  function tone(f0, f1, dur, type = "sine", vol = 0.18, delay = 0) {
+    const a = ctx(); if (!a) return;
+    const t0 = a.currentTime + delay, o = a.createOscillator(), g = a.createGain();
+    o.type = type; o.frequency.setValueAtTime(f0, t0); o.frequency.exponentialRampToValueAtTime(Math.max(30, f1), t0 + dur);
+    g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(vol, t0 + 0.015); g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    o.connect(g).connect(a.destination); o.start(t0); o.stop(t0 + dur + 0.02);
+  }
+  K.sfx = {
+    pop: () => tone(520, 880, 0.12, "triangle", 0.16),
+    thud: () => tone(180, 90, 0.14, "sine", 0.22),
+    boing: () => { tone(300, 120, 0.25, "square", 0.06); tone(150, 260, 0.2, "sine", 0.12, 0.05); },
+    chime: () => { [660, 880, 1320].forEach((f, i) => tone(f, f * 1.01, 0.22, "triangle", 0.12, i * 0.07)); },
+    tada: () => { [523, 659, 784, 1046].forEach((f, i) => tone(f, f, 0.3, "triangle", 0.14, i * 0.09)); },
+    tick: () => tone(1200, 900, 0.04, "square", 0.04)
+  };
+  K.setMuted = m => { K.muted = m; store.set("dl-muted", m); const b = document.getElementById("soundBtn"); if (b) b.innerHTML = m ? K.ICON.mute : K.ICON.sound; };
+
+  /* ---------- confetti ---------- */
+  let cc = null, cg = null, bits = [], craf = 0;
+  const CONF = ["#FF6B57", "#FFC93C", "#3FBF7F", "#5DB8FF", "#8C6BF2", "#FF8FB8"];
+  K.confetti = (x, y, n = 60) => {
+    if (K.CALM) return;
+    if (!cc) { cc = document.createElement("canvas"); cc.id = "confetti"; document.body.appendChild(cc); cg = cc.getContext("2d"); }
+    const d = Math.min(devicePixelRatio || 1, 2); cc.width = innerWidth * d; cc.height = innerHeight * d;
+    x = x ?? innerWidth / 2; y = y ?? innerHeight / 3;
+    for (let i = 0; i < n; i++) { const a = Math.random() * Math.PI * 2, s = 4 + Math.random() * 7;
+      bits.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s - 5, r: Math.random() * 6, vr: (Math.random() - .5) * .4, w: 6 + Math.random() * 6, h: 4 + Math.random() * 4, c: CONF[i % CONF.length], life: 0 }); }
+    if (!craf) craf = requestAnimationFrame(step);
+    function step() {
+      const d = cc.width / innerWidth; cg.clearRect(0, 0, cc.width, cc.height);
+      for (let i = bits.length - 1; i >= 0; i--) { const b = bits[i]; b.life++; b.vy += 0.25; b.vx *= 0.99; b.x += b.vx; b.y += b.vy; b.r += b.vr;
+        if (b.y > innerHeight + 20 || b.life > 240) { bits.splice(i, 1); continue; }
+        cg.save(); cg.translate(b.x * d, b.y * d); cg.rotate(b.r); cg.fillStyle = b.c; cg.fillRect(-b.w * d / 2, -b.h * d / 2, b.w * d, b.h * d); cg.restore(); }
+      craf = bits.length ? requestAnimationFrame(step) : 0;
+    }
+  };
+
+  /* ---------- toy friends: our own little characters, drawn with canvas ---------- */
+  K.COLS = { coral: "#FF6B57", sun: "#FFC93C", grass: "#3FBF7F", sky: "#5DB8FF", grape: "#8C6BF2", pink: "#FF8FB8", orange: "#FF9B3D", mint: "#7FE0C2" };
+  K.INK = "#1B2547";
+  function shapePath(g, shape, w, h) {
+    g.beginPath();
+    const r = Math.min(w, h) * 0.22;
+    if (shape === "ball") { g.ellipse(0, 0, w / 2, h / 2, 0, 0, Math.PI * 2); }
+    else if (shape === "tri") { g.moveTo(0, -h / 2); g.lineTo(w / 2, h / 2); g.lineTo(-w / 2, h / 2); g.closePath(); }
+    else if (shape === "dome") { g.moveTo(-w / 2, h / 2); g.lineTo(-w / 2, 0); g.ellipse(0, 0, w / 2, h / 2, 0, Math.PI, 0); g.lineTo(w / 2, h / 2); g.closePath(); }
+    else if (shape === "star") { for (let k = 0; k < 10; k++) { const a = -Math.PI / 2 + k * Math.PI / 5, rr = k % 2 ? 0.42 : 1; g.lineTo(Math.cos(a) * w / 2 * rr, Math.sin(a) * h / 2 * rr * 1.05 + h * 0.04); } g.closePath(); }
+    else if (shape === "heart") { const s = w / 2; g.moveTo(0, h * 0.42); g.bezierCurveTo(-s * 1.4, -h * 0.05, -s * 0.55, -h * 0.62, 0, -h * 0.2); g.bezierCurveTo(s * 0.55, -h * 0.62, s * 1.4, -h * 0.05, 0, h * 0.42); }
+    else { g.roundRect ? g.roundRect(-w / 2, -h / 2, w, h, r) : g.rect(-w / 2, -h / 2, w, h); }
+  }
+  K.shapePath = shapePath;
+  /* Each block colour belongs to one of the shop's animals, so a colour still means the same friend in every puzzle.
+     The block keeps its shape (the physics and the puzzles use it); the animal is painted on: ears, patches, nose, beak. */
+  K.ANIMALS = {
+    fox: { ears: "point", tip: "#1B2547", inner: "#FFE3D6", muzzle: "#FFFFFF", nose: true },
+    chick: { tuft: true, belly: "#FFE58A", beak: "#FF9B3D" },
+    frog: { bumps: true, belly: "#BFF0C9", wide: true },
+    whale: { spout: true, belly: "#D6EEFF", lines: true },
+    penguin: { mask: "#FFFFFF", beak: "#FFB13D" },
+    axolotl: { gills: "#E0457B", spots: "#FF6FA0" },
+    kitten: { ears: "point", inner: "#FFC4D6", stripes: "rgba(27,37,71,.32)", nose: "#FF8FB8", whiskers: true },
+    bear: { ears: "round", inner: "#E8C9A0", muzzle: "#E8C9A0", nose: true },
+    bunny: { ears: "long", inner: "#FFC4D6", nose: "#FF8FB8", whiskers: true }
+  };
+  K.ANIMAL_OF = { "#ff6b57": "fox", "#ffc93c": "chick", "#3fbf7f": "frog", "#5db8ff": "whale", "#8c6bf2": "penguin", "#ff8fb8": "axolotl",
+    "#ff9b3d": "kitten", "#b8834f": "bear", "#f4effa": "bunny", "#7fe0c2": "frog" };
+  // y of the top edge of a shape at x (for ears and bumps); null where there is no flat-ish top
+  function topAt(shape, w, h, x) {
+    const u = Math.min(1, Math.abs(x) / (w / 2));
+    if (shape === "ball" || shape === "dome") return -(h / 2) * Math.sqrt(1 - u * u);
+    if (shape === "tri") return -h / 2 + h * u;
+    if (shape === "star" || shape === "heart") return null;
+    return -h / 2;
+  }
+  function blob(g, x, y, rx, ry, rot, fill, lw) { g.beginPath(); g.ellipse(x, y, rx, ry, rot || 0, 0, Math.PI * 2); g.fillStyle = fill; g.fill(); if (lw) { g.lineWidth = lw; g.strokeStyle = K.INK; g.stroke(); } }
+  // behind the body: ears, gills, bumps, tuft, spout
+  function animalBack(g, a, o, w, h, s, lw, colour) {
+    const sh = o.shape, tri = sh === "tri", ex = tri ? w * 0.15 : Math.min(w * 0.3, w / 2 - s * 0.14), ear = s * (tri ? 0.18 : 0.22);
+    const T = x => topAt(sh, w, h, x);
+    if (a.ears && T(ex) !== null) for (const sx of [-1, 1]) {
+      const x = sx * ex, y = T(x) + ear * 0.25;
+      g.save(); g.translate(x, y); g.rotate(sx * (tri ? 0.75 : a.ears === "long" ? 0.12 : 0.28));
+      if (a.ears === "point") {
+        g.beginPath(); g.moveTo(-ear * 0.62, ear * 0.3); g.lineTo(0, -ear * 1.05); g.lineTo(ear * 0.62, ear * 0.3); g.closePath(); g.fillStyle = colour; g.fill(); g.lineWidth = lw; g.strokeStyle = K.INK; g.lineJoin = "round"; g.stroke();
+        g.beginPath(); g.moveTo(-ear * 0.3, ear * 0.15); g.lineTo(0, -ear * 0.6); g.lineTo(ear * 0.3, ear * 0.15); g.closePath(); g.fillStyle = a.inner; g.fill();
+        if (a.tip) { g.save(); g.beginPath(); g.moveTo(-ear * 0.62, ear * 0.3); g.lineTo(0, -ear * 1.05); g.lineTo(ear * 0.62, ear * 0.3); g.closePath(); g.clip(); g.fillStyle = a.tip; g.fillRect(-ear, -ear * 1.2, ear * 2, ear * 0.55); g.restore(); }
+      } else if (a.ears === "round") { blob(g, 0, -ear * 0.2, ear * 0.55, ear * 0.55, 0, colour, lw); blob(g, 0, -ear * 0.2, ear * 0.28, ear * 0.28, 0, a.inner); }
+      else { blob(g, 0, -ear * 1.0, ear * 0.42, ear * 1.25, 0, colour, lw); blob(g, 0, -ear * 0.95, ear * 0.2, ear * 0.85, 0, a.inner); }
+      g.restore();
+    }
+    if (a.gills) for (const sx of [-1, 1]) {
+      const bx = sx * (sh === "tri" ? w * 0.3 : w / 2), by = sh === "tri" ? h * 0.12 : -h * 0.12;
+      for (let k = -1; k <= 1; k++) { g.save(); g.translate(bx, by + k * s * 0.13); g.rotate(sx * (Math.PI / 2 + k * 0.5) - Math.PI / 2 * sx + sx * 0.0); blob(g, sx * s * 0.11, 0, s * 0.13, s * 0.055, k * 0.45 * sx, a.gills, lw * 0.8); g.restore(); }
+    }
+    if (a.tuft && T(0) !== null) { g.lineWidth = lw; g.strokeStyle = K.INK; g.lineCap = "round"; const y = T(0);
+      for (const k of [-1, 0, 1]) { g.beginPath(); g.moveTo(k * s * 0.05, y + 1); g.quadraticCurveTo(k * s * 0.12, y - s * 0.12, k * s * 0.09 + s * 0.04, y - s * 0.17); g.stroke(); } }
+    if (a.spout && T(0) !== null) { const y = T(0) - s * 0.05; g.lineWidth = lw * 0.9; g.strokeStyle = K.INK; g.fillStyle = "#BDE6FF";
+      for (const sx of [-1, 1]) { g.beginPath(); g.moveTo(0, y); g.quadraticCurveTo(sx * s * 0.05, y - s * 0.2, sx * s * 0.17, y - s * 0.17); g.stroke(); }
+      for (const sx of [-1, 0, 1]) blob(g, sx * s * 0.19, y - s * (sx ? 0.15 : 0.26), s * 0.045, s * 0.055, 0, "#BDE6FF", lw * 0.6); }
+  }
+  // inside the body (clipped): patches, belly, stripes
+  function animalPatches(g, a, o, w, h, s, fy, ey, ex) {
+    if (a.belly) blob(g, 0, h / 2, w * (a.wide ? 0.42 : 0.34), h * 0.4, 0, a.belly);
+    if (a.lines) { g.strokeStyle = "rgba(27,37,71,.18)"; g.lineWidth = Math.max(1, s * 0.025); for (const k of [-1, 0, 1]) { g.beginPath(); g.moveTo(k * w * 0.12, h * 0.2); g.lineTo(k * w * 0.12, h / 2); g.stroke(); } }
+    if (a.mask) { blob(g, -ex * 0.95, ey + s * 0.02, s * 0.2, s * 0.22, 0, a.mask); blob(g, ex * 0.95, ey + s * 0.02, s * 0.2, s * 0.22, 0, a.mask); blob(g, 0, ey + s * 0.16, s * 0.24, s * 0.16, 0, a.mask); blob(g, 0, h / 2, w * 0.32, h * 0.36, 0, a.mask); }
+    if (a.muzzle) blob(g, 0, ey + s * 0.13, s * 0.21, s * 0.13, 0, a.muzzle);
+    if (a.stripes) { g.strokeStyle = a.stripes; g.lineWidth = Math.max(1.5, s * 0.05); g.lineCap = "round"; const y = ey - s * 0.2;
+      for (const k of [-1, 0, 1]) { g.beginPath(); g.moveTo(k * s * 0.1, y - s * 0.06 + Math.abs(k) * s * 0.03); g.lineTo(k * s * 0.1, y + s * 0.04); g.stroke(); }
+      for (const sx of [-1, 1]) for (const k of [0, 1]) { g.beginPath(); g.moveTo(sx * w / 2, ey + k * s * 0.12); g.lineTo(sx * (w / 2 - s * 0.12), ey + k * s * 0.12 + s * 0.02); g.stroke(); } }
+    if (a.spots) for (const [x, y, r] of [[-0.3, -0.25, 0.05], [0.32, -0.18, 0.04], [0.25, 0.3, 0.05], [-0.28, 0.28, 0.035]]) blob(g, x * w, y * h + fy, s * r, s * r, 0, a.spots);
+  }
+  /* ---------- the toy library: every model the shop has made (toys.json), so games grow with the shop ----------
+     Each toy brings its body colour, a front-view sticker (icon.png), its Vietnamese name and, for known animals, a 2D look.
+     After K.library() resolves, K.TOYS[slug] is set and a slug can be passed anywhere a colour goes. */
+  K.TOYS = {};
+  K.library = (timeout = 5000) => K._lib || (K._lib = new Promise(res => {
+    const base = window.ASSETS || "/", done = list => res(list), timer = setTimeout(() => done([]), timeout);
+    fetch(base + "toys.json").then(r => r.ok ? r.json() : { toys: [] }).then(async j => {
+      const list = await Promise.all((j.toys || []).map(t => new Promise(r2 => {
+        const toy = { ...t, img: null }; K.TOYS[t.slug] = toy;
+        if (!t.icon) return r2(toy);
+        const im = new Image(); im.onload = () => { toy.img = im; r2(toy); }; im.onerror = () => r2(toy); im.src = base + t.icon;
+      })));
+      clearTimeout(timer); done(list);
+    }).catch(() => { clearTimeout(timer); done([]); });
+  }));
+  K.toyName = t => (K.lang === "vi" && t.title_vi ? t.title_vi : (t.title || "").replace(/\s*\(.*\)\s*/, ""));
+  // draw a friend centred at (0,0); opts: shape, colour (or a toy slug from the library), w, h, mood ("happy" | "wow" | "sleepy" | "sad"), lw, animal (defaults from the colour)
+  K.friend = (g, o) => {
+    const toy = o.toy || K.TOYS[o.colour];
+    const { shape = "square", w = 60, h = 60, mood = "happy" } = o, colour = toy ? toy.colour : (o.colour || "#FFC93C"), lw = o.lw ?? Math.max(2, Math.min(w, h) * 0.07);
+    const name = toy ? toy.look : o.animal === undefined ? K.ANIMAL_OF[String(colour).toLowerCase()] : o.animal, a = name ? K.ANIMALS[name] : null;
+    if (toy && !a && toy.img) return stickerFriend(g, toy, shape, colour, w, h, lw);
+    const s = Math.min(w, h), fy = shape === "tri" ? h * 0.18 : shape === "dome" ? h * 0.08 : 0, ex = s * 0.17, ey = fy - s * 0.04, er = Math.max(1.6, s * 0.065);
+    g.save();
+    if (a) animalBack(g, a, o, w, h, s, lw, colour);
+    shapePath(g, shape, w, h); g.fillStyle = colour; g.fill();
+    // soft highlight, animal patches and a little shade, all inside the shape
+    g.save(); shapePath(g, shape, w, h); g.clip();
+    if (a) animalPatches(g, a, o, w, h, s, fy, ey, ex);
+    g.fillStyle = "rgba(255,255,255,.28)"; g.beginPath(); g.ellipse(-w * 0.22, -h * 0.28, w * 0.28, h * 0.16, -0.5, 0, Math.PI * 2); g.fill();
+    g.fillStyle = "rgba(0,0,0,.08)"; g.fillRect(-w, h * 0.22, w * 2, h); g.restore();
+    shapePath(g, shape, w, h); g.lineWidth = lw; g.strokeStyle = K.INK; g.lineJoin = "round"; g.stroke();
+    // frog eyes sit on bumps on top of the head
+    let eY = ey; const T0 = topAt(shape, w, h, ex);
+    if (a && a.bumps && T0 !== null && shape !== "tri") { eY = T0 + s * 0.02; for (const sx of [-1, 1]) blob(g, sx * ex, eY, s * 0.15, s * 0.14, 0, colour, lw);
+      g.save(); g.beginPath(); g.rect(-w, T0 + lw / 2, w * 2, h); g.clip(); for (const sx of [-1, 1]) blob(g, sx * ex, eY, s * 0.15 - lw / 2, s * 0.14 - lw / 2, 0, colour); g.restore();
+      for (const sx of [-1, 1]) blob(g, sx * ex, eY - s * 0.01, s * 0.1, s * 0.1, 0, "#FFFFFF"); }
+    // face
+    g.fillStyle = K.INK; g.strokeStyle = K.INK; g.lineCap = "round"; g.lineWidth = Math.max(1.5, s * 0.05);
+    if (mood === "sleepy") { for (const sx of [-1, 1]) { g.beginPath(); g.arc(sx * ex, eY, er, 0.1 * Math.PI, 0.9 * Math.PI); g.stroke(); } }
+    else for (const sx of [-1, 1]) { g.beginPath(); g.ellipse(sx * ex, eY, er, er * (mood === "wow" ? 1.35 : 1.15), 0, 0, Math.PI * 2); g.fill();
+      g.fillStyle = "#fff"; g.beginPath(); g.arc(sx * ex - er * 0.3, eY - er * 0.35, er * 0.38, 0, Math.PI * 2); g.fill(); g.fillStyle = K.INK; }
+    g.fillStyle = "rgba(255,120,150,.55)";
+    for (const sx of [-1, 1]) { g.beginPath(); g.ellipse(sx * ex * 1.75, ey + s * 0.1, s * 0.07, s * 0.045, 0, 0, Math.PI * 2); g.fill(); }
+    let my = ey + s * 0.07;
+    if (a && a.beak) { my = ey + s * 0.16; g.beginPath(); g.moveTo(-s * 0.075, ey + s * 0.05); g.lineTo(s * 0.075, ey + s * 0.05); g.lineTo(0, ey + s * 0.14); g.closePath(); g.fillStyle = a.beak; g.fill(); g.lineWidth = Math.max(1.2, s * 0.03); g.stroke(); g.lineWidth = Math.max(1.5, s * 0.05); }
+    if (a && a.nose) { my = ey + s * 0.1; blob(g, 0, ey + s * 0.065, s * 0.045, s * 0.032, 0, a.nose === true ? K.INK : a.nose); }
+    if (a && a.whiskers) { g.lineWidth = Math.max(1, s * 0.022); for (const sx of [-1, 1]) for (const k of [-1, 1]) { g.beginPath(); g.moveTo(sx * s * 0.13, ey + s * 0.11); g.lineTo(sx * s * 0.3, ey + s * 0.11 + k * s * 0.04); g.stroke(); } g.lineWidth = Math.max(1.5, s * 0.05); }
+    g.fillStyle = K.INK; g.beginPath();
+    const mr = a && a.wide ? s * 0.15 : s * 0.09;
+    if (mood === "wow") { g.ellipse(0, my + s * 0.08, s * 0.05, s * 0.065, 0, 0, Math.PI * 2); g.fill(); }
+    else if (mood === "sad") { g.arc(0, my + s * 0.15, s * 0.08, 1.15 * Math.PI, 1.85 * Math.PI); g.stroke(); }
+    else { g.arc(0, my - (a && a.wide ? s * 0.06 : 0), mr, 0.15 * Math.PI, 0.85 * Math.PI); g.stroke(); }
+    g.restore();
+  };
+  // a toy without a painted 2D look (a new model) wears its own picture on the block
+  function stickerFriend(g, toy, shape, colour, w, h, lw) {
+    g.save();
+    shapePath(g, shape, w, h); g.fillStyle = colour; g.fill();
+    g.save(); shapePath(g, shape, w, h); g.clip();
+    g.fillStyle = "rgba(255,255,255,.55)"; g.beginPath(); g.ellipse(0, shape === "tri" ? h * 0.18 : 0, Math.min(w, h) * 0.44, Math.min(w, h) * 0.44, 0, 0, Math.PI * 2); g.fill();
+    const s = Math.min(w, h) * (shape === "tri" ? 0.62 : 0.86), cy = shape === "tri" ? h * 0.16 : shape === "dome" ? h * 0.06 : 0;
+    g.drawImage(toy.img, -s / 2, cy - s / 2, s, s);
+    g.fillStyle = "rgba(0,0,0,.08)"; g.fillRect(-w, h * 0.3, w * 2, h); g.restore();
+    shapePath(g, shape, w, h); g.lineWidth = lw; g.strokeStyle = K.INK; g.lineJoin = "round"; g.stroke();
+    g.restore();
+  }
+  K.star = (g, x, y, r, fill = "#FFC93C") => {
+    g.save(); g.beginPath();
+    for (let k = 0; k < 10; k++) { const a = -Math.PI / 2 + k * Math.PI / 5, rr = k % 2 ? r * 0.45 : r; g.lineTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr); }
+    g.closePath(); g.fillStyle = fill; g.fill(); g.lineWidth = Math.max(2, r * 0.18); g.strokeStyle = K.INK; g.lineJoin = "round"; g.stroke(); g.restore();
+  };
+  K.starSVG = on => `<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M20 3l5 10.3 11.3 1.5-8.3 7.8 2.1 11.2L20 28.3 9.9 33.8 12 22.6 3.7 14.8 15 13.3z" fill="${on ? "#FFC93C" : "rgba(127,140,180,.25)"}" stroke="#1B2547" stroke-width="3" stroke-linejoin="round"/></svg>`;
+
+  /* ---------- canvas helper: crisp at any pixel density ---------- */
+  K.fit = (canvas, onSize) => {
+    const ro = new ResizeObserver(() => { const r = canvas.getBoundingClientRect(), d = Math.min(devicePixelRatio || 1, 2.5);
+      if (!r.width) return; canvas.width = Math.round(r.width * d); canvas.height = Math.round(r.height * d); onSize && onSize(r.width, r.height, d); });
+    ro.observe(canvas);
+  };
+
+  K.ICON = {
+    back: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>',
+    sound: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor" fill-opacity=".2"/><path d="M16.5 9a4 4 0 010 6M19 6.5a7.5 7.5 0 010 11"/></svg>',
+    mute: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor" fill-opacity=".2"/><path d="M17 9l5 6M22 9l-5 6"/></svg>',
+    star: '<svg viewBox="0 0 24 24"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z" fill="#fff" stroke="#1B2547" stroke-width="2" stroke-linejoin="round"/></svg>',
+    replay: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 108-8H8"/><path d="M8 1L5 4l3 3"/></svg>',
+    play: '<svg viewBox="0 0 24 24"><path d="M7 4.5v15l12.5-7.5z" fill="currentColor"/></svg>'
+  };
+  // shared bar wiring: back link, sound, language
+  K.initBar = () => {
+    const back = document.getElementById("back"); if (back) { back.innerHTML = K.ICON.back; back.href = window.SHOP_URL || "/"; }
+    const s = document.getElementById("soundBtn"); if (s) { s.innerHTML = K.muted ? K.ICON.mute : K.ICON.sound; s.onclick = () => { K.setMuted(!K.muted); if (!K.muted) K.sfx.pop(); }; }
+    const l = document.getElementById("langBtn"); if (l) l.onclick = K.toggleLang;
+  };
+  window.K = K;
+})();
+
+</script>
+<script>
+K.words.en = { title: "Magic Printer", back: "Back", sound: "Sound on or off", ask: "Tap the bottom layer first!", next: "Now the next layer up!", loading: "Warming up the printer…", introH: "Magic Printer",
+  introP: "A 3D printer builds a toy one layer at a time, from the bottom up. Tap the layers in order, bottom first, and watch your toy appear!", start: "Start printing!",
+  again: "Print more", home: "More games", done: t => "You printed the " + t + "!", tryAgain: "That one goes higher. Find a lower layer!",
+  overH: n => n >= 5 ? "Master printer!" : n >= 3 ? "Great printing!" : "Well done!", overP: (n, r) => "You printed " + r + " toys, " + n + " of them without a single mix-up.",
+  noLoad: "The game couldn't load. Check the connection and try again." };
+K.words.vi = { title: "Máy In Thần Kỳ", back: "Quay lại", sound: "Bật hoặc tắt âm thanh", ask: "Chạm vào lớp dưới cùng trước nhé!", next: "Giờ đến lớp ngay phía trên!", loading: "Đang khởi động máy in…", introH: "Máy In Thần Kỳ",
+  introP: "Máy in 3D làm đồ chơi từng lớp một, từ dưới lên trên. Bé chạm vào các lớp theo thứ tự, lớp dưới cùng trước, rồi xem đồ chơi hiện ra nhé!", start: "Bắt đầu in!",
+  again: "In tiếp", home: "Trò khác", done: t => "Bé đã in xong " + t + "!", tryAgain: "Lớp này ở cao hơn. Tìm lớp thấp hơn nhé!",
+  overH: n => n >= 5 ? "Thợ in siêu đẳng!" : n >= 3 ? "Bé in giỏi quá!" : "Giỏi lắm!", overP: (n, r) => "Bé đã in " + r + " đồ chơi, " + n + " cái không nhầm lớp nào.",
+  noLoad: "Chưa tải được trò chơi. Kiểm tra mạng rồi thử lại." };
+K.initBar(); K.applyWords();
+let toastT = 0;
+function toast(m) { const e = document.getElementById("toast"); e.textContent = m; e.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => (e.hidden = true), 1700); }
+</script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/","cannon-es":"https://cdn.jsdelivr.net/npm/cannon-es@0.20.0/dist/cannon-es.js"}}</script>
+<script type="module">
+import * as THREE from "three";
+/* ---------- Daily Layer 3D kit: loads the shop's real figures as light game toys (inlined into module scripts) ---------- */
+const ASSETS = window.ASSETS || "/";
+async function fetchBytes(url) {
+  const res = await fetch(url); if (!res.ok) throw new Error("fetch " + res.status + " " + url);
+  if (!url.endsWith(".txt")) return new Uint8Array(await res.arrayBuffer());
+  const bin = atob((await res.text()).trim()), out = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+  return out;
+}
+async function loadToyList() { const r = await fetch(ASSETS + "toys.json"); if (!r.ok) throw new Error("toys"); return r.json(); }
+const geoCache = new Map();
+// a toy is 1 unit tall, standing on y = 0, centred on x/z, one colour per triangle
+async function toyGeometry(t) {
+  if (geoCache.has(t.slug)) return geoCache.get(t.slug);
+  const p = (async () => {
+    const gz = await fetchBytes(ASSETS + t.game);
+    const buf = await new Response(new Blob([gz]).stream().pipeThrough(new DecompressionStream("gzip"))).arrayBuffer();
+    const dv = new DataView(buf), nv = dv.getUint32(0, true), nf = dv.getUint32(4, true);
+    const lo = [0, 1, 2].map(i => dv.getFloat32(8 + 4 * i, true)), hi = [0, 1, 2].map(i => dv.getFloat32(20 + 4 * i, true));
+    const q = new Uint16Array(buf.slice(32, 32 + nv * 6)), pos = new Float32Array(nv * 3);
+    for (let i = 0; i < nv; i++) for (let k = 0; k < 3; k++) pos[3 * i + k] = lo[k] + q[3 * i + k] / 65535 * (hi[k] - lo[k]);
+    const fo = 32 + nv * 6, idx = new Uint32Array(buf.slice(fo, fo + nf * 12)), rgb = new Uint8Array(buf, fo + nf * 12, nf * 3);
+    const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.BufferAttribute(pos, 3)); g.setIndex(new THREE.BufferAttribute(idx, 1));
+    g.computeVertexNormals();
+    const ng = g.toNonIndexed(), col = new Float32Array(nf * 9), c = new THREE.Color();
+    for (let f = 0; f < nf; f++) { c.setRGB(rgb[3 * f] / 255, rgb[3 * f + 1] / 255, rgb[3 * f + 2] / 255, THREE.SRGBColorSpace); for (let k = 0; k < 3; k++) col.set([c.r, c.g, c.b], 9 * f + 3 * k); }
+    ng.setAttribute("color", new THREE.BufferAttribute(col, 3)); ng.computeBoundingBox(); g.dispose();
+    return ng;
+  })();
+  geoCache.set(t.slug, p); return p;
+}
+const toyMat = () => new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.55, metalness: 0 });
+async function toyMesh(t) { const m = new THREE.Mesh(await toyGeometry(t), toyMat()); m.castShadow = true; m.receiveShadow = true; m.userData.toy = t; return m; }
+// the child's collection is kept on this device only
+const collection = {
+  get() { return K.store.get("dl-collection", {}); },
+  add(slug) { const c = collection.get(); c[slug] = (c[slug] || 0) + 1; K.store.set("dl-collection", c); return c[slug]; }
+};
+const shopLink = slug => (window.SHOP_URL || "/") + "#m-" + slug;
+const assetURL = p => ASSETS + p;
+
+
+/* ---------- scene: a friendly printer (bed, two posts, a nozzle on a bar) and a shelf of loose layers ---------- */
+const cv = document.getElementById("view");
+const renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2)); renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap; renderer.localClippingEnabled = true;
+const scene = new THREE.Scene(); scene.background = new THREE.Color("#DDF3FF");
+const cam = new THREE.PerspectiveCamera(38, 1, 0.1, 60);
+scene.add(new THREE.HemisphereLight(0xffffff, 0xB9A7FF, 1.25));
+const sun = new THREE.DirectionalLight(0xffffff, 1.7); sun.position.set(2.5, 6, 5); sun.castShadow = true; sun.shadow.mapSize.set(1024, 1024);
+Object.assign(sun.shadow.camera, { left: -3, right: 3, top: 3, bottom: -3, near: 1, far: 20 }); scene.add(sun);
+const mat = c => new THREE.MeshStandardMaterial({ color: c, roughness: 0.55 });
+const BED_Y = 0.35;                                       // the toy is printed on the bed, the loose layers wait on the shelf below
+const printer = new THREE.Group(); scene.add(printer);
+const bed = new THREE.Mesh(new THREE.BoxGeometry(2.0, 0.12, 1.3), mat("#3A4750")); bed.position.y = BED_Y - 0.06; bed.receiveShadow = true; printer.add(bed);
+const plate = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.02, 1.1), mat("#FFC93C")); plate.position.y = BED_Y + 0.005; plate.receiveShadow = true; printer.add(plate);
+for (const sx of [-1.05, 1.05]) { const post = new THREE.Mesh(new THREE.BoxGeometry(0.12, 2.25, 0.12), mat("#8C6BF2")); post.position.set(sx, BED_Y + 1.0, -0.45); post.castShadow = true; printer.add(post); }
+const gantry = new THREE.Group(); printer.add(gantry);
+const bar = new THREE.Mesh(new THREE.BoxGeometry(2.3, 0.1, 0.12), mat("#8C6BF2")); bar.position.z = -0.45; gantry.add(bar);
+const head = new THREE.Group(); gantry.add(head);
+const headBox = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.26, 0.3), mat("#FF6B57")); headBox.position.set(0, 0.03, -0.3); headBox.castShadow = true; head.add(headBox);
+const nozzle = new THREE.Mesh(new THREE.ConeGeometry(0.07, 0.14, 16), mat("#E9E4D8")); nozzle.rotation.x = Math.PI; nozzle.position.set(0, -0.17, -0.3); head.add(nozzle);
+const eyeM = mat("#1B2547"); for (const ex of [-0.07, 0.07]) { const e = new THREE.Mesh(new THREE.SphereGeometry(0.03, 12, 8), eyeM); e.position.set(ex, 0.07, -0.145); head.add(e); }   // the printer has a little face
+const glowDot = new THREE.Mesh(new THREE.SphereGeometry(0.035, 12, 8), new THREE.MeshBasicMaterial({ color: "#FFE58A" })); glowDot.position.set(0, -0.25, -0.3); head.add(glowDot);
+const shelf = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.1, 1.0), mat("#FFFFFF")); shelf.receiveShadow = true; scene.add(shelf);
+
+/* ---------- a toy cut into layers: the same mesh drawn several times, each copy clipped to its band ---------- */
+const INFILL = new THREE.Color("#FFF0C4");
+function layerMat() {
+  const m = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.55, side: THREE.DoubleSide, clipShadows: true });
+  m.onBeforeCompile = sh => { sh.fragmentShader = sh.fragmentShader.replace("#include <color_fragment>", "#include <color_fragment>\nif (!gl_FrontFacing) diffuseColor.rgb = vec3(1.0, 0.94, 0.77);"); };   // the cut face looks like creamy infill
+  return m;
+}
+let finishing = false, layers = [], ghost = null, toyScale = 1, done = 0, N = 3, cur = null;
+const tmpP = new THREE.Plane();
+function updateClips() {
+  for (const L of layers) { L.mesh.updateMatrixWorld(true);
+    L.mesh.material.clippingPlanes.forEach((pl, k) => { tmpP.copy(L.local[k]).applyMatrix4(L.mesh.matrixWorld); pl.copy(tmpP); }); }
+}
+function layout() {   // where the shelf sits and how big the loose layers are, from the visible width
+  const h = 2 * Math.tan(THREE.MathUtils.degToRad(cam.fov / 2)) * cam.position.distanceTo(new THREE.Vector3(0, 0.3, 0)), w = h * cam.aspect;
+  return { w, shelfY: -1.3, gap: Math.min(1.05, (w * 0.94) / Math.max(N, 1)) };
+}
+function shelfSpot(i) { const L = layout(), x0 = -L.gap * (N - 1) / 2; return { pos: new THREE.Vector3(x0 + L.gap * i, L.shelfY + 0.06, 0.15), scale: Math.min(toyScale * 0.8, L.gap * 0.92 / Math.max(0.6, cur.w)) }; }
+async function buildToy(t) {
+  for (const L of layers) { scene.remove(L.mesh); L.mesh.material.dispose(); }
+  if (ghost) scene.remove(ghost);
+  const g = await toyGeometry(t), bb = g.boundingBox; cur = { t, w: Math.max(bb.max.x - bb.min.x, bb.max.z - bb.min.z) };
+  toyScale = Math.min(1.35 / (bb.max.y - bb.min.y), 1.6 / cur.w);
+  ghost = new THREE.Mesh(g, new THREE.MeshBasicMaterial({ color: "#5DB8FF", transparent: true, opacity: 0.16, depthWrite: false }));
+  ghost.scale.setScalar(toyScale); ghost.position.set(0, BED_Y + 0.015, 0); scene.add(ghost);
+  layers = [];
+  const y0 = bb.min.y, y1 = bb.max.y;
+  for (let k = 0; k < N; k++) {
+    const a = y0 + (y1 - y0) * k / N, b = y0 + (y1 - y0) * (k + 1) / N, m = layerMat();
+    const local = [new THREE.Plane(new THREE.Vector3(0, 1, 0), -a + (k ? 0.002 : 1)), new THREE.Plane(new THREE.Vector3(0, -1, 0), b + (k === N - 1 ? 1 : -0.002))];
+    m.clippingPlanes = local.map(p => p.clone());
+    const mesh = new THREE.Mesh(g, m); mesh.castShadow = true; mesh.receiveShadow = true; mesh.userData.k = k;
+    scene.add(mesh); layers.push({ k, a, b, mesh, local, placed: false, slot: 0, fly: 0, wig: 0, hint: false });
+  }
+  // shuffle the loose layers on the shelf, never already in order
+  let slots; do { slots = layers.map((_, i) => i).sort(() => Math.random() - 0.5); } while (N > 1 && slots.every((s, i) => s === i));
+  layers.forEach((L, i) => { L.slot = slots[i]; const s = shelfSpot(L.slot); L.mesh.position.copy(s.pos); L.mesh.position.y -= L.a * s.scale; L.mesh.scale.setScalar(s.scale); L.home = s; });
+}
+
+/* ---------- rounds ---------- */
+const ROUNDS = 6;
+let toys = [], order = [], round = 0, misses = 0, clean = 0, busy = false, roundMiss = 0, hop = 0, spin = 0;
+const shuffle = a => a.map(v => [Math.random(), v]).sort((x, y) => x[0] - y[0]).map(v => v[1]);
+function dots() { document.getElementById("dots").innerHTML = Array.from({ length: ROUNDS }, (_, i) => `<i class="${i < round ? "on" : i === round ? "now" : ""}"></i>`).join(""); }
+async function showRound() {
+  busy = true; finishing = false; done = 0; misses = 0; roundMiss = 0; hop = 0; spin = 0;
+  N = round < 2 ? 3 : round < 4 ? 4 : 5;                   // 3 layers to start, up to 5
+  await buildToy(order[round % order.length]);
+  document.getElementById("ask").textContent = K.t("ask"); dots(); busy = false;
+}
+function choose(L) {
+  if (busy || L.placed || L.fly) return;
+  if (L.k === done) {
+    L.placed = true; L.fly = 0.0001; done++; misses = 0; layers.forEach(x => (x.hint = false));
+    K.sfx.pop();
+    document.getElementById("ask").textContent = done < N ? K.t("next") : "";
+    if (done === N) busy = true;   // finish() runs when the last layer lands
+  } else {
+    misses++; roundMiss++; L.wig = 1; K.sfx.boing(); toast(K.t("tryAgain"));
+    if (misses >= 2) layers.find(x => x.k === done).hint = true;   // gentle help, never a fail screen
+  }
+}
+function finish() {
+  if (!roundMiss) clean++;
+  document.getElementById("total").textContent = round + 1; hop = 1; spin = 1;
+  document.getElementById("ask").textContent = K.t("done", K.toyName(cur.t));
+  K.sfx.chime(); const r = cv.getBoundingClientRect(); K.confetti(r.left + r.width / 2, r.top + r.height * 0.35, 50);
+  after(2.3, next);
+}
+async function next() { round++; if (round >= ROUNDS) return gameOver(); await showRound(); }
+async function newGame() {
+  timers = []; round = 0; clean = 0; document.getElementById("total").textContent = 0; document.getElementById("over").hidden = true;
+  const featured = toys.find(t => t.featured), rest = shuffle(toys.filter(t => t !== featured));
+  order = featured ? [featured, ...rest] : rest;
+  await showRound();
+}
+function gameOver() {
+  dots();
+  const st = clean >= 5 ? 3 : clean >= 3 ? 2 : 1;          // everyone who finishes gets at least one star
+  document.getElementById("stars").innerHTML = [0, 1, 2].map(i => K.starSVG(i < st)).join("");
+  document.getElementById("overH").textContent = K.t("overH", clean); document.getElementById("overP").textContent = K.t("overP", clean, ROUNDS);
+  document.getElementById("over").hidden = false; K.sfx.tada(); K.confetti();
+}
+
+/* ---------- taps ---------- */
+const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
+function pickAt(cx, cy) {
+  const r = cv.getBoundingClientRect(); ndc.set((cx - r.left) / r.width * 2 - 1, -((cy - r.top) / r.height) * 2 + 1); ray.setFromCamera(ndc, cam);
+  let best = null, bd = 1e9;   // forgiving: the nearest loose layer to the finger, not only an exact hit
+  for (const L of layers) { if (L.placed) continue;
+    const c = layerCentre(L).project(cam), d = Math.hypot((c.x - ndc.x) * r.width / 2, (c.y - ndc.y) * r.height / 2);
+    if (d < bd) { bd = d; best = L; } }
+  return bd < Math.max(48, layout().gap / layout().w * r.width * 0.55) ? best : null;
+}
+function layerCentre(L) { const s = L.mesh.scale.x; return new THREE.Vector3(L.mesh.position.x, L.mesh.position.y + (L.a + L.b) / 2 * s, L.mesh.position.z); }
+cv.addEventListener("pointerdown", e => { if (!document.getElementById("intro").hidden) return; const L = pickAt(e.clientX, e.clientY); if (L) choose(L); });
+
+/* ---------- loop ---------- */
+function resize() { const r = cv.getBoundingClientRect(); if (!r.width) return; renderer.setSize(r.width, r.height, false); cam.aspect = r.width / r.height;
+  const tall = cam.aspect < 0.9; cam.fov = tall ? 50 : 38; const d = tall ? 3.9 / Math.max(0.5, cam.aspect) * 0.62 : 5.2;
+  cam.position.set(0, 1.35, d); cam.lookAt(0, 0.28, 0); cam.updateProjectionMatrix();
+  const L = layout(); shelf.position.set(0, L.shelfY, 0.15); shelf.scale.x = Math.max(1, L.w * 0.98 / 3.2);
+  layers.forEach(Lr => { if (!Lr.placed) { const s = shelfSpot(Lr.slot); Lr.home = s; Lr.mesh.scale.setScalar(s.scale); Lr.mesh.position.set(s.pos.x, s.pos.y - Lr.a * s.scale, s.pos.z); } }); }
+new ResizeObserver(resize).observe(cv); resize();
+let last = performance.now(), headX = 0, headY = BED_Y + 1.7;
+let timers = [];   // game timers run on the animation clock, so the game never runs ahead of what is drawn
+function after(sec, fn) { timers.push({ t: sec, fn }); }
+(function loop(now) {
+  requestAnimationFrame(loop);
+  const dt = Math.min(0.05, (now - last) / 1000); last = now;
+  for (const tm of timers.splice(0)) { tm.t -= dt; if (tm.t > 0) timers.push(tm); else tm.fn(); }
+  const topL = done > 0 ? layers[done - 1] : null;   // the nozzle waits just above the last printed layer
+  const allDone = layers.length && done === N;   // when the toy is finished the nozzle steps aside so the toy can show off
+  let wantX = allDone ? 0.82 : 0, wantY = allDone ? BED_Y + 1.25 : BED_Y + (topL && topL.mesh ? topL.b * toyScale : 0) + 0.32;
+  for (const L of layers) {
+    if (L.placed) {
+      if (L.fly > 0 && L.fly < 1) {   // fly from the shelf up to the printer, landing exactly on its layer
+        L.fly = Math.min(1, L.fly + dt * (K.CALM ? 6 : 1.8)); const e = L.fly < 0.5 ? 2 * L.fly * L.fly : 1 - Math.pow(-2 * L.fly + 2, 2) / 2;
+        const from = L.home, s = from.scale + (toyScale - from.scale) * e;
+        const fx = from.pos.x, fy = from.pos.y - L.a * from.scale, tx = 0, ty = BED_Y + 0.015 - 0 * s;
+        L.mesh.scale.setScalar(s); L.mesh.position.set(fx + (tx - fx) * e, fy + (ty - fy) * e + Math.sin(Math.PI * e) * 0.6 * (K.CALM ? 0 : 1), from.pos.z * (1 - e));
+        L.mesh.rotation.y = 0; wantX = L.mesh.position.x; wantY = L.mesh.position.y + L.b * s + 0.32;
+        if (L.fly >= 1) { K.sfx.thud(); L.fly = 0; }
+      }
+    } else {
+      L.mesh.rotation.y = K.CALM ? 0.4 : now / 1400 + L.slot;   // loose layers turn slowly so the child sees their shape
+      const s = L.home; let bob = 0;
+      if (L.wig > 0) { L.wig = Math.max(0, L.wig - dt * 2.5); L.mesh.rotation.z = K.CALM ? 0 : Math.sin(L.wig * 18) * 0.18 * L.wig; } else L.mesh.rotation.z = 0;
+      if (L.hint) bob = K.CALM ? 0.08 : Math.abs(Math.sin(now / 220)) * 0.15;
+      L.mesh.position.y = s.pos.y - L.a * s.scale + bob;
+    }
+  }
+  if (ghost) ghost.visible = done < N;
+  if (layers.length && done === N && !finishing && layers.every(x => !x.fly)) { finishing = true; after(0.35, finish); }   // every layer has landed
+  // the finished toy hops and turns once to show off
+  const placedAll = layers.length && done === N && layers.every(L => !L.fly);
+  if (placedAll && hop > 0) { hop = Math.max(0, hop - dt * 0.9); const y = K.CALM ? 0 : Math.abs(Math.sin((1 - hop) * Math.PI * 3)) * 0.22 * hop;
+    const ry = K.CALM ? 0 : (1 - hop) * Math.PI * 2; for (const L of layers) { L.mesh.position.y = BED_Y + 0.015 + y; L.mesh.rotation.y = ry; } }
+  headX += (wantX - headX) * Math.min(1, dt * 6); headY += (Math.max(wantY, BED_Y + 0.32) - headY) * Math.min(1, dt * 4);
+  head.position.x = headX + (done < N && !K.CALM ? Math.sin(now / 300) * 0.05 : 0); gantry.position.y = headY;
+  glowDot.visible = layers.some(L => L.fly > 0) || (Math.floor(now / 500) % 2 === 0);
+  updateClips();
+  renderer.render(scene, cam);
+})(performance.now());
+
+/* ---------- boot ---------- */
+document.getElementById("homeBtn").href = window.SHOP_URL ? window.SHOP_URL : "/#play";
+document.getElementById("back").href = window.SHOP_URL || "/";
+document.getElementById("langBtn").addEventListener("click", () => { if (!busy) document.getElementById("ask").textContent = done ? K.t("next") : K.t("ask"); });
+(async () => {
+  try { toys = (await loadToyList()).toys; if (!toys.length) throw new Error("no toys"); await Promise.all(toys.map(toyGeometry)); }
+  catch (e) { document.getElementById("loading").textContent = K.t("noLoad"); return; }
+  document.getElementById("loading").hidden = true;
+  await newGame();
+  // intro art: a toy's cover cut into three stripes, the top one floating down into place
+  const c = document.getElementById("introArt"), x = c.getContext("2d");
+  x.fillStyle = "#DDF3FF"; x.fillRect(0, 0, 400, 280); x.fillStyle = "#3A4750"; x.fillRect(80, 236, 240, 18); x.fillStyle = "#FFC93C"; x.fillRect(92, 230, 216, 8);
+  x.fillStyle = "#8C6BF2"; x.fillRect(70, 30, 14, 224); x.fillRect(316, 30, 14, 224); x.fillRect(60, 24, 280, 14);
+  const t0 = toys.find(t => t.featured) || toys[0];
+  const im = await new Promise(r => { const i = new Image(); i.onload = () => r(i); i.onerror = () => r(null); i.src = assetURL(t0.cover); });
+  if (im) { const S = 170, X = 115, Y = 62, sh = im.height / 3; [[2, 0], [1, 0], [0, -26]].forEach(([k, dy]) => { x.save(); x.beginPath(); x.rect(X, Y + k * S / 3 + dy, S, S / 3); x.clip(); x.drawImage(im, 0, 0, im.width, im.height, X, Y + dy, S, S); x.restore();
+      x.lineWidth = 4; x.strokeStyle = "#1B2547"; x.strokeRect(X, Y + k * S / 3 + dy, S, S / 3); }); }
+  x.fillStyle = "#FF6B57"; x.fillRect(178, 38, 44, 22); x.fillStyle = "#E9E4D8"; x.beginPath(); x.moveTo(192, 60); x.lineTo(208, 60); x.lineTo(200, 70); x.fill();
+})();
+document.getElementById("startBtn").onclick = () => { K.sfx.pop(); document.getElementById("intro").hidden = true; };
+document.getElementById("againBtn").onclick = () => { K.sfx.pop(); newGame(); };
+// used by automated play tests and the Shorts recorder
+window.__game = { THREE, cam, round: () => round, clean: () => clean, ready: () => layers.length > 0 && !busy, layersLeft: () => layers.filter(L => !L.placed).length,
+  flying: () => layers.some(L => L.fly > 0), done: () => done, N: () => N,
+  where: k => { const L = layers.find(x => x.k === k); if (!L) return null; const c = layerCentre(L).project(cam); return [c.x, c.y]; },
+  nextAt: () => { const L = layers.find(x => x.k === done && !x.placed); if (!L) return null; const c = layerCentre(L).project(cam); return [c.x, c.y]; },
+  wrongAt: () => { const L = layers.find(x => !x.placed && x.k !== done); if (!L) return null; const c = layerCentre(L).project(cam); return [c.x, c.y]; } };
+</script>
+</body>
+</html>

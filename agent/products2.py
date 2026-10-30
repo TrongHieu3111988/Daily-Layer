@@ -267,3 +267,120 @@ CATALOG2 = {
         blurb="Snap-in AirTag case that slides onto pet collars up to 25 mm wide. Print in TPU for a secure, soft fit.",
         tags=["pet", "airtag", "dog", "cat"])),
 }
+
+# ---------- Rainbow Wiggle Snake (print-in-place, 2026-10-30) ----------
+# 13 segments joined by 12 captured bicone pins: every overhang is 45 degrees, nothing bridges, 0.55 mm clearance all round.
+SNK_J = [24.0 + 14.0 * k for k in range(12)]           # joint centres along x (head at x ~ 0, tail toward +x)
+SNK_TIP = SNK_J[-1] + 28.0
+SNK_H, SNK_ZC, SNK_W = 10.0, 4.5, 6.0                  # height, top of the straight walls, body half-width
+SNK_CLR, SNK_WRAP = 0.55, 6.0
+SNK_PIN = np.array([(0, 0), (2.0, 0), (3.8, 1.8), (3.8, 7.2), (2.0, 9.0), (0, 9.0)], float)
+SNK_RAINBOW = ["#E8453C", "#F28C28", "#F6C833", "#4CB963", "#3B8FD9", "#8C5BD6"]
+
+def _snk_w(x):
+    head = 9.6 * np.sqrt(np.clip(1 - ((x - 9.0) / 12.5) ** 2, 0, 1))
+    tail = np.where(x > SNK_J[-1] + 7.0, SNK_W - (SNK_W - 1.4) * np.clip((x - SNK_J[-1] - 7.0) / (SNK_TIP - SNK_J[-1] - 7.0), 0, 1) ** 1.3, SNK_W)
+    body = np.where(x > 13.0, tail, 0.0)
+    return np.maximum(head, body)
+
+def _snk_h(x):
+    t = np.clip((x - SNK_J[-1] - 7.0) / (SNK_TIP - SNK_J[-1] - 7.0), 0, 1)
+    return SNK_H - 5.0 * t ** 1.5 + 1.0 * np.exp(-((x - 9.0) / 7.0) ** 2)   # a little taller head, low pointed tail
+
+def _snk_body(p, x0, x1):
+    x, y, z = p[..., 0], p[..., 1], p[..., 2]
+    w = np.maximum(_snk_w(x), 1e-3); h = _snk_h(x); zc = np.minimum(SNK_ZC, h * 0.45)
+    side = np.abs(y) - w
+    k = np.hypot(y / w, np.maximum(z - zc, 0) / np.maximum(h - zc, 1e-3))
+    dome = (k - 1.0) * np.minimum(w, h - zc)
+    d = np.where(z > zc, dome, side)
+    return np.maximum(np.maximum(d, -z), np.maximum(x0 - x, x - x1))
+
+def _snk_rz(p, jx):
+    r = np.hypot(p[..., 0] - jx, p[..., 1])
+    return np.stack([r, p[..., 2], np.zeros_like(r)], -1)
+
+def _snk_pin(p, jx): return poly2(_snk_rz(p, jx), SNK_PIN)
+
+def _snk_seg(p, i):
+    n = len(SNK_J)
+    x0 = SNK_J[i - 1] if i > 0 else -4.0
+    x1 = SNK_J[i] if i < n else SNK_TIP + 1.0
+    s = _snk_body(p, x0, min(x1, SNK_TIP + 1.0))
+    if i < n:                                            # rear: a disc that wraps the next segment's pin
+        jx = x1
+        wrap = np.maximum(_snk_body(p, jx - SNK_WRAP, jx + SNK_WRAP), circ2(p, (jx, 0), SNK_WRAP))
+        s = np.minimum(s, wrap)
+        cav = np.minimum(_snk_pin(p, jx) - SNK_CLR, circ2(p, (jx, 0), 2.0 + SNK_CLR))  # open top and bottom over the pin
+        ang = np.arctan2(p[..., 1], p[..., 0] - jx)
+        slot = np.abs(ang) - np.radians(50)
+        s = diff(s, cav, slot)
+    if i > 0:                                            # front: concave face, pin and neck
+        jx = x0
+        s = diff(s, circ2(p, (jx, 0), SNK_WRAP + SNK_CLR))
+        pin = np.maximum(_snk_pin(p, jx), _snk_body(p, jx - 5, jx + 5))
+        neck = np.maximum(extrude(rrect2(p, (jx + 3.8, 0), (3.8, 1.6), 0.5), p, 2.4, 6.6), _snk_body(p, jx, jx + 9))
+        s = union(s, pin, neck)
+    if i == 0:                                           # face: round eyes with pupils, two nostrils
+        for sd in (1, -1):
+            ey = sd * 4.9; zt = float(_snk_top(7.0, 4.9))
+            s = union(s, sphere(p, np.array([7.0, ey, zt - 1.0]), 3.0))
+            s = diff(s, sphere(p, np.array([5.6, sd * 5.3, zt + 2.0]), 1.35))
+            s = diff(s, sphere(p, np.array([0.6, sd * 2.3, float(_snk_top(0.6, 2.3)) + 0.35]), 0.85))
+    return s
+
+def _snk_top(x, y):
+    w = float(_snk_w(np.array(x))); h = float(_snk_h(np.array(x))); zc = min(SNK_ZC, h * 0.45)
+    return zc + (h - zc) * np.sqrt(max(0.0, 1 - (y / w) ** 2))
+
+def _snk_range(i):
+    n = len(SNK_J)
+    a = (SNK_J[i - 1] - 7.0) if i > 0 else -6.0
+    b = (SNK_J[i] + 7.5) if i < n else SNK_TIP + 2.0
+    return a, b
+
+def _snk_sdf(segs):
+    def f(P):
+        sh = P.shape[:-1]; Q = P.reshape(-1, 3); out = np.full(len(Q), 50.0)
+        for i in segs:
+            a, b = _snk_range(i); m = (Q[:, 0] > a - 0.5) & (Q[:, 0] < b + 0.5)
+            out[m] = np.minimum(out[m], _snk_seg(Q[m], i))
+        return out.reshape(sh)
+    return f
+
+def rainbow_snake(step=0.28):
+    n = len(SNK_J) + 1
+    lo, hi = (-5.0, -11.0, 0.0), (SNK_TIP + 1.0, 11.0, SNK_H + 2.5)
+    v, f = mesh(_snk_sdf(range(n)), lo, hi, step)
+    groups = {}
+    for i in range(n): groups.setdefault(min(5, i * 6 // n), []).append(i)
+    names = ["red", "orange", "yellow", "green", "blue", "purple"]
+    colour_parts = []
+    for g, segs in groups.items():
+        a, b = _snk_range(segs[0])[0], _snk_range(segs[-1])[1]
+        gv, gf = mesh(_snk_sdf(segs), (max(lo[0], a - 1), lo[1], lo[2]), (min(hi[0], b + 1), hi[1], hi[2]), step)
+        colour_parts.append((names[g], gv, gf, SNK_RAINBOW[g]))
+    # shop preview: the same segments posed in a gentle S, the way it sits after a wiggle (the print file stays straight)
+    ang = [0.0] + [np.radians(19) * np.sin(0.9 * k + 0.6) for k in range(1, n)]
+    T = [np.eye(3)]
+    posed = {}
+    for i in range(n):
+        if i > 0:
+            jx = SNK_J[i - 1]; c, s_ = np.cos(ang[i]), np.sin(ang[i])
+            R = np.array([[c, -s_, jx - c * jx], [s_, c, -s_ * jx], [0, 0, 1]])
+            T.append(T[-1] @ R)
+        a, b = _snk_range(i)
+        sv, sf = mesh(_snk_sdf([i]), (a - 1, lo[1], lo[2]), (b + 1, hi[1], hi[2]), step)
+        xy = np.c_[sv[:, :2], np.ones(len(sv))] @ T[i].T
+        sv = np.c_[xy[:, :2], sv[:, 2]].astype(np.float32)
+        g = min(5, i * 6 // n); pv, pf = posed.get(g, (np.zeros((0, 3), np.float32), np.zeros((0, 3), np.int64)))
+        posed[g] = (np.concatenate([pv, sv]), np.concatenate([pf, sf + len(pv)]))
+    allv = np.concatenate([pv for pv, _ in posed.values()]); ctr = (allv.max(0) + allv.min(0)) / 2
+    preview = [(names[g], posed[g][0] - np.array([ctr[0], ctr[1], 0], np.float32), posed[g][1], SNK_RAINBOW[g]) for g in sorted(posed)]
+    return dict(parts=preview, print_parts=[("snake", v, f, "#E8453C")], expect_shells=n, colour_3mf=colour_parts,
+                meta=dict(view=(62, -75), line="print-in-place",
+                          print_hint="Prints straight; the photos show it after a wiggle. Print-in-place, no supports, no assembly: 13 segments on 12 captured pins, 45-degree overhangs only, 0.55 mm clearance. 0.2 mm layers, 2 walls, PLA. One colour, a rainbow/silk-rainbow filament, or the included 3MF with each segment group pre-split for 6 AMS colours. Flex each joint gently after printing. Contains small parts: not for children under 3."))
+
+CATALOG2["rainbow-wiggle-snake"] = (rainbow_snake, dict(title="Rainbow Wiggle Snake", title_vi="Rắn Cầu Vồng Uốn Éo", price=1.99,
+    blurb="A 21 cm articulated snake that prints in one piece and slithers straight off the bed. 13 rainbow segments on captured pins, no supports, no assembly.",
+    tags=["flexi", "print-in-place", "fidget", "snake", "rainbow", "stocking-stuffer"]))

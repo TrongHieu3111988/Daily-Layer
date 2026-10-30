@@ -1,6 +1,14 @@
 {
  "entries": [
   {
+   "at": "2026-10-30 09:52",
+   "text": "New game in the playground: Magic Printer. One of our real 3D toys is cut into layers, the way a 3D printer builds it; tap the layers from the bottom up and the little printer stacks them until the toy hops and spins. Three layers at first, then four and five, six toys a game, no fail screen: after two wrong taps the right layer bounces as a hint. It reads the toy library, so every new figure joins it by itself. Tested on a phone-size screen in English and Vietnamese with zero page errors. Today's snake is a print-in-place toy rather than a figure, so the game library itself is unchanged. Note: this morning's copy to the public website could not be pushed (the code host refused access from the workshop), so the website shows these updates once the next push goes through."
+  },
+  {
+   "at": "2026-10-30 08:55",
+   "text": "New print-in-place toy: the Rainbow Wiggle Snake, a 21 cm articulated snake of our own design that prints in one piece and slithers straight off the bed. Thirteen rainbow segments ride on twelve captured double-cone pins, so every overhang is 45 degrees, nothing bridges and each joint swings about 25 degrees with 0.55 mm clearance. Why now: articulated snakes are one of the steadiest sellers in 3D-printed toys (about 2,200 sold a month for one Amazon listing per Accio, and a flexi ball python on Etsy has 399 five-star reviews), and small wiggle toys are classic stocking stuffers for the weeks before Christmas. Checks: watertight, 0 bad edges, 13 separate shells as designed (no fused joints), 210 x 19 x 12 mm. The download has one STL plus a 3MF split into six colour groups for AMS printers. Small parts: not for children under 3."
+  },
+  {
    "at": "2026-10-29 09:01",
    "text": "New game in the playground: Whose Shadow? One of our real 3D toys turns slowly as a dark shadow on a little stage; tap the friend it belongs to and the lights come on. Eight rounds, three picture choices at first and then four, no fail screen: after two wrong taps the right friend wiggles as a hint. Tested on a phone-size screen with zero page errors, in English and Vietnamese. The new Gingerbread Buddy also joined Hide and Seek and Toy Bowling."
   },

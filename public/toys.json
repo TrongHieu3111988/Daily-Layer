@@ -1,6 +1,6 @@
 {
- "updated": "2026-10-29 08:48",
- "featured": "sculpt-gingerbread",
+ "updated": "2026-10-30 08:55",
+ "featured": "rainbow-wiggle-snake",
  "toys": [
   {
    "slug": "sculpt-gingerbread",
@@ -14,7 +14,7 @@
    "icon": "products/sculpt-gingerbread/icon.png",
    "colour": "#C27C43",
    "look": null,
-   "featured": true
+   "featured": false
   },
   {
    "slug": "sculpt-penguin",

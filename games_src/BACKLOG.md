@@ -12,7 +12,7 @@ model is made for a game only when the game needs a kind of model the library la
 - [x] 2026-10-29 Hide and Seek, 3D (hide) https://claude.ai/artifact/Q3idBaN6tiht1SzcC2wrVK
 - [x] 2026-10-29 Toy Bowling, 3D (bowl) https://claude.ai/artifact/8wVbSSvujjEp4qp44eUKoa
 - [x] 2026-10-29 Whose Shadow? (shadow) https://claude.ai/artifact/A2WdpL6ztBRyJCbU2moABm — a real 3D toy turns slowly as a black silhouette; tap which friend it is (3–4 covers). Lights come on when right.
-- [ ] Magic Printer (layers) — a real toy is cut into 5–8 horizontal slices like a 3D printer prints; drag slices into order bottom to top, then watch it "print".
+- [x] 2026-10-30 Magic Printer (layers) https://claude.ai/artifact/K7SEug6s3i7K8mHbqgXyoF — a real toy is cut into 3–5 layers (fewer than planned, so a 4-year-old can do it); tap them bottom to top and the printer stacks them, then the toy hops.
 - [ ] Toy Memory (memory) — flip cards to match pairs of toy covers; 6 / 8 / 12 cards.
 - [ ] Toy Town (town) — free play: place collected 3D toys on a little town board and take a picture; no winning or losing.
 - [ ] Count and Print (count) — "How many foxes?" a pile of 3D toys; tap the number. Numbers 1–10.

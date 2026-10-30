@@ -3,6 +3,77 @@
  "started": "2026-10-28",
  "products": [
   {
+   "slug": "rainbow-wiggle-snake",
+   "title": "Rainbow Wiggle Snake",
+   "title_vi": "R\u1eafn C\u1ea7u V\u1ed3ng U\u1ed1n \u00c9o",
+   "price": 1.99,
+   "blurb": "A 21 cm articulated snake that prints in one piece and slithers straight off the bed. 13 rainbow segments on captured pins, no supports, no assembly.",
+   "tags": [
+    "flexi",
+    "print-in-place",
+    "fidget",
+    "snake",
+    "rainbow",
+    "stocking-stuffer"
+   ],
+   "line": "print-in-place",
+   "print_hint": "Prints straight; the photos show it after a wiggle. Print-in-place, no supports, no assembly: 13 segments on 12 captured pins, 45-degree overhangs only, 0.55 mm clearance. 0.2 mm layers, 2 walls, PLA. One colour, a rainbow/silk-rainbow filament, or the included 3MF with each segment group pre-split for 6 AMS colours. Flex each joint gently after printing. Contains small parts: not for children under 3.",
+   "parts": [
+    {
+     "name": "snake",
+     "triangles": 470344,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 13,
+     "volume_cm3": 17.94,
+     "size_mm": [
+      210.6,
+      19.2,
+      12.0
+     ],
+     "min_z": -0.0
+    }
+   ],
+   "watertight": true,
+   "web": [
+    {
+     "file": "products/rainbow-wiggle-snake/web_red.bin",
+     "color": "#E8453C",
+     "name": "red"
+    },
+    {
+     "file": "products/rainbow-wiggle-snake/web_orange.bin",
+     "color": "#F28C28",
+     "name": "orange"
+    },
+    {
+     "file": "products/rainbow-wiggle-snake/web_yellow.bin",
+     "color": "#F6C833",
+     "name": "yellow"
+    },
+    {
+     "file": "products/rainbow-wiggle-snake/web_green.bin",
+     "color": "#4CB963",
+     "name": "green"
+    },
+    {
+     "file": "products/rainbow-wiggle-snake/web_blue.bin",
+     "color": "#3B8FD9",
+     "name": "blue"
+    },
+    {
+     "file": "products/rainbow-wiggle-snake/web_purple.bin",
+     "color": "#8C5BD6",
+     "name": "purple"
+    }
+   ],
+   "download": "",
+   "cover": "products/rainbow-wiggle-snake/cover.jpg",
+   "build_seconds": 40.7,
+   "download_bytes": 9508242,
+   "dropped": "2026-10-30"
+  },
+  {
    "slug": "sculpt-gingerbread",
    "title": "Gingerbread Buddy",
    "price": 2.49,
@@ -1916,6 +1987,6 @@
   "members": 0,
   "costs_usd": 0.0
  },
- "updated": "2026-10-29 08:48",
- "featured": "sculpt-gingerbread"
+ "updated": "2026-10-30 08:55",
+ "featured": "rainbow-wiggle-snake"
 }
