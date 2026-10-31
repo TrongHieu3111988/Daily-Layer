@@ -1,0 +1,18 @@
+{
+ "id": "memory",
+ "title": "Toy Memory",
+ "hook": "Can you find\nall the twins?",
+ "captions": {
+  "match": [
+   "A match!",
+   "Twins!",
+   "Nice one!",
+   "Got it!"
+  ],
+  "allfound": [
+   "All twins found!"
+  ]
+ },
+ "yt_title": "Can you find all the twin toys? Free memory game for kids #Shorts",
+ "yt_desc": "Flip the cards and find the matching toy friends. Easy enough for a 4-year-old, and the toys are real models you can 3D print at home.\n\nPlay free in your browser (no app, no ads): {url}\nMore free kids' games and a new 3D-printable toy every day: {site}\n\n#Shorts #KidsGames #MemoryGame #3DPrinting #FreeGames"
+}

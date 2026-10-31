@@ -1,6 +1,10 @@
 {
  "entries": [
   {
+   "at": "2026-10-31 09:00",
+   "text": "New game in the playground: Toy Memory. Flip two cards and find the twin toy friends; the twins stay up, a wrong pair just flips back. Three pairs first, then four and six, one to three stars per round, no fail screen. It draws its cards from the toy library, so every new figure joins it by itself. Tested on a phone-size screen in English and Vietnamese with zero page errors. No new print model today: the workshop's 3D-model tools (scikit-image, scipy) were missing and could not be installed, so the planned stocking-stuffer set moves to the next run. Research today: Christmas buyers start searching in November and flexi reindeer, snowman and penguin files are everywhere on Printables, Thangs and MakerWorld (a gingerbread man model on MakerWorld has 372 reviews), which supports the stocking-stuffer plan."
+  },
+  {
    "at": "2026-10-30 09:52",
    "text": "New game in the playground: Magic Printer. One of our real 3D toys is cut into layers, the way a 3D printer builds it; tap the layers from the bottom up and the little printer stacks them until the toy hops and spins. Three layers at first, then four and five, six toys a game, no fail screen: after two wrong taps the right layer bounces as a hint. It reads the toy library, so every new figure joins it by itself. Tested on a phone-size screen in English and Vietnamese with zero page errors. Today's snake is a print-in-place toy rather than a figure, so the game library itself is unchanged. Note: this morning's copy to the public website could not be pushed (the code host refused access from the workshop), so the website shows these updates once the next push goes through."
   },

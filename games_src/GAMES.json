@@ -35,6 +35,11 @@
    "id": "layers",
    "artifact": "https://claude.ai/artifact/K7SEug6s3i7K8mHbqgXyoF",
    "library": "3d"
+  },
+  {
+   "id": "memory",
+   "artifact": "https://claude.ai/artifact/ACkhzUHHNxfdRYZ9AN2Fwz",
+   "library": "2d"
   }
  ]
 }
