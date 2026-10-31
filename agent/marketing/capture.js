@@ -49,19 +49,21 @@ const DIRECTORS = {
     }
     await s.hold(45);
   },
-  // Toy Memory: show one wrong guess (it just flips back), then find every twin. CSS flips are stepped by hand so they follow the fake clock.
+  // Toy Memory: one wrong guess (it just flips back), then every twin in rounds 1 and 2. CSS flips are stepped by hand so they follow the fake clock.
   async memory(s) {
     const fr = async () => { await s.page.evaluate(dt => { for (const a of document.getAnimations()) { if (a.playState === "finished") continue; a.pause(); const end = a.effect.getComputedTiming().endTime; a.currentTime = Math.min((a.currentTime || 0) + dt, end); if (a.currentTime >= end) a.finish(); } }, DT); await s.frame(); };
     const hold = async k => { for (let i = 0; i < k; i++) await fr(); };
-    await hold(20); await s.tap("#startBtn"); await hold(10);
-    await s.page.evaluate(() => { level = 3; newRound(); }); await hold(24);
-    const ids = await s.page.evaluate(() => cards.map(c => c.id)), n = ids.length, click = async i => { await s.tap(`.card3[data-i="${i}"]`); await hold(18); };
-    const a = 0, b = ids.findIndex((v, k) => k && v !== ids[0]);   // a mismatch on purpose
-    await click(a); await click(b); await hold(40);
-    const done = new Set();
-    for (let i = 0; i < n; i++) { if (done.has(i)) continue; const j = ids.findIndex((v, k) => k !== i && v === ids[i]);
-      await click(i); await click(j); done.add(i); done.add(j); s.mark("match"); await hold(28); }
-    await s.waitFor(() => !document.getElementById("end").hidden); s.mark("allfound"); await hold(70);
+    const click = async i => { await s.tap(`.cardx:nth-child(${i + 1})`); await hold(16); };
+    await hold(20); await s.tap("#startBtn"); await hold(30);
+    for (let r = 0; r < 2; r++) {
+      const keys = await s.page.evaluate(() => cards.map(c => c.item.key)), n = keys.length;
+      if (r === 0) { const b = keys.findIndex((v, k) => k && v !== keys[0]); await click(0); await click(b); await hold(36); }
+      const done = new Set();
+      for (let i = 0; i < n; i++) { if (done.has(i)) continue; const j = keys.findIndex((v, k) => k !== i && v === keys[i]);
+        await click(i); await click(j); done.add(i); done.add(j); s.mark("match"); await hold(26); }
+      if (r === 0) { s.mark("next"); await s.waitFor(() => cards.length === 8 && !cards.some(c => c.done), 200); await hold(30); }
+    }
+    s.mark("allfound"); await hold(60);
   },
   // Stack the Drop: drop friends when the crane is over the table
   async stack(s) {

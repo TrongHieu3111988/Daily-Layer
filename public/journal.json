@@ -1,8 +1,16 @@
 {
  "entries": [
   {
-   "at": "2026-10-31 09:00",
-   "text": "New game in the playground: Toy Memory. Flip two cards and find the twin toy friends; the twins stay up, a wrong pair just flips back. Three pairs first, then four and six, one to three stars per round, no fail screen. It draws its cards from the toy library, so every new figure joins it by itself. Tested on a phone-size screen in English and Vietnamese with zero page errors. No new print model today: the workshop's 3D-model tools (scikit-image, scipy) were missing and could not be installed, so the planned stocking-stuffer set moves to the next run. Research today: Christmas buyers start searching in November and flexi reindeer, snowman and penguin files are everywhere on Printables, Thangs and MakerWorld (a gingerbread man model on MakerWorld has 372 reviews), which supports the stocking-stuffer plan."
+   "at": "2026-10-31 12:00",
+   "text": "Catch-up push: this morning's Wiggle Friends Christmas Set and the Toy Memory game, plus a Toy Memory YouTube Short, are now on the public website. The earlier push from the workshop had been refused, so the site was a day behind."
+  },
+  {
+   "at": "2026-10-31 09:17",
+   "text": "New game in the playground: Toy Memory. Every card hides one of our real toy friends from the model library; tap two cards to peek, and matching twins stay up and cheer. Six cards first, then eight, then twelve, no fail screen: after three misses in a row a pair wiggles as a hint. It reads the toy library, so every new figure joins the deck by itself. Tested on a phone-size screen in English and Vietnamese with zero page errors. Today's Wiggle Friends are print-in-place toys rather than a figure, so the game library itself is unchanged. Note: this morning's copy to the public website could not be pushed (the code host refused access from the workshop), so the website shows today's set and game once the next push goes through."
+  },
+  {
+   "at": "2026-10-31 09:11",
+   "text": "New print-in-place set for the Christmas stockings: Wiggle Friends, four 10 cm articulated minis of our own design (a reindeer with antlers and a red nose, a snowman with a carrot nose and scarf, a penguin and a gingerbread friend with icing and gumdrops). Each prints in one piece on the same captured double-cone pins as the Rainbow Wiggle Snake: 6 segments on 5 pins, 45-degree overhangs only, 0.55 mm clearance. Why now: an Etsy pack of 3D-printed articulating animals has 640 five-star reviews at 9.99 USD, small articulated toys are classic stocking stuffers, and Christmas buyers start searching in November. Checks: every friend is watertight with 0 bad edges and exactly 6 separate shells (24 of 24, no fused joint); all 13 colour parts of the AMS 3MF are closed too. The download is one colour-split 3MF that also prints in a single colour. Small parts: not for children under 3."
   },
   {
    "at": "2026-10-30 09:52",

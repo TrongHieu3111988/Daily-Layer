@@ -384,3 +384,168 @@ def rainbow_snake(step=0.28):
 CATALOG2["rainbow-wiggle-snake"] = (rainbow_snake, dict(title="Rainbow Wiggle Snake", title_vi="Rắn Cầu Vồng Uốn Éo", price=1.99,
     blurb="A 21 cm articulated snake that prints in one piece and slithers straight off the bed. 13 rainbow segments on captured pins, no supports, no assembly.",
     tags=["flexi", "print-in-place", "fidget", "snake", "rainbow", "stocking-stuffer"]))
+
+# ---------- Wiggle Friends Christmas set (print-in-place, 2026-10-31) ----------
+# Four 10 cm wiggle friends (reindeer, snowman, penguin, gingerbread) on the same captured bicone pins as the
+# Rainbow Wiggle Snake (45-degree overhangs, 0.55 mm clearance). Each prints in one piece; a stocking-stuffer set.
+WF_J = [22.0 + 14.0 * k for k in range(5)]           # joints along x; head at x ~ 0..20, tail toward +x
+WF_TIP = WF_J[-1] + 19.0
+WF_H, WF_ZC, WF_W, WF_RH, WF_HX = 10.0, 4.5, 6.0, 9.5, 9.0
+WF_FRIENDS = [   # name, body colour, accent colours
+    ("reindeer", "#A0683E", {"nose": "#D9443F", "antler": "#5A3A24"}),
+    ("snowman", "#F4F4EF", {"carrot": "#F28C28", "coal": "#2B2E3A", "scarf": "#2F8A57"}),
+    ("penguin", "#2E3140", {"face": "#F4F4EF", "beak": "#F2A93B"}),
+    ("gingerbread", "#C27C43", {"icing": "#F7F4EC", "gumdrop": "#D9443F"}),
+]
+WF_Y = [-51.0, -17.0, 17.0, 51.0]
+
+def _wf_w(x):
+    head = WF_RH * np.sqrt(np.clip(1 - ((x - WF_HX) / WF_RH) ** 2, 0, 1))
+    t = np.clip((x - WF_J[-1] - 6.0) / (WF_TIP - WF_J[-1] - 6.0), 0, 1)
+    tail = np.where(x > WF_J[-1] + 6.0, WF_W - (WF_W - 2.2) * t ** 1.2, WF_W)
+    return np.maximum(head, np.where(x > 13.0, tail, 0.0))
+
+def _wf_h(x):
+    t = np.clip((x - WF_J[-1] - 6.0) / (WF_TIP - WF_J[-1] - 6.0), 0, 1)
+    return WF_H - 3.5 * t ** 1.5 + 2.0 * np.exp(-((x - WF_HX) / 7.0) ** 2)
+
+def _wf_body(p, x0, x1):
+    x, y, z = p[..., 0], p[..., 1], p[..., 2]
+    w = np.maximum(_wf_w(x), 1e-3); h = _wf_h(x); zc = np.minimum(WF_ZC, h * 0.45)
+    k = np.hypot(y / w, np.maximum(z - zc, 0) / np.maximum(h - zc, 1e-3))
+    d = np.where(z > zc, (k - 1.0) * np.minimum(w, h - zc), np.abs(y) - w)
+    return np.maximum(np.maximum(d, -z), np.maximum(x0 - x, x - x1))
+
+def _wf_top(x, y):
+    w = float(_wf_w(np.array(x))); h = float(_wf_h(np.array(x))); zc = min(WF_ZC, h * 0.45)
+    return zc + (h - zc) * np.sqrt(max(0.0, 1 - (y / w) ** 2))
+
+def _wf_pin(p, jx): return poly2(_snk_rz(p, jx), SNK_PIN)
+
+def _wf_dot(p, x, y, r):     # a bump sitting on the body top (buttons, gumdrops); its lower half is buried
+    return sphere(p, np.array([x, y, _wf_top(x, y) - 0.6 * r]), r)
+
+def _wf_flat(d2, p, z1):     # flat feature on the bed: rounded top edge, no overhang
+    return np.maximum(d2, np.maximum(-p[..., 2], p[..., 2] - z1))
+
+def _wf_features(p, kind, i):
+    """(extra solids to add, accent solids by colour) for segment i of a friend."""
+    add, acc = [], {}
+    def put(name, s): acc[name] = s if name not in acc else np.minimum(acc[name], s)
+    if i == 0:
+        if kind == "reindeer":
+            for sd in (1, -1):
+                ant = np.minimum.reduce([cap2(p, (11.0, sd * 7.0), (14.0, sd * 18.0), 1.7), cap2(p, (12.6, sd * 12.5), (5.5, sd * 15.5), 1.5),
+                                         cap2(p, (13.7, sd * 16.5), (8.5, sd * 20.0), 1.4)])
+                a = _wf_flat(ant, p, 3.4); add.append(a); put("antler", a)
+            nose = np.minimum(cyl_z(p, np.array([-0.6, 0, 0]), 3.4, 0, 4.8), sphere(p, np.array([-0.6, 0, 4.8]), 3.4))
+            add.append(nose); put("nose", np.minimum(nose, sphere(p, np.array([-0.6, 0, 4.8]), 3.6)))
+        elif kind == "snowman":
+            car = _wf_flat(poly2(p, np.array([(1.0, 3.0), (-10.0, 0.6), (-10.0, -0.6), (1.0, -3.0)])), p, 4.2)
+            car = np.maximum(car, p[..., 2] - (4.4 - 0.35 * np.abs(p[..., 1]) - 0.05 * np.maximum(-p[..., 0], 0)))
+            add.append(car); put("carrot", np.maximum(car, p[..., 0] + 0.4))
+            for sd in (1, -1):    # coal smile under the carrot
+                for k, (sx, sy) in enumerate([(3.4, 4.6), (2.1, 3.0), (1.6, 1.2)]):
+                    put("coal", sphere(p, np.array([sx + 0.9, sd * sy, float(_wf_top(sx + 0.9, sy)) - 0.2]), 0.85))
+        elif kind == "penguin":
+            beak = _wf_flat(poly2(p, np.array([(1.5, 3.2), (-5.5, 0.0), (1.5, -3.2)])), p, 4.6)
+            add.append(beak); put("beak", np.maximum(beak, p[..., 0] + 0.2))
+            put("face", np.maximum(ell2(p, (4.6, 0.0), 5.4, 8.2), 5.5 - p[..., 2]))
+        elif kind == "gingerbread":
+            r = np.hypot(p[..., 0] - WF_HX, p[..., 1])
+            band = np.maximum(np.abs(r - 7.4) - 0.75, 5.0 - p[..., 2])
+            wave = np.abs(r - (7.4 + 0.6 * np.sin(8 * np.arctan2(p[..., 1], p[..., 0] - WF_HX)))) - 0.7
+            put("icing", np.maximum(np.maximum(wave, 5.5 - p[..., 2]), p[..., 0] - 13.5))
+    if i == 1:
+        if kind == "penguin":
+            for sd in (1, -1):
+                fl = _wf_flat(poly2(p, np.array([(WF_J[0] + 7.0, sd * 5.0), (WF_J[0] + 12.0, sd * 5.0), (WF_J[0] + 12.5, sd * 11.0), (WF_J[0] + 9.0, sd * 10.0)])), p, 3.0)
+                add.append(fl)
+        if kind == "gingerbread":
+            for sd in (1, -1):
+                arm = _wf_flat(cap2(p, (WF_J[0] + 9.5, sd * 4.5), (WF_J[0] + 9.0, sd * 10.5), 2.2), p, 4.0)
+                add.append(arm); put("icing", np.maximum(_wf_flat(np.abs(cap2(p, (WF_J[0] + 9.5, sd * 4.5), (WF_J[0] + 9.0, sd * 10.5), 2.2) + 0.0) - 0.5, p, 4.2), np.abs(p[..., 1]) - 8.6 * 1.0 + 0 * p[..., 0]))
+        if kind == "snowman":   # knitted scarf band just behind the head
+            jx = WF_J[0] + 4.6
+            band = np.maximum(np.maximum(np.abs(p[..., 0] - jx) - 1.6, _wf_body(p, jx - 3, jx + 3) - 0.9), -p[..., 2])
+            add.append(band); put("scarf", band)
+    if 1 <= i <= 3:
+        mx = (WF_J[i - 1] + WF_J[i]) / 2 + 2.5
+        if kind == "snowman": d = _wf_dot(p, mx, 0.0, 1.6); add.append(d); put("coal", d)
+        if kind == "gingerbread": d = _wf_dot(p, mx, 0.0, 1.9); add.append(d); put("gumdrop", d)
+    return add, acc
+
+def _wf_seg(p, kind, i):
+    n = len(WF_J)
+    x0 = WF_J[i - 1] if i > 0 else -4.0
+    x1 = WF_J[i] if i < n else WF_TIP + 1.0
+    s = _wf_body(p, x0, min(x1, WF_TIP + 1.0))
+    add, _ = _wf_features(p, kind, i)
+    if add: s = np.minimum(s, np.minimum.reduce(add))
+    if i < n:
+        jx = x1
+        wrap = np.maximum(_wf_body(p, jx - SNK_WRAP, jx + SNK_WRAP), circ2(p, (jx, 0), SNK_WRAP))
+        s = np.minimum(s, wrap)
+        cav = np.minimum(_wf_pin(p, jx) - SNK_CLR, circ2(p, (jx, 0), 2.0 + SNK_CLR))
+        slot = np.abs(np.arctan2(p[..., 1], p[..., 0] - jx)) - np.radians(50)
+        s = diff(s, cav, slot)
+    if i > 0:
+        jx = x0
+        s = diff(s, circ2(p, (jx, 0), SNK_WRAP + SNK_CLR))
+        pin = np.maximum(_wf_pin(p, jx), _wf_body(p, jx - 5, jx + 5))
+        neck = np.maximum(extrude(rrect2(p, (jx + 3.8, 0), (3.8, 1.6), 0.5), p, 2.4, 6.6), _wf_body(p, jx, jx + 9))
+        s = union(s, pin, neck)
+    if i == 0:   # eyes: raised domes with a pupil dimple, like the snake
+        for sd in (1, -1):
+            ex, ey = 8.2, sd * 4.2; zt = float(_wf_top(ex, abs(ey)))
+            s = union(s, sphere(p, np.array([ex, ey, zt - 1.2]), 2.7))
+            s = diff(s, sphere(p, np.array([ex - 1.1, sd * 4.5, zt + 1.9]), 1.25))
+    return s
+
+def _wf_range(i):
+    n = len(WF_J)
+    a = (WF_J[i - 1] - 7.0) if i > 0 else -12.0
+    b = (WF_J[i] + 7.5) if i < n else WF_TIP + 2.0
+    return a, b
+
+def _wf_sdf(kind, segs, accent=None):
+    def f(P):
+        sh = P.shape[:-1]; Q = P.reshape(-1, 3); out = np.full(len(Q), 50.0)
+        for i in segs:
+            a, b = _wf_range(i); m = (Q[:, 0] > a - 0.5) & (Q[:, 0] < b + 0.5)
+            if not m.any(): continue
+            s = _wf_seg(Q[m], kind, i)
+            if accent is not None:   # the accent colour region of this segment: inside the part and inside the accent solid
+                _, acc = _wf_features(Q[m], kind, i)
+                s = np.maximum(s, acc[accent]) if accent in acc else np.full(len(s), 50.0)
+            out[m] = np.minimum(out[m], s)
+        return out.reshape(sh)
+    return f
+
+def _wf_minus(kind, segs, accents):
+    base = _wf_sdf(kind, segs)
+    accs = [_wf_sdf(kind, segs, a) for a in accents]
+    return lambda P: diff(base(P), *[a(P) for a in accs]) if accs else base(P)
+
+def wiggle_friends(step=0.3):
+    n = len(WF_J) + 1
+    lo, hi = (-12.5, -22.0, 0.0), (WF_TIP + 1.0, 22.0, WF_H + 3.0)
+    prints, colour_parts, preview = [], [], []
+    def sh(v, y): v = v.copy(); v[:, 1] += y; return v
+    for (kind, col, accs), y in zip(WF_FRIENDS, WF_Y):
+        v, f = mesh(_wf_sdf(kind, range(n)), lo, hi, step)
+        prints.append((kind, sh(v, y), f, col))
+        names = list(accs)
+        bv, bf = mesh(_wf_minus(kind, range(n), names), lo, hi, step)
+        colour_parts.append((kind, sh(bv, y), bf, col)); preview.append((kind, sh(bv, y), bf, col))
+        for a in names:
+            av, af = mesh(_wf_sdf(kind, range(n), a), lo, hi, step)
+            if len(af) == 0: continue
+            colour_parts.append((f"{kind}_{a}", sh(av, y), af, accs[a])); preview.append((f"{kind}_{a}", sh(av, y), af, accs[a]))
+    return dict(parts=preview, print_parts=prints, expect_shells=4 * n, colour_3mf=colour_parts, zip_3mf_only=True,
+                meta=dict(view=(58, -62), line="print-in-place",
+                          print_hint="Four 10 cm wiggle friends on one plate (or print one at a time). Print-in-place, no supports, no assembly: 6 segments each on 5 captured pins, 45-degree overhangs only, 0.55 mm clearance. 0.2 mm layers, 2 walls, PLA. One 3MF (opens in Bambu Studio, OrcaSlicer, PrusaSlicer and Cura) with the noses, antlers, beak, scarf and buttons pre-split for AMS colours; for a single-colour print, give every part the same filament. Flex each joint gently after printing. Contains small parts: not for children under 3."))
+
+CATALOG2["wiggle-friends-xmas-4"] = (wiggle_friends, dict(title="Wiggle Friends Christmas Set (4 minis)", title_vi="Bộ 4 Bạn Uốn Éo Giáng Sinh", price=2.99,
+    blurb="Four 10 cm articulated stocking stuffers that print in one piece each: a reindeer, a snowman, a penguin and a gingerbread friend. No supports, no assembly.",
+    tags=["flexi", "print-in-place", "christmas", "stocking-stuffer", "reindeer", "snowman", "penguin", "gingerbread"]))

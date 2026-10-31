@@ -3,6 +3,156 @@
  "started": "2026-10-28",
  "products": [
   {
+   "slug": "wiggle-friends-xmas-4",
+   "title": "Wiggle Friends Christmas Set (4 minis)",
+   "title_vi": "B\u1ed9 4 B\u1ea1n U\u1ed1n \u00c9o Gi\u00e1ng Sinh",
+   "price": 2.99,
+   "blurb": "Four 10 cm articulated stocking stuffers that print in one piece each: a reindeer, a snowman, a penguin and a gingerbread friend. No supports, no assembly.",
+   "tags": [
+    "flexi",
+    "print-in-place",
+    "christmas",
+    "stocking-stuffer",
+    "reindeer",
+    "snowman",
+    "penguin",
+    "gingerbread"
+   ],
+   "line": "print-in-place",
+   "print_hint": "Four 10 cm wiggle friends on one plate (or print one at a time). Print-in-place, no supports, no assembly: 6 segments each on 5 captured pins, 45-degree overhangs only, 0.55 mm clearance. 0.2 mm layers, 2 walls, PLA. One 3MF (opens in Bambu Studio, OrcaSlicer, PrusaSlicer and Cura) with the noses, antlers, beak, scarf and buttons pre-split for AMS colours; for a single-colour print, give every part the same filament. Flex each joint gently after printing. Contains small parts: not for children under 3.",
+   "parts": [
+    {
+     "name": "reindeer",
+     "triangles": 206976,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 6,
+     "volume_cm3": 9.59,
+     "size_mm": [
+      102.0,
+      42.8,
+      12.7
+     ],
+     "min_z": -0.0
+    },
+    {
+     "name": "snowman",
+     "triangles": 194612,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 6,
+     "volume_cm3": 9.14,
+     "size_mm": [
+      108.0,
+      19.0,
+      12.7
+     ],
+     "min_z": -0.0
+    },
+    {
+     "name": "penguin",
+     "triangles": 194060,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 6,
+     "volume_cm3": 9.12,
+     "size_mm": [
+      103.3,
+      21.9,
+      12.7
+     ],
+     "min_z": -0.0
+    },
+    {
+     "name": "gingerbread",
+     "triangles": 194816,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 6,
+     "volume_cm3": 9.19,
+     "size_mm": [
+      98.5,
+      25.4,
+      12.7
+     ],
+     "min_z": -0.0
+    }
+   ],
+   "watertight": true,
+   "web": [
+    {
+     "file": "products/wiggle-friends-xmas-4/web_reindeer.bin",
+     "color": "#A0683E",
+     "name": "reindeer"
+    },
+    {
+     "file": "products/wiggle-friends-xmas-4/web_reindeer_nose.bin",
+     "color": "#D9443F",
+     "name": "reindeer_nose"
+    },
+    {
+     "file": "products/wiggle-friends-xmas-4/web_reindeer_antler.bin",
+     "color": "#5A3A24",
+     "name": "reindeer_antler"
+    },
+    {
+     "file": "products/wiggle-friends-xmas-4/web_snowman.bin",
+     "color": "#F4F4EF",
+     "name": "snowman"
+    },
+    {
+     "file": "products/wiggle-friends-xmas-4/web_snowman_carrot.bin",
+     "color": "#F28C28",
+     "name": "snowman_carrot"
+    },
+    {
+     "file": "products/wiggle-friends-xmas-4/web_snowman_coal.bin",
+     "color": "#2B2E3A",
+     "name": "snowman_coal"
+    },
+    {
+     "file": "products/wiggle-friends-xmas-4/web_snowman_scarf.bin",
+     "color": "#2F8A57",
+     "name": "snowman_scarf"
+    },
+    {
+     "file": "products/wiggle-friends-xmas-4/web_penguin.bin",
+     "color": "#2E3140",
+     "name": "penguin"
+    },
+    {
+     "file": "products/wiggle-friends-xmas-4/web_penguin_face.bin",
+     "color": "#F4F4EF",
+     "name": "penguin_face"
+    },
+    {
+     "file": "products/wiggle-friends-xmas-4/web_penguin_beak.bin",
+     "color": "#F2A93B",
+     "name": "penguin_beak"
+    },
+    {
+     "file": "products/wiggle-friends-xmas-4/web_gingerbread.bin",
+     "color": "#C27C43",
+     "name": "gingerbread"
+    },
+    {
+     "file": "products/wiggle-friends-xmas-4/web_gingerbread_icing.bin",
+     "color": "#F7F4EC",
+     "name": "gingerbread_icing"
+    },
+    {
+     "file": "products/wiggle-friends-xmas-4/web_gingerbread_gumdrop.bin",
+     "color": "#D9443F",
+     "name": "gingerbread_gumdrop"
+    }
+   ],
+   "download": "",
+   "cover": "products/wiggle-friends-xmas-4/cover.jpg",
+   "build_seconds": 213.6,
+   "download_bytes": 6682960,
+   "dropped": "2026-10-31"
+  },
+  {
    "slug": "rainbow-wiggle-snake",
    "title": "Rainbow Wiggle Snake",
    "title_vi": "R\u1eafn C\u1ea7u V\u1ed3ng U\u1ed1n \u00c9o",
@@ -1987,6 +2137,6 @@
   "members": 0,
   "costs_usd": 0.0
  },
- "updated": "2026-10-30 08:55",
- "featured": "rainbow-wiggle-snake"
+ "updated": "2026-10-31 09:11",
+ "featured": "wiggle-friends-xmas-4"
 }
