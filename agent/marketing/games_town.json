@@ -1,0 +1,26 @@
+{
+ "id": "town",
+ "title": "Toy Town",
+ "hook": "Build a tiny\ntoy town!",
+ "captions": {
+  "place": [
+   "Pick a friend",
+   "Tap to put it down",
+   "Another one!",
+   "Add more!",
+   "So cute!",
+   "Build your town",
+   "Everyone fits!"
+  ],
+  "hop": [
+   "Tap a friend to hop!"
+  ],
+  "snap": [
+   "Take a picture!"
+  ]
+ },
+ "yt_title": "Build a tiny toy town! Free calm game for kids #Shorts",
+ "yt_desc": "Pick a toy friend, tap to put it down, tap it to make it hop, then take a picture of your town. Easy enough for a 4-year-old, no winning or losing, and the toys are real models you can 3D print at home.\n\nPlay free in your browser (no app, no ads): {url}\nMore free kids' games and a new 3D-printable toy every day: {site}\n\n#Shorts #KidsGames #ToyTown #3DPrinting #FreeGames",
+ "icons": "/home/user/Daily-Layer/public/products",
+ "toys": "/home/user/Daily-Layer/public/toys.json"
+}

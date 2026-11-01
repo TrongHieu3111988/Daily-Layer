@@ -65,6 +65,20 @@ const DIRECTORS = {
     }
     s.mark("allfound"); await hold(60);
   },
+  // Toy Town: put a different toy friend down with each tap, make two of them hop, then take the picture
+  async town(s) {
+    const pt = async (fx, fy) => { const bb = await (await s.page.$("#town")).boundingBox(); await s.page.mouse.click(bb.x + fx * bb.width, bb.y + fy * bb.height); };
+    await s.hold(20); await s.tap("#startBtn"); await s.hold(30);
+    const spots = [[.18, .33], [.78, .3], [.5, .72], [.2, .82], [.82, .62], [.5, .3], [.7, .9]];
+    const n = await s.page.evaluate(() => document.querySelectorAll(".pick").length);
+    for (let i = 0; i < spots.length; i++) {
+      const picks = await s.page.$$(".pick"); await picks[(i * 3) % n].click(); await s.hold(8);
+      await pt(...spots[i]); s.mark("place"); await s.hold(26);
+      if (i === 5) { await s.hold(40); await s.tap("#againBtn"); await s.hold(14); }
+    }
+    await s.hold(20); await pt(...spots[0]); s.mark("hop"); await s.hold(30); await pt(...spots[2]); await s.hold(34);
+    await s.tap("#snapBtn"); s.mark("snap"); await s.hold(50);
+  },
   // Stack the Drop: drop friends when the crane is over the table
   async stack(s) {
     await s.hold(20); await s.tap("#startBtn"); await s.hold(20);
