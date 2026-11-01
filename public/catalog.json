@@ -3,6 +3,91 @@
  "started": "2026-10-28",
  "products": [
   {
+   "slug": "xmas-cookie-cutters-3",
+   "title": "Christmas Cookie Cutter Set (3 shapes)",
+   "title_vi": "B\u1ed9 3 Khu\u00f4n B\u00e1nh Gi\u00e1ng Sinh",
+   "price": 0.0,
+   "blurb": "Gingerbread friend, Christmas tree and star cutters with a wide pusher flange, a thin cutting edge and a flat print bed. No supports. Free for the holidays.",
+   "tags": [
+    "christmas",
+    "cookie-cutter",
+    "gingerbread",
+    "baking",
+    "play-dough",
+    "holiday",
+    "free"
+   ],
+   "line": "functional",
+   "print_hint": "Print as shown, flange down on the bed: no supports, no brim. 0.2 mm layers, 3 walls, 100% of the wall is solid. Each cutter is 14 mm tall with a 2 mm pusher flange; flip it over to cut. For dough and play dough: hand wash in lukewarm water, keep it off the dishwasher. PLA is not guaranteed food safe, so for real cookies use a food-safe filament or press through baking paper. Not a toy for children under 3.",
+   "parts": [
+    {
+     "name": "gingerbread",
+     "triangles": 292416,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 9.67,
+     "size_mm": [
+      76.4,
+      83.7,
+      14.0
+     ],
+     "min_z": -0.0
+    },
+    {
+     "name": "tree",
+     "triangles": 279372,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 8.92,
+     "size_mm": [
+      85.0,
+      90.5,
+      14.0
+     ],
+     "min_z": -0.0
+    },
+    {
+     "name": "star",
+     "triangles": 301732,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 9.47,
+     "size_mm": [
+      97.8,
+      93.8,
+      14.0
+     ],
+     "min_z": -0.0
+    }
+   ],
+   "watertight": true,
+   "web": [
+    {
+     "file": "products/xmas-cookie-cutters-3/web_gingerbread.bin",
+     "color": "#C98B4A",
+     "name": "gingerbread"
+    },
+    {
+     "file": "products/xmas-cookie-cutters-3/web_tree.bin",
+     "color": "#2F7D4F",
+     "name": "tree"
+    },
+    {
+     "file": "products/xmas-cookie-cutters-3/web_star.bin",
+     "color": "#E9B949",
+     "name": "star"
+    }
+   ],
+   "download": "products/xmas-cookie-cutters-3/xmas-cookie-cutters-3_files.zip",
+   "cover": "products/xmas-cookie-cutters-3/cover.jpg",
+   "build_seconds": 71.1,
+   "download_bytes": 7834346,
+   "dropped": "2026-11-01"
+  },
+  {
    "slug": "wiggle-friends-xmas-4",
    "title": "Wiggle Friends Christmas Set (4 minis)",
    "title_vi": "B\u1ed9 4 B\u1ea1n U\u1ed1n \u00c9o Gi\u00e1ng Sinh",
@@ -2137,6 +2222,6 @@
   "members": 0,
   "costs_usd": 0.0
  },
- "updated": "2026-10-31 09:11",
- "featured": "wiggle-friends-xmas-4"
+ "updated": "2026-11-01 08:53",
+ "featured": "xmas-cookie-cutters-3"
 }

@@ -549,3 +549,54 @@ def wiggle_friends(step=0.3):
 CATALOG2["wiggle-friends-xmas-4"] = (wiggle_friends, dict(title="Wiggle Friends Christmas Set (4 minis)", title_vi="Bộ 4 Bạn Uốn Éo Giáng Sinh", price=2.99,
     blurb="Four 10 cm articulated stocking stuffers that print in one piece each: a reindeer, a snowman, a penguin and a gingerbread friend. No supports, no assembly.",
     tags=["flexi", "print-in-place", "christmas", "stocking-stuffer", "reindeer", "snowman", "penguin", "gingerbread"]))
+
+# ---------- Christmas cookie cutter set (functional, 2026-11-01) ----------
+# Printed upside down: the 2 mm pusher flange lies on the bed, the wall rises 14 mm and thins to a cutting edge. No overhangs, no supports.
+CC_H, CC_FL, CC_FW = 14.0, 2.0, 5.0
+
+def _smin(a, b, k):
+    h = np.clip(0.5 + 0.5 * (b - a) / k, 0, 1)
+    return b * (1 - h) + a * h - k * h * (1 - h)
+
+def cc_gingerbread(p):
+    d = circ2(p, (0, 27), 10.5)
+    d = _smin(d, ell2(p, (0, 7), 14, 17), 5)
+    for s in (1, -1):
+        d = _smin(d, cap2(p, (s * 9, 15), (s * 28, 24), 5.2), 4)
+        d = _smin(d, cap2(p, (s * 8, -8), (s * 13, -30), 6.2), 4)
+    return d
+
+def cc_tree(p):
+    tiers = [((0, 40), (-18, 14), (18, 14)), ((0, 26), (-27, -4), (27, -4)), ((0, 8), (-35, -26), (35, -26))]
+    d = np.inf
+    for a, b, c in tiers: d = np.minimum(d, poly2(p, np.array([a, b, c], float)) - 2.5)
+    return np.minimum(d, rrect2(p, (0, -31), (6, 7), 1.5))
+
+def cc_star(p):
+    return star2(p, 43, 19, 5) - 3.0
+
+def _cc_sdf(shape):
+    def f(p):
+        d = shape(p); z = p[..., 2]
+        w = np.where(z < 11.0, 1.5, 1.5 - 0.7 * (z - 11.0) / 3.0)      # wall 1.5 mm, thinning to 0.8 mm at the cutting edge
+        wall = np.maximum(d, -(d + w))
+        flange = np.maximum(d - CC_FW, -(d + 1.5))
+        return np.minimum(extrude(wall, p, 0, CC_H), extrude(flange, p, 0, CC_FL))
+    return f
+
+def xmas_cutters(step=0.32):
+    designs = [("gingerbread", cc_gingerbread, (-36, -38), (36, 38), "#C98B4A", (-48, 0)),
+               ("tree", cc_tree, (-39, -41), (39, 44), "#2F7D4F", (48, 0)),
+               ("star", cc_star, (-46, -44), (46, 46), "#E9B949", (0, -95))]
+    parts = []
+    for n, fn, lo, hi, col, (ox, oy) in designs:
+        m = CC_FW + 2
+        v, f = mesh(_cc_sdf(fn), (lo[0] - m, lo[1] - m, 0), (hi[0] + m, hi[1] + m, CC_H), step)
+        v = v.copy(); v[:, 0] += ox; v[:, 1] += oy + 45
+        parts.append((n, v, f, col))
+    return dict(parts=parts, print_parts=parts, meta=dict(view=(52, -35), line="functional",
+        print_hint="Print as shown, flange down on the bed: no supports, no brim. 0.2 mm layers, 3 walls, 100% of the wall is solid. Each cutter is 14 mm tall with a 2 mm pusher flange; flip it over to cut. For dough and play dough: hand wash in lukewarm water, keep it off the dishwasher. PLA is not guaranteed food safe, so for real cookies use a food-safe filament or press through baking paper. Not a toy for children under 3."))
+
+CATALOG2["xmas-cookie-cutters-3"] = (xmas_cutters, dict(title="Christmas Cookie Cutter Set (3 shapes)", title_vi="Bộ 3 Khuôn Bánh Giáng Sinh", price=0.0,
+    blurb="Gingerbread friend, Christmas tree and star cutters with a wide pusher flange, a thin cutting edge and a flat print bed. No supports. Free for the holidays.",
+    tags=["christmas", "cookie-cutter", "gingerbread", "baking", "play-dough", "holiday", "free"]))

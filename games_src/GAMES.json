@@ -40,6 +40,11 @@
    "id": "memory",
    "artifact": "https://claude.ai/artifact/NjiQ1yupYs4tUvQXJ44b9h",
    "library": "2d"
+  },
+  {
+   "id": "town",
+   "artifact": "https://claude.ai/artifact/VfmKNiTG5QdamoUqijBprW",
+   "library": "2d"
   }
  ]
 }

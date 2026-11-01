@@ -1,0 +1,221 @@
+<title>Toy Town</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<!--HEAD-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@500;600;700;800&display=swap">
+<style>
+/*KITCSS*/
+/* Toy Town: free play. Pick a toy friend, tap the town to put it down, tap a friend to make it hop, take a picture. No winning, no losing. */
+.stage{background:#9BDB7A;display:flex;flex-direction:column}
+#town{flex:1;min-height:0;width:100%;display:block;touch-action:manipulation;cursor:pointer}
+.tray{display:flex;align-items:center;gap:8px;padding:10px 10px 12px;background:var(--paper);border-top:3px solid var(--outline)}
+.picks{flex:1;min-width:0;display:flex;gap:8px;overflow-x:auto;padding:2px 2px 6px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.picks::-webkit-scrollbar{display:none}
+.pick{flex:none;width:58px;height:58px;border-radius:16px;border:2.5px solid var(--outline);background:var(--sky);padding:3px;box-shadow:var(--pop-sm);display:grid;place-items:center}
+.pick img{width:100%;height:100%;object-fit:contain;pointer-events:none}
+.pick.on{background:var(--sun);transform:translateY(-3px);box-shadow:0 6px 0 var(--outline)}
+.tools{flex:none;display:flex;gap:8px}
+.tools .ibtn{width:48px;height:48px}
+.flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:6}
+.flash.go{animation:flash .5s ease-out}
+@keyframes flash{0%{opacity:.9}100%{opacity:0}}
+.tap{position:absolute;left:0;right:0;top:12px;text-align:center;font-weight:800;font-size:14px;color:#1B2547;pointer-events:none}
+.tap span{background:rgba(255,255,255,.85);border:2px solid var(--outline);border-radius:14px;padding:4px 12px}
+@media (prefers-reduced-motion:reduce){.flash.go{animation:none}}
+</style>
+
+<div class="app">
+  <header class="bar">
+    <a class="ibtn" id="back" href="/" data-t-label="back" aria-label="Back"></a>
+    <h1 data-t="title">Toy Town</h1>
+    <span class="score" aria-live="polite"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-7 9 7v9H3z" fill="#FF6B57" stroke="#1B2547" stroke-width="2" stroke-linejoin="round"/><rect x="10" y="13" width="4" height="7" fill="#FFC93C" stroke="#1B2547" stroke-width="2"/></svg><span id="count">0</span></span>
+    <button class="ibtn" id="soundBtn" type="button" data-t-label="sound" aria-label="Sound"></button>
+    <button class="ibtn" id="langBtn" type="button" aria-label="Language">VI</button>
+  </header>
+  <main class="stage" id="stage">
+    <canvas id="town" aria-label="Town"></canvas>
+    <div class="tap" id="tapHint"><span data-t="tap">Tap the town to put a friend down!</span></div>
+    <div class="toast" id="toast" hidden></div>
+    <div class="flash" id="flash"></div>
+    <div class="tray">
+      <div class="picks" id="picks" role="listbox" aria-label="Toys"></div>
+      <div class="tools">
+        <button class="ibtn" id="undoBtn" type="button" data-t-label="undo" aria-label="Undo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 7L4 12l5 5"/><path d="M4 12h10a6 6 0 010 12" transform="translate(0 -5)"/></svg></button>
+        <button class="ibtn" id="snapBtn" type="button" data-t-label="snap" aria-label="Take a picture"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"><path d="M3 8h4l2-3h6l2 3h4v11H3z" fill="currentColor" fill-opacity=".15"/><circle cx="12" cy="13" r="3.8"/></svg></button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="overlay" id="intro">
+  <div class="card">
+    <canvas class="hero" id="introArt" width="400" height="280"></canvas>
+    <h2 data-t="introH">Build a toy town!</h2>
+    <p data-t="introP">Pick a toy friend at the bottom, then tap the town to put it down. Tap a friend to make it hop. Take a picture when you like your town!</p>
+    <button class="btn coral" type="button" id="startBtn"><span data-t="start">Let's build!</span></button>
+  </div>
+</div>
+<div class="overlay" id="over" hidden>
+  <div class="card">
+    <div class="stars" id="stars"></div>
+    <h2 data-t="overH">What a lovely town!</h2>
+    <p data-t="overP">Your friends love living here. Keep building, or take a picture to keep.</p>
+    <div class="row"><button class="btn coral" type="button" id="againBtn"><span data-t="keep">Keep building</span></button><a class="btn" id="homeBtn" href="/" data-t="home">More games</a></div>
+  </div>
+</div>
+
+<script>/*KITJS*/</script>
+<script>
+"use strict";
+K.words.en = { title: "Toy Town", back: "Back", sound: "Sound on or off", undo: "Undo", snap: "Take a picture", tap: "Tap the town to put a friend down!", introH: "Build a toy town!",
+  introP: "Pick a toy friend at the bottom, then tap the town to put it down. Tap a friend to make it hop. Take a picture when you like your town!", start: "Let's build!", keep: "Keep building", home: "More games",
+  overH: "What a lovely town!", overP: "Your friends love living here. Keep building, or take a picture to keep.", hi: name => name + " says hi!", saved: "Picture saved!" };
+K.words.vi = { title: "Thị Trấn Đồ Chơi", back: "Quay lại", sound: "Bật hoặc tắt âm thanh", undo: "Làm lại", snap: "Chụp ảnh", tap: "Chạm vào thị trấn để đặt bạn xuống!", introH: "Xây thị trấn đồ chơi!",
+  introP: "Chọn một bạn đồ chơi ở dưới, rồi chạm vào thị trấn để đặt bạn xuống. Chạm vào bạn để bạn nhảy lên. Thích thị trấn thì chụp ảnh nhé!", start: "Xây thôi!", keep: "Xây tiếp", home: "Trò khác",
+  overH: "Thị trấn đẹp quá!", overP: "Các bạn rất thích sống ở đây. Bé xây tiếp hoặc chụp ảnh để giữ nhé.", hi: name => name + " chào bé!", saved: "Đã lưu ảnh!" };
+
+const PAINTED = ["#FF6B57", "#FFC93C", "#3FBF7F", "#5DB8FF", "#8C6BF2", "#FF8FB8", "#FF9B3D", "#B8834F"];
+const MAX = 30, PRAISE_AT = 6;
+let toys = [], sel = null, placed = K.store.get("town-save", []), running = false, praised = false, W = 0, H = 0, D = 1, bg = null;
+const cv = document.getElementById("town"), g = cv.getContext("2d");
+let toastT = 0;
+function toast(m) { const e = document.getElementById("toast"); e.textContent = m; e.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => (e.hidden = true), 1500); }
+
+/* ---------- the town, drawn once: grass, two roads, a pond, houses, trees ---------- */
+function house(c, x, y, w, col, roof) {
+  c.fillStyle = col; c.strokeStyle = K.INK; c.lineWidth = 3; c.lineJoin = "round";
+  c.beginPath(); c.roundRect(x - w / 2, y - w * 0.55, w, w * 0.55, 4); c.fill(); c.stroke();
+  c.fillStyle = roof; c.beginPath(); c.moveTo(x - w * 0.6, y - w * 0.55); c.lineTo(x, y - w * 1.0); c.lineTo(x + w * 0.6, y - w * 0.55); c.closePath(); c.fill(); c.stroke();
+  c.fillStyle = "#FFE08A"; c.beginPath(); c.roundRect(x - w * 0.34, y - w * 0.4, w * 0.22, w * 0.2, 3); c.fill(); c.stroke();
+  c.fillStyle = "#9A5B2E"; c.beginPath(); c.roundRect(x + w * 0.08, y - w * 0.34, w * 0.2, w * 0.34, 3); c.fill(); c.stroke();
+}
+function tree(c, x, y, r) {
+  c.strokeStyle = K.INK; c.lineWidth = 3; c.fillStyle = "#9A5B2E"; c.beginPath(); c.roundRect(x - r * 0.18, y - r * 0.5, r * 0.36, r * 0.7, 3); c.fill(); c.stroke();
+  c.fillStyle = "#2FA45E"; c.beginPath(); c.arc(x, y - r * 0.9, r * 0.75, 0, Math.PI * 2); c.fill(); c.stroke();
+  c.fillStyle = "rgba(255,255,255,.25)"; c.beginPath(); c.ellipse(x - r * 0.25, y - r * 1.1, r * 0.25, r * 0.15, -0.5, 0, Math.PI * 2); c.fill();
+}
+function paintBg() {
+  bg = document.createElement("canvas"); bg.width = cv.width; bg.height = cv.height;
+  const c = bg.getContext("2d"); c.scale(D, D);
+  const grd = c.createLinearGradient(0, 0, 0, H); grd.addColorStop(0, "#B9E88F"); grd.addColorStop(1, "#86D06A"); c.fillStyle = grd; c.fillRect(0, 0, W, H);
+  c.fillStyle = "rgba(255,255,255,.18)"; for (let i = 0; i < 26; i++) { const x = (i * 97 % 100) / 100 * W, y = (i * 53 % 100) / 100 * H; c.beginPath(); c.arc(x, y, 3, 0, 7); c.fill(); }
+  // roads
+  c.strokeStyle = K.INK; c.lineWidth = 3;
+  c.fillStyle = "#E7D6B3"; c.beginPath(); c.roundRect(-10, H * 0.5, W + 20, H * 0.13, 16); c.fill(); c.stroke();
+  c.beginPath(); c.roundRect(W * 0.42, -10, W * 0.16, H + 20, 16); c.fill(); c.stroke();
+  c.fillStyle = "#E7D6B3"; c.fillRect(W * 0.42 + 2, H * 0.5 + 2, W * 0.16 - 4, H * 0.13 - 4);
+  c.strokeStyle = "rgba(27,37,71,.35)"; c.lineWidth = 3; c.setLineDash([12, 12]); c.beginPath(); c.moveTo(0, H * 0.565); c.lineTo(W, H * 0.565); c.stroke(); c.setLineDash([]);
+  // pond
+  c.fillStyle = "#6FC8F5"; c.strokeStyle = K.INK; c.lineWidth = 3; c.beginPath(); c.ellipse(W * 0.78, H * 0.82, W * 0.17, H * 0.07, 0, 0, Math.PI * 2); c.fill(); c.stroke();
+  c.strokeStyle = "rgba(255,255,255,.7)"; c.lineWidth = 2.5; c.beginPath(); c.arc(W * 0.74, H * 0.82, 10, 3.4, 5.6); c.stroke();
+  // houses and trees along the top and sides
+  const hw = Math.min(W * 0.22, 92);
+  house(c, W * 0.17, H * 0.2, hw, "#FFB8A8", "#E4574A"); house(c, W * 0.78, H * 0.16, hw * 0.9, "#BFE3FF", "#5C7CE0"); house(c, W * 0.2, H * 0.78, hw * 0.85, "#FFE08A", "#B65FD8");
+  tree(c, W * 0.34, H * 0.3, 34); tree(c, W * 0.9, H * 0.38, 30); tree(c, W * 0.07, H * 0.42, 28); tree(c, W * 0.36, H * 0.93, 30);
+}
+function fit() {
+  const r = cv.getBoundingClientRect(); if (!r.width) return;
+  D = Math.min(devicePixelRatio || 1, 2.5); W = r.width; H = r.height; cv.width = Math.round(W * D); cv.height = Math.round(H * D); paintBg();
+}
+
+/* ---------- toys on the board ---------- */
+const sizeAt = y => Math.min(W * 0.27, H * 0.22, 130) * (0.78 + 0.32 * y);   // friends lower on the screen are a bit bigger
+function toyOf(slug) { return toys.find(t => t.slug === slug) || null; }
+function drawOne(p, now) {
+  const t = toyOf(p.slug), s = sizeAt(p.y), x = p.x * W, y = p.y * H;
+  let hop = 0, sq = 1;
+  const a = (now - (p.hopAt || -1e9)) / 1000;
+  if (!K.CALM && a >= 0 && a < 0.7) { hop = Math.abs(Math.sin(a * Math.PI * 2.2)) * s * 0.35 * (1 - a / 0.7); }
+  const b = (now - p.born) / 1000; if (!K.CALM && b >= 0 && b < 0.45) { const k = b / 0.45; sq = 1 + Math.sin(k * Math.PI) * 0.18 - (1 - k) * 0.5 * (1 - k); }
+  g.save(); g.translate(x, y);
+  g.fillStyle = "rgba(20,60,30,.28)"; g.beginPath(); g.ellipse(0, 0, s * 0.34 * (1 - hop / s * 0.6), s * 0.09, 0, 0, Math.PI * 2); g.fill();
+  g.translate(0, -hop); g.scale(sq, sq);
+  if (t && t.img) { const k = s / Math.max(t.img.width, t.img.height); g.drawImage(t.img, -t.img.width * k / 2, -t.img.height * k * 0.96, t.img.width * k, t.img.height * k); }
+  else { g.translate(0, -s * 0.4); K.friend(g, { shape: "square", w: s * 0.7, h: s * 0.7, colour: p.slug, mood: "happy" }); }
+  g.restore();
+}
+let raf = 0;
+function frame(now) {
+  raf = 0; if (!W) return;
+  g.setTransform(1, 0, 0, 1, 0, 0); g.drawImage(bg, 0, 0); g.setTransform(D, 0, 0, D, 0, 0);
+  [...placed].sort((a, b) => a.y - b.y).forEach(p => drawOne(p, now));
+  if (placed.some(p => now - Math.max(p.born, p.hopAt || 0) < 800)) raf = requestAnimationFrame(frame);
+}
+function redraw() { if (!raf) raf = requestAnimationFrame(frame); }
+addEventListener("resize", () => { fit(); redraw(); });
+
+function save() { K.store.set("town-save", placed.map(({ slug, x, y }) => ({ slug, x, y }))); document.getElementById("count").textContent = placed.length; }
+function hit(px, py) {
+  for (const p of [...placed].sort((a, b) => b.y - a.y)) {
+    const s = sizeAt(p.y), x = p.x * W, y = p.y * H;
+    if (Math.abs(px - x) < s * 0.4 && py < y + s * 0.08 && py > y - s * 0.95) return p;
+  }
+  return null;
+}
+cv.addEventListener("pointerdown", e => {
+  if (!running) return;
+  const r = cv.getBoundingClientRect(), px = e.clientX - r.left, py = e.clientY - r.top, now = performance.now();
+  document.getElementById("tapHint").hidden = true;
+  const h = hit(px, py);
+  if (h) {
+    h.hopAt = now; K.sfx.boing(); const t = toyOf(h.slug); if (t) toast(K.t("hi", K.toyName(t))); redraw(); return;
+  }
+  if (!sel) return;
+  const y = Math.min(0.97, Math.max(0.18, py / H)), x = Math.min(0.94, Math.max(0.06, px / W));
+  placed.push({ slug: sel, x, y, born: now }); if (placed.length > MAX) placed.shift();
+  K.sfx.pop(); save(); redraw();
+  if (!K.CALM) K.confetti(e.clientX, e.clientY, 10);
+  if (placed.length >= PRAISE_AT && !praised) { praised = true; setTimeout(praise, 700); }
+});
+function praise() {
+  document.getElementById("stars").innerHTML = [0, 1, 2].map(() => K.starSVG(true)).join("");
+  document.getElementById("over").hidden = false; K.sfx.tada(); K.confetti(); document.getElementById("againBtn").focus();
+}
+document.getElementById("againBtn").onclick = () => { K.sfx.pop(); document.getElementById("over").hidden = true; };
+document.getElementById("undoBtn").onclick = () => { if (!placed.length) return; placed.pop(); K.sfx.tick(); save(); redraw(); };
+document.getElementById("snapBtn").onclick = () => {
+  K.sfx.chime(); const f = document.getElementById("flash"); f.classList.remove("go"); void f.offsetWidth; f.classList.add("go");
+  frame(performance.now() + 5000);
+  const out = document.createElement("canvas"); out.width = cv.width; out.height = cv.height; const o = out.getContext("2d"); o.drawImage(cv, 0, 0);
+  o.font = "800 " + Math.round(18 * D) + "px Baloo 2, Nunito, sans-serif"; o.fillStyle = "rgba(255,255,255,.9)"; o.strokeStyle = K.INK; o.lineWidth = 4 * D;
+  o.textAlign = "right"; o.strokeText("Daily Layer", out.width - 14 * D, out.height - 14 * D); o.fillText("Daily Layer", out.width - 14 * D, out.height - 14 * D);
+  out.toBlob(b => { if (!b) return; const a = document.createElement("a"); a.href = URL.createObjectURL(b); a.download = "my-toy-town.png"; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000); toast(K.t("saved")); }, "image/png");
+};
+
+/* ---------- the tray ---------- */
+function buildPicks() {
+  const box = document.getElementById("picks"); box.innerHTML = "";
+  const list = toys.length ? toys : PAINTED.map(c => ({ slug: c, colour: c, title: "Friend" }));
+  list.forEach(t => {
+    const b = document.createElement("button"); b.type = "button"; b.className = "pick" + (t.slug === sel ? " on" : ""); b.setAttribute("aria-label", K.toyName ? K.toyName(t) : t.title);
+    if (t.img) { const im = document.createElement("img"); im.src = t.img.src; im.alt = ""; b.appendChild(im); }
+    else { const c = document.createElement("canvas"); c.width = c.height = 96; const x = c.getContext("2d"); x.translate(48, 48); K.friend(x, { shape: "square", w: 62, h: 62, colour: t.colour, mood: "happy", lw: 3.5 }); c.style.width = c.style.height = "100%"; b.appendChild(c); }
+    b.onclick = () => { sel = t.slug; K.sfx.tick(); box.querySelectorAll(".pick").forEach(x => x.classList.remove("on")); b.classList.add("on"); };
+    box.appendChild(b);
+  });
+}
+
+function start() {
+  running = true; document.getElementById("intro").hidden = true; document.getElementById("count").textContent = placed.length;
+  if (!sel && toys.length) sel = toys[0].slug; else if (!sel) sel = PAINTED[0];
+  buildPicks(); fit(); redraw();
+  document.getElementById("tapHint").hidden = placed.length > 0;
+}
+
+/* ---------- boot ---------- */
+K.initBar();
+K.onLang = () => { if (running) buildPicks(); };
+K.applyWords();
+function introArt() {
+  const c = document.getElementById("introArt"), x = c.getContext("2d"); x.clearRect(0, 0, c.width, c.height);
+  x.fillStyle = "#9BDB7A"; x.strokeStyle = K.INK; x.lineWidth = 5; x.beginPath(); x.roundRect(10, 40, 380, 220, 28); x.fill(); x.stroke();
+  x.fillStyle = "#E7D6B3"; x.fillRect(14, 150, 372, 40);
+  house(x, 90, 130, 110, "#FFB8A8", "#E4574A"); tree(x, 330, 150, 44);
+  [[170, 215, 0], [250, 225, 1]].forEach(([px, py, i]) => { const t = toys[i]; if (t && t.img) x.drawImage(t.img, px - 50, py - 100, 100, 100); else { x.save(); x.translate(px, py - 45); K.friend(x, { shape: "square", w: 70, h: 70, colour: PAINTED[i], mood: "happy", lw: 4 }); x.restore(); } });
+}
+introArt();
+document.getElementById("homeBtn").href = window.SHOP_URL ? window.SHOP_URL + (window.SHOP_URL.includes("#") ? "" : "#play") : "/#play";
+K.library().then(list => { toys = list.filter(t => t.img); introArt(); });
+document.getElementById("startBtn").onclick = () => { K.sfx.pop(); K.library().then(l => { toys = l.filter(t => t.img); start(); }); };
+</script>
+<!--TAIL-->
