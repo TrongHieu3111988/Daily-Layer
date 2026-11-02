@@ -1,0 +1,152 @@
+<title>Count and Print</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<!--HEAD-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@500;600;700;800&display=swap">
+<style>
+/*KITCSS*/
+/* Count and Print: a pile of one toy friend; tap each to count, then tap the number. */
+.stage{background:linear-gradient(#E6F6FF,#FFF1D6);display:flex;flex-direction:column}
+:root[data-theme="dark"] .stage{background:linear-gradient(#1B1F44,#2A1B3F)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .stage{background:linear-gradient(#1B1F44,#2A1B3F)}}
+.ask{text-align:center;font-family:'Baloo 2',sans-serif;font-weight:800;font-size:22px;padding:12px 12px 0;color:var(--outline)}
+.pile{position:relative;flex:1;min-height:0;margin:8px 12px}
+.pile button{position:absolute;border:0;background:none;padding:0;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.pile canvas{width:100%;height:100%;display:block;pointer-events:none}
+.pile b{position:absolute;right:-2px;top:-2px;min-width:26px;height:26px;border-radius:13px;background:var(--sun);border:2.5px solid var(--outline);font:800 15px/21px 'Baloo 2',sans-serif;text-align:center;color:var(--outline)}
+.pile button.hop{animation:hop .45s ease}
+@keyframes hop{40%{transform:translateY(-14px) scale(1.12)}}
+.nums{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;padding:0 12px 14px}
+.nums button{height:56px;border:3px solid var(--outline);border-radius:16px;background:var(--paper);box-shadow:0 4px 0 var(--outline);font:800 28px 'Baloo 2',sans-serif;color:var(--outline);cursor:pointer;touch-action:manipulation}
+.nums button:active{transform:translateY(3px);box-shadow:0 1px 0 var(--outline)}
+.nums button.no{animation:shk .4s ease;background:#FFE2EC}
+.nums button.yes{background:var(--grass);color:#fff}
+@keyframes shk{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+@media (prefers-reduced-motion:reduce){.pile button.hop,.nums button.no{animation:none}}
+.round{display:flex;justify-content:center;gap:8px;padding:10px 12px 0}
+.round i{width:14px;height:14px;border-radius:50%;border:2.5px solid var(--outline);background:var(--paper)}
+.round i.on{background:var(--grass)}.round i.now{background:var(--sun)}
+</style>
+
+<div class="app">
+  <header class="bar">
+    <a class="ibtn" id="back" href="/" data-t-label="back" aria-label="Back"></a>
+    <h1 data-t="title">Count and Print</h1>
+    <span class="score" aria-live="polite"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.8-4.5 4.2 1.2 6L12 16.6 6.5 19.6l1.2-6L3.2 9.4l6.1-.8z" fill="#FFC93C" stroke="#1B2547" stroke-width="2" stroke-linejoin="round"/></svg><span id="count">0</span></span>
+    <button class="ibtn" id="soundBtn" type="button" data-t-label="sound" aria-label="Sound"></button>
+    <button class="ibtn" id="langBtn" type="button" aria-label="Language">VI</button>
+  </header>
+  <main class="stage" id="stage">
+    <div class="round" id="round" aria-hidden="true"></div>
+    <div class="ask" id="ask">How many?</div>
+    <div class="pile" id="pile"></div>
+    <div class="nums" id="nums"></div>
+    <div class="toast" id="toast" hidden></div>
+  </main>
+</div>
+
+<div class="overlay" id="intro">
+  <div class="card">
+    <canvas class="hero" id="introArt" width="400" height="280"></canvas>
+    <h2 data-t="introH">How many friends?</h2>
+    <p data-t="introP">A pile of toy friends! Tap each one to count it, then tap the right number.</p>
+    <button class="btn coral" type="button" id="startBtn"><span data-t="start">Let's count!</span></button>
+  </div>
+</div>
+<div class="overlay" id="over" hidden>
+  <div class="card">
+    <div class="stars" id="stars"></div>
+    <h2 id="overH">Great counting!</h2>
+    <p id="overP"></p>
+    <div class="row"><button class="btn coral" type="button" id="againBtn"><span data-t="again">Play again</span></button><a class="btn" id="homeBtn" href="/" data-t="home">More games</a></div>
+  </div>
+</div>
+
+<script>/*KITJS*/</script>
+<script>
+"use strict";
+K.words.en = { title: "Count and Print", back: "Back", sound: "Sound on or off", introH: "How many friends?",
+  introP: "A pile of toy friends! Tap each one to count it, then tap the right number.", start: "Let's count!", again: "Play again", home: "More games",
+  ask: n => "How many " + n + "?", yes: (n, name) => n + " " + name + "! Yes!", no: "Count them again!", overH: s => s >= 3 ? "Super counting!" : s >= 2 ? "Great counting!" : "You counted!", overP: n => "You counted " + n + " piles of toy friends." };
+K.words.vi = { title: "Đếm Bạn Nhỏ", back: "Quay lại", sound: "Bật hoặc tắt âm thanh", introH: "Có bao nhiêu bạn?",
+  introP: "Một đống bạn đồ chơi! Chạm từng bạn để đếm, rồi chạm đúng con số.", start: "Đếm thôi!", again: "Chơi lại", home: "Trò khác",
+  ask: n => "Có bao nhiêu " + n + "?", yes: (n, name) => n + " " + name + "! Đúng rồi!", no: "Đếm lại nhé!", overH: s => s >= 3 ? "Đếm siêu giỏi!" : s >= 2 ? "Đếm giỏi lắm!" : "Bé đếm xong rồi!", overP: n => "Bé đã đếm " + n + " đống bạn đồ chơi." };
+
+const ROUNDS = [[1, 3], [2, 5], [3, 6], [4, 8], [5, 10]];   // [round, biggest number]
+const PAINTED = ["#FF6B57", "#FFC93C", "#3FBF7F", "#5DB8FF", "#8C6BF2", "#FF8FB8"];
+let toys = [], round = 0, answer = 0, toy = null, counted = 0, wrongs = 0, totalWrong = 0, running = false, locked = false, done = 0;
+const pile = document.getElementById("pile"), nums = document.getElementById("nums");
+function rnd(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+function nameOf() { return toy.t ? K.toyName(toy.t) : "★"; }
+function paint(c, t) {
+  const r = c.getBoundingClientRect(), d = Math.min(2, devicePixelRatio || 1);
+  c.width = Math.max(40, Math.round(r.width * d)); c.height = Math.max(40, Math.round(r.height * d));
+  const g = c.getContext("2d"), W = c.width, H = c.height;
+  if (t.t && t.t.img) { const im = t.t.img, k = Math.min(W, H) * 0.96 / Math.max(im.width, im.height); g.drawImage(im, (W - im.width * k) / 2, (H - im.height * k) / 2, im.width * k, im.height * k); }
+  else { const s = Math.min(W, H) / 90; g.save(); g.translate(W / 2, H / 2); g.scale(s, s); K.friend(g, { shape: "square", w: 62, h: 62, colour: t.t ? t.t.slug : t.colour, mood: "happy", lw: 3.5 }); g.restore(); }
+}
+function deal() {
+  const [n, hi] = ROUNDS[round]; const lo = round === 0 ? 1 : 2;
+  answer = rnd(Math.min(lo, hi), hi); counted = 0; wrongs = 0; locked = false;
+  toy = toys.length ? { t: toys[rnd(0, toys.length - 1)] } : { colour: PAINTED[rnd(0, 5)] };
+  document.getElementById("ask").textContent = K.t("ask", nameOf());
+  document.getElementById("round").innerHTML = ROUNDS.map((_, i) => `<i class="${i < round ? "on" : i === round ? "now" : ""}"></i>`).join("");
+  nums.innerHTML = ""; nums.style.gridTemplateColumns = `repeat(${hi <= 5 ? hi : 5},1fr)`;
+  for (let i = 1; i <= hi; i++) { const b = document.createElement("button"); b.type = "button"; b.textContent = i; b.onclick = () => pick(i, b); nums.appendChild(b); }
+  pile.innerHTML = "";
+  requestAnimationFrame(() => {
+    const W = pile.clientWidth, H = pile.clientHeight;
+    const cols = Math.ceil(Math.sqrt(answer * W / H)), rows = Math.ceil(answer / cols), size = Math.min(110, W / cols - 6, H / rows - 6);
+    const cells = []; for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) cells.push([r, c]);
+    cells.sort(() => Math.random() - .5);
+    for (let i = 0; i < answer; i++) {
+      const [r, c] = cells[i], b = document.createElement("button"), cv = document.createElement("canvas");
+      b.style.width = b.style.height = size + "px";
+      b.style.left = ((W - cols * (size + 6)) / 2 + c * (size + 6) + (Math.random() - .5) * 6) + "px";
+      b.style.top = ((H - rows * (size + 6)) / 2 + r * (size + 6)) + "px";
+      b.setAttribute("aria-label", nameOf()); b.appendChild(cv);
+      b.onclick = () => { if (b.dataset.n) return; b.dataset.n = ++counted; const s = document.createElement("b"); s.textContent = counted; b.appendChild(s); b.classList.add("hop"); K.sfx.pop(); };
+      pile.appendChild(b); paint(cv, toy);
+    }
+  });
+}
+function pick(i, b) {
+  if (!running || locked) return;
+  if (i === answer) {
+    locked = true; b.classList.add("yes"); done++; document.getElementById("count").textContent = done; K.sfx.tada ? K.sfx.tada() : K.sfx.pop();
+    pile.querySelectorAll("button").forEach((x, k) => setTimeout(() => x.classList.add("hop"), k * 80));
+    document.getElementById("ask").textContent = K.t("yes", answer, nameOf());
+    const r = b.getBoundingClientRect(); if (!K.CALM) K.confetti(r.left + r.width / 2, r.top, 36);
+    totalWrong += wrongs;
+    setTimeout(() => { if (round < ROUNDS.length - 1) { round++; deal(); } else finish(); }, 1500);
+  } else {
+    wrongs++; b.classList.remove("no"); void b.offsetWidth; b.classList.add("no");
+    document.getElementById("ask").textContent = K.t("no");
+    setTimeout(() => { if (!locked) document.getElementById("ask").textContent = K.t("ask", nameOf()); }, 1400);
+  }
+}
+function finish() {
+  running = false; const stars = totalWrong <= 1 ? 3 : totalWrong <= 4 ? 2 : 1;
+  document.getElementById("stars").innerHTML = [0, 1, 2].map(i => K.starSVG(i < stars)).join("");
+  document.getElementById("overH").textContent = K.t("overH", stars); document.getElementById("overP").textContent = K.t("overP", ROUNDS.length);
+  document.getElementById("over").hidden = false; K.sfx.tada(); K.confetti(); document.getElementById("againBtn").focus();
+}
+function start() { round = 0; done = 0; totalWrong = 0; running = true; document.getElementById("count").textContent = "0"; document.getElementById("intro").hidden = true; document.getElementById("over").hidden = true; deal(); }
+
+K.initBar(); K.onLang = () => { if (running && toy && !locked) document.getElementById("ask").textContent = K.t("ask", nameOf()); }; K.applyWords();
+function introArt() {
+  const c = document.getElementById("introArt"), x = c.getContext("2d"); x.clearRect(0, 0, c.width, c.height);
+  const t = toys[0];
+  [[90, 170], [190, 130], [290, 170]].forEach(([cx, cy], i) => {
+    if (t && t.img) x.drawImage(t.img, cx - 55, cy - 55, 110, 110); else { x.save(); x.translate(cx, cy); x.scale(1.2, 1.2); K.friend(x, { shape: "square", w: 62, h: 62, colour: PAINTED[i], mood: "happy", lw: 3.5 }); x.restore(); }
+    x.fillStyle = "#FFC93C"; x.strokeStyle = K.INK; x.lineWidth = 4; x.beginPath(); x.arc(cx + 42, cy - 48, 18, 0, 7); x.fill(); x.stroke();
+    x.fillStyle = K.INK; x.font = "800 22px 'Baloo 2',sans-serif"; x.textAlign = "center"; x.fillText(i + 1, cx + 42, cy - 40);
+  });
+}
+introArt();
+document.getElementById("homeBtn").href = window.SHOP_URL ? window.SHOP_URL + (window.SHOP_URL.includes("#") ? "" : "#play") : "/#play";
+K.library().then(list => { toys = list.filter(t => t.img); introArt(); });
+document.getElementById("startBtn").onclick = () => { K.sfx.pop(); K.library().then(start); };
+document.getElementById("againBtn").onclick = () => { K.sfx.pop(); K.library().then(start); };
+</script>
+<!--TAIL-->

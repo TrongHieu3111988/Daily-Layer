@@ -15,7 +15,7 @@ model is made for a game only when the game needs a kind of model the library la
 - [x] 2026-10-30 Magic Printer (layers) https://claude.ai/artifact/K7SEug6s3i7K8mHbqgXyoF — a real toy is cut into 3–5 layers (fewer than planned, so a 4-year-old can do it); tap them bottom to top and the printer stacks them, then the toy hops.
 - [x] 2026-10-31 Toy Memory (memory) https://claude.ai/artifact/NjiQ1yupYs4tUvQXJ44b9h — flip cards to match pairs of toy stickers from the library; 6 / 8 / 12 cards, a pair wiggles as a hint after 3 misses.
 - [x] 2026-11-01 Toy Town (town) https://claude.ai/artifact/VfmKNiTG5QdamoUqijBprW — free play: pick a toy from the library, tap the town to put it down, tap a friend to make it hop, undo, and a camera button that saves a picture of the town; no winning or losing.
-- [ ] Count and Print (count) — "How many foxes?" a pile of 3D toys; tap the number. Numbers 1–10.
+- [x] 2026-11-02 Count and Print (count) https://claude.ai/artifact/MepqwqjycBAc2YFqhD6sQC — "How many foxes?" a pile of 3D toys; tap the number. Numbers 1–10.
 - [ ] Sort the Toys (sort) — Montessori sorting: drag toys into boxes by colour, then size, then shape.
 - [ ] Toy Parade (parade) — tap along to a simple beat as toys march by; gentle, no fail state.
 - [ ] Jigsaw Friends (jigsaw) — 4 / 6 / 9 piece jigsaw of a toy cover.

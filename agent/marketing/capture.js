@@ -65,6 +65,18 @@ const DIRECTORS = {
     }
     s.mark("allfound"); await hold(60);
   },
+  // Count and Print: count each toy in the pile with a tap (a number pops up on each), then tap the right number; 3 rounds
+  async count(s) {
+    const fr = async () => { await s.page.evaluate(dt => { for (const a of document.getAnimations()) { if (a.playState === "finished") continue; a.pause(); const end = a.effect.getComputedTiming().endTime; a.currentTime = Math.min((a.currentTime || 0) + dt, end); if (a.currentTime >= end) a.finish(); } }, DT); await s.frame(); };
+    const hold = async k => { for (let i = 0; i < k; i++) await fr(); };
+    await hold(20); await s.tap("#startBtn"); await hold(36);
+    for (let r = 0; r < 3; r++) {
+      const n = await s.page.evaluate(() => document.querySelectorAll(".pile button").length);
+      for (let i = 1; i <= n; i++) { await s.tap(`.pile button:nth-child(${i})`); if (r === 0) s.mark("count"); await hold(16); }
+      await hold(14); await s.tap(`.nums button:nth-child(${n})`); s.mark("yes"); await hold(66);
+    }
+    await hold(40);
+  },
   // Toy Town: put a different toy friend down with each tap, make two of them hop, then take the picture
   async town(s) {
     const pt = async (fx, fy) => { const bb = await (await s.page.$("#town")).boundingBox(); await s.page.mouse.click(bb.x + fx * bb.width, bb.y + fy * bb.height); };

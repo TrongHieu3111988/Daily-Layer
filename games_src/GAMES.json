@@ -45,6 +45,11 @@
    "id": "town",
    "artifact": "https://claude.ai/artifact/VfmKNiTG5QdamoUqijBprW",
    "library": "2d"
+  },
+  {
+   "id": "count",
+   "artifact": "https://claude.ai/artifact/MepqwqjycBAc2YFqhD6sQC",
+   "library": "2d"
   }
  ]
 }

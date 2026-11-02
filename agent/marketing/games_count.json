@@ -1,0 +1,24 @@
+{
+ "id": "count",
+ "title": "Count and Print",
+ "hook": "Can you count\nthe toy friends?",
+ "captions": {
+  "count": [
+   "1!",
+   "2!",
+   "3!",
+   "4!",
+   "5!",
+   "6!"
+  ],
+  "yes": [
+   "That's right!",
+   "You counted them!",
+   "Great counting!"
+  ]
+ },
+ "yt_title": "Can you count the toy friends? Free counting game for kids #Shorts",
+ "yt_desc": "Tap each toy friend to count it, then tap the right number. Easy enough for a 4-year-old, with no ads and no signing up, and the toys are real models you can 3D print at home.\n\nPlay free in your browser: {url}\nMore free kids' games and a new 3D-printable toy every day: {site}\n\n#Shorts #CountingGame #KidsGames #3DPrinting #FreeGames",
+ "icons": "/home/user/Daily-Layer/public/products",
+ "toys": "/home/user/Daily-Layer/public/toys.json"
+}
