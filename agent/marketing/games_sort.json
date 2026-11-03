@@ -1,0 +1,21 @@
+{
+ "id": "sort",
+ "title": "Sort the Toys",
+ "hook": "Can you sort\nthe toy friends?",
+ "captions": {
+  "sorted": [
+   "Into the box!",
+   "Nice!",
+   "Sorted!",
+   "Yes!"
+  ],
+  "round": [
+   "Big and small!",
+   "All sorted!"
+  ]
+ },
+ "yt_title": "Can you sort the toy friends? Free sorting game for kids #Shorts",
+ "yt_desc": "Drag each toy friend into its own box, then sort big and small. Easy enough for a 4-year-old, with no ads and no signing up, and the toys are real models you can 3D print at home.\n\nPlay free in your browser: {url}\nMore free kids' games and a new 3D-printable toy every day: {site}\n\n#Shorts #SortingGame #KidsGames #3DPrinting #FreeGames",
+ "icons": "/home/user/Daily-Layer/public/products",
+ "toys": "/home/user/Daily-Layer/public/toys.json"
+}

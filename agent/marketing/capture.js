@@ -77,6 +77,23 @@ const DIRECTORS = {
     }
     await hold(40);
   },
+  // Sort the Toys: drag each toy into the box that shows its friend (or its size); 3 rounds, shown in full for round 1 and quicker after
+  async sort(s) {
+    const fr = async () => { await s.page.evaluate(dt => { for (const a of document.getAnimations()) { if (a.playState === "finished") continue; a.pause(); const end = a.effect.getComputedTiming().endTime; a.currentTime = Math.min((a.currentTime || 0) + dt, end); if (a.currentTime >= end) a.finish(); } }, DT); await s.frame(); };
+    const hold = async k => { for (let i = 0; i < k; i++) await fr(); };
+    await hold(20); await s.tap("#startBtn"); await hold(40);
+    for (let r = 0; r < 3; r++) {
+      const n = await s.page.evaluate(() => items.length);
+      for (let i = 0; i < n; i++) {
+        const t = await s.page.evaluate(() => { const it = items.find(x => !x.in), a = it.el.getBoundingClientRect(), b = boxesEl.children[it.box].getBoundingClientRect(); return [a.x + a.width / 2, a.y + a.height / 2, b.x + b.width / 2, b.y + 30]; });
+        await s.page.mouse.move(t[0], t[1]); await s.page.mouse.down(); const steps = r === 0 ? 10 : 6;
+        for (let k = 1; k <= steps; k++) { await s.page.mouse.move(t[0] + (t[2] - t[0]) * k / steps, t[1] + (t[3] - t[1]) * k / steps); await fr(); }
+        await s.page.mouse.up(); s.mark("sorted"); await hold(r === 0 ? 14 : 8);
+      }
+      s.mark("round"); await hold(60);
+    }
+    await hold(40);
+  },
   // Toy Town: put a different toy friend down with each tap, make two of them hop, then take the picture
   async town(s) {
     const pt = async (fx, fy) => { const bb = await (await s.page.$("#town")).boundingBox(); await s.page.mouse.click(bb.x + fx * bb.width, bb.y + fy * bb.height); };

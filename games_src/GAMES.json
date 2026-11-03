@@ -50,6 +50,11 @@
    "id": "count",
    "artifact": "https://claude.ai/artifact/MepqwqjycBAc2YFqhD6sQC",
    "library": "2d"
+  },
+  {
+   "id": "sort",
+   "artifact": "https://claude.ai/artifact/ReimNPbNqBXz5xab4xSAMQ",
+   "library": "2d"
   }
  ]
 }

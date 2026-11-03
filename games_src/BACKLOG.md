@@ -16,7 +16,7 @@ model is made for a game only when the game needs a kind of model the library la
 - [x] 2026-10-31 Toy Memory (memory) https://claude.ai/artifact/NjiQ1yupYs4tUvQXJ44b9h — flip cards to match pairs of toy stickers from the library; 6 / 8 / 12 cards, a pair wiggles as a hint after 3 misses.
 - [x] 2026-11-01 Toy Town (town) https://claude.ai/artifact/VfmKNiTG5QdamoUqijBprW — free play: pick a toy from the library, tap the town to put it down, tap a friend to make it hop, undo, and a camera button that saves a picture of the town; no winning or losing.
 - [x] 2026-11-02 Count and Print (count) https://claude.ai/artifact/MepqwqjycBAc2YFqhD6sQC — "How many foxes?" a pile of 3D toys; tap the number. Numbers 1–10.
-- [ ] Sort the Toys (sort) — Montessori sorting: drag toys into boxes by colour, then size, then shape.
+- [x] 2026-11-03 Sort the Toys (sort) https://claude.ai/artifact/ReimNPbNqBXz5xab4xSAMQ — drag (or tap, then tap the box) each toy into the box showing its friend; round 2 sorts big and small, round 3 uses three boxes.
 - [ ] Toy Parade (parade) — tap along to a simple beat as toys march by; gentle, no fail state.
 - [ ] Jigsaw Friends (jigsaw) — 4 / 6 / 9 piece jigsaw of a toy cover.
 - [ ] Spin to Match (spin) — rotate a 3D toy until it matches a target pose (spatial reasoning).

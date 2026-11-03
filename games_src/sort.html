@@ -1,0 +1,187 @@
+<title>Sort the Toys</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<!--HEAD-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@500;600;700;800&display=swap">
+<style>
+/*KITCSS*/
+/* Sort the Toys: drag each toy (or tap it, then tap a box) into the box that shows its friend or size. */
+.stage{background:linear-gradient(#E6F6FF,#FFF1D6);display:flex;flex-direction:column;touch-action:none}
+:root[data-theme="dark"] .stage{background:linear-gradient(#1B1F44,#2A1B3F)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .stage{background:linear-gradient(#1B1F44,#2A1B3F)}}
+.ask{text-align:center;font-family:'Baloo 2',sans-serif;font-weight:800;font-size:22px;padding:12px 12px 0;color:var(--outline)}
+.pile{position:relative;flex:1;min-height:0;margin:8px 12px}
+.pile .toy{position:absolute;border:0;background:none;padding:0;cursor:grab;touch-action:none;-webkit-tap-highlight-color:transparent;transition:left .35s,top .35s,transform .2s}
+.pile .toy.drag{transition:none;z-index:9;cursor:grabbing;transform:scale(1.12)}
+.pile .toy.sel{transform:scale(1.15);filter:drop-shadow(0 0 8px #FFC93C)}
+.pile .toy.in{transition:none;pointer-events:none}
+.toy canvas{width:100%;height:100%;display:block;pointer-events:none}
+.boxes{display:flex;gap:10px;padding:0 12px 14px}
+.box{flex:1;height:128px;border:4px dashed var(--outline);border-radius:20px;background:rgba(255,255,255,.7);position:relative;display:flex;align-items:center;justify-content:center;cursor:pointer;touch-action:manipulation}
+.box canvas{width:64px;height:64px;opacity:.9}
+.box.hot{background:#FFF3C2;border-style:solid}
+.box.yes{animation:hop .45s ease}
+.box.no{animation:shk .4s ease;background:#FFE2EC}
+.box b{position:absolute;right:6px;top:4px;font:800 18px 'Baloo 2',sans-serif;color:var(--outline)}
+.box .mini{position:absolute;left:6px;right:6px;bottom:4px;display:flex;flex-wrap:wrap;justify-content:center;gap:0}
+.box .mini canvas{width:26px;height:26px}
+@keyframes hop{40%{transform:translateY(-10px) scale(1.05)}}
+@keyframes shk{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+@media (prefers-reduced-motion:reduce){.box.yes,.box.no{animation:none}.pile .toy{transition:none}}
+.round{display:flex;justify-content:center;gap:8px;padding:10px 12px 0}
+.round i{width:14px;height:14px;border-radius:50%;border:2.5px solid var(--outline);background:var(--paper)}
+.round i.on{background:var(--grass)}.round i.now{background:var(--sun)}
+</style>
+
+<div class="app">
+  <header class="bar">
+    <a class="ibtn" id="back" href="/" data-t-label="back" aria-label="Back"></a>
+    <h1 data-t="title">Sort the Toys</h1>
+    <span class="score" aria-live="polite"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.8-4.5 4.2 1.2 6L12 16.6 6.5 19.6l1.2-6L3.2 9.4l6.1-.8z" fill="#FFC93C" stroke="#1B2547" stroke-width="2" stroke-linejoin="round"/></svg><span id="count">0</span></span>
+    <button class="ibtn" id="soundBtn" type="button" data-t-label="sound" aria-label="Sound"></button>
+    <button class="ibtn" id="langBtn" type="button" aria-label="Language">VI</button>
+  </header>
+  <main class="stage" id="stage">
+    <div class="round" id="round" aria-hidden="true"></div>
+    <div class="ask" id="ask">Sort them!</div>
+    <div class="pile" id="pile"></div>
+    <div class="boxes" id="boxes"></div>
+    <div class="toast" id="toast" hidden></div>
+  </main>
+</div>
+
+<div class="overlay" id="intro">
+  <div class="card">
+    <canvas class="hero" id="introArt" width="400" height="280"></canvas>
+    <h2 data-t="introH">Sort the toys!</h2>
+    <p data-t="introP">Put each toy friend in its own box. Drag it, or tap it and then tap the box.</p>
+    <button class="btn coral" type="button" id="startBtn"><span data-t="start">Let's sort!</span></button>
+  </div>
+</div>
+<div class="overlay" id="over" hidden>
+  <div class="card">
+    <div class="stars" id="stars"></div>
+    <h2 id="overH">Great sorting!</h2>
+    <p id="overP"></p>
+    <div class="row"><button class="btn coral" type="button" id="againBtn"><span data-t="again">Play again</span></button><a class="btn" id="homeBtn" href="/" data-t="home">More games</a></div>
+  </div>
+</div>
+
+
+<script>/*KITJS*/</script>
+<script>
+"use strict";
+K.words.en = { title: "Sort the Toys", back: "Back", sound: "Sound on or off", introH: "Sort the toys!",
+  introP: "Put each toy friend in its own box. Drag it, or tap it and then tap the box.", start: "Let's sort!", again: "Play again", home: "More games",
+  askKind: "Which box does it go in?", askSize: "Big toys here, small toys there!", yes: "Yes! Well done!", no: "Try the other box!", done: "All sorted!",
+  overH: s => s >= 3 ? "Super sorting!" : s >= 2 ? "Great sorting!" : "You sorted them!", overP: n => "You sorted " + n + " piles of toys." };
+K.words.vi = { title: "Xếp Đồ Chơi", back: "Quay lại", sound: "Bật hoặc tắt âm thanh", introH: "Xếp đồ chơi nào!",
+  introP: "Bỏ mỗi bạn đồ chơi vào đúng hộp. Kéo bạn ấy, hoặc chạm bạn ấy rồi chạm hộp.", start: "Xếp thôi!", again: "Chơi lại", home: "Trò khác",
+  askKind: "Bạn này vào hộp nào?", askSize: "Bạn to ở đây, bạn nhỏ ở kia!", yes: "Đúng rồi! Giỏi quá!", no: "Thử hộp kia nhé!", done: "Xếp xong rồi!",
+  overH: s => s >= 3 ? "Xếp siêu giỏi!" : s >= 2 ? "Xếp giỏi lắm!" : "Bé xếp xong rồi!", overP: n => "Bé đã xếp " + n + " đống đồ chơi." };
+
+// each round: [mode, number of boxes, items per box]
+const ROUNDS = [["kind", 2, 3], ["size", 2, 3], ["kind", 3, 2]];
+const FALLBACK = ["fox", "frog", "chick", "whale"].map((n, i) => ({ slug: n, title: n, fake: ["#FF6B57", "#3FBF7F", "#FFC93C", "#5DB8FF"][i] }));
+let toys = [], round = 0, kinds = [], items = [], left = 0, wrongs = 0, totalWrong = 0, running = false, done = 0, sel = null, mode = "kind";
+const pile = document.getElementById("pile"), boxesEl = document.getElementById("boxes");
+function shuffle(a) { return a.map(x => [Math.random(), x]).sort((p, q) => p[0] - q[0]).map(p => p[1]); }
+function paint(c, t, k) {
+  const r = c.getBoundingClientRect(), d = Math.min(2, devicePixelRatio || 1);
+  c.width = Math.max(40, Math.round((r.width || 80) * d)); c.height = Math.max(40, Math.round((r.height || 80) * d));
+  const g = c.getContext("2d"), W = c.width, H = c.height;
+  if (t.img) { const im = t.img, s = Math.min(W, H) * 0.96 / Math.max(im.width, im.height) * (k || 1); g.drawImage(im, (W - im.width * s) / 2, (H - im.height * s) / 2, im.width * s, im.height * s); }
+  else { const s = Math.min(W, H) / 90 * (k || 1); g.save(); g.translate(W / 2, H / 2); g.scale(s, s); K.friend(g, { shape: "square", w: 62, h: 62, colour: t.fake, mood: "happy", lw: 3.5 }); g.restore(); }
+}
+function deal() {
+  const [m, nb, per] = ROUNDS[round]; mode = m; sel = null; wrongs = 0;
+  const pool = toys.length >= nb ? toys : FALLBACK;
+  kinds = m === "size" ? [shuffle(pool)[0], null] : shuffle(pool).slice(0, nb);
+  const defs = m === "size" ? [{ t: kinds[0], big: true }, { t: kinds[0], big: false }] : kinds.map(t => ({ t, big: true }));
+  items = []; defs.forEach((d, bi) => { for (let i = 0; i < per; i++) items.push({ box: bi, t: d.t, big: d.big }); });
+  items = shuffle(items); left = items.length;
+  document.getElementById("ask").textContent = K.t(m === "size" ? "askSize" : "askKind");
+  document.getElementById("round").innerHTML = ROUNDS.map((_, i) => `<i class="${i < round ? "on" : i === round ? "now" : ""}"></i>`).join("");
+  boxesEl.innerHTML = "";
+  defs.forEach((d, bi) => {
+    const b = document.createElement("div"); b.className = "box"; b.dataset.i = bi; b.setAttribute("role", "button"); b.setAttribute("aria-label", K.toyName(d.t));
+    const cv = document.createElement("canvas"); b.appendChild(cv); const mini = document.createElement("div"); mini.className = "mini"; b.appendChild(mini);
+    b.onclick = () => { if (sel) drop(sel, bi); };
+    boxesEl.appendChild(b); requestAnimationFrame(() => paint(cv, d.t, m === "size" ? (d.big ? 1.5 : 0.7) : 1));
+  });
+  pile.innerHTML = "";
+  requestAnimationFrame(() => requestAnimationFrame(layout));
+}
+function layout() {
+  const W = pile.clientWidth, H = pile.clientHeight, n = items.length;
+  const cols = Math.ceil(Math.sqrt(n * W / H)), rows = Math.ceil(n / cols), cw = W / cols, ch = H / rows;
+  const cells = shuffle([...Array(cols * rows).keys()]);
+  items.forEach((it, i) => {
+    const full = Math.min(100, cw - 8, ch - 8), size = it.box !== undefined && mode === "size" ? (it.big ? full : full * 0.55) : full;
+    const cell = cells[i], r = Math.floor(cell / cols), c = cell % cols;
+    const b = document.createElement("button"); b.type = "button"; b.className = "toy"; b.setAttribute("aria-label", K.toyName(it.t));
+    b.style.width = b.style.height = size + "px"; it.size = size;
+    it.hx = c * cw + (cw - size) / 2; it.hy = r * ch + (ch - size) / 2; b.style.left = it.hx + "px"; b.style.top = it.hy + "px";
+    const cv = document.createElement("canvas"); b.appendChild(cv); it.el = b; pile.appendChild(b); paint(cv, it.t);
+    wire(it);
+  });
+}
+function boxAt(x, y) { return [...boxesEl.children].findIndex(b => { const r = b.getBoundingClientRect(); return x >= r.left && x <= r.right && y >= r.top - 20 && y <= r.bottom + 20; }); }
+function wire(it) {
+  const b = it.el; let sx, sy, ox, oy, moved = false, id = null;
+  b.addEventListener("pointerdown", e => { if (!running || it.in) return; id = e.pointerId; b.setPointerCapture(id); sx = e.clientX; sy = e.clientY; ox = parseFloat(b.style.left); oy = parseFloat(b.style.top); moved = false; K.sfx.tick(); });
+  b.addEventListener("pointermove", e => {
+    if (id !== e.pointerId) return;
+    if (!moved && Math.hypot(e.clientX - sx, e.clientY - sy) > 8) { moved = true; b.classList.add("drag"); if (sel) { sel.el.classList.remove("sel"); sel = null; } }
+    if (moved) { b.style.left = ox + e.clientX - sx + "px"; b.style.top = oy + e.clientY - sy + "px"; const k = boxAt(e.clientX, e.clientY); [...boxesEl.children].forEach((x, i) => x.classList.toggle("hot", i === k)); }
+  });
+  const end = e => {
+    if (id !== e.pointerId) return; id = null; b.classList.remove("drag"); [...boxesEl.children].forEach(x => x.classList.remove("hot"));
+    if (moved) { const k = boxAt(e.clientX, e.clientY); if (k >= 0) drop(it, k); else home(it); }
+    else { if (sel) sel.el.classList.remove("sel"); sel = sel === it ? null : it; if (sel) b.classList.add("sel"); K.sfx.pop(); }
+  };
+  b.addEventListener("pointerup", end); b.addEventListener("pointercancel", e => { if (id === e.pointerId) { id = null; b.classList.remove("drag"); home(it); } });
+}
+function home(it) { it.el.style.left = it.hx + "px"; it.el.style.top = it.hy + "px"; }
+function drop(it, k) {
+  if (it.in) return;
+  const bx = boxesEl.children[k];
+  if (it.box === k) {
+    it.in = true; it.el.classList.remove("sel"); sel = null; it.el.classList.add("in"); it.el.style.display = "none";
+    const mini = bx.querySelector(".mini"), cv = document.createElement("canvas"); mini.appendChild(cv); paint(cv, it.t, mode === "size" && !it.big ? 0.6 : 1);
+    bx.classList.remove("yes"); void bx.offsetWidth; bx.classList.add("yes"); K.sfx.chime();
+    document.getElementById("ask").textContent = K.t("yes");
+    if (!K.CALM) { const r = bx.getBoundingClientRect(); K.confetti(r.left + r.width / 2, r.top, 14); }
+    if (--left === 0) { document.getElementById("ask").textContent = K.t("done"); done++; document.getElementById("count").textContent = done; K.sfx.tada(); totalWrong += wrongs;
+      setTimeout(() => { if (round < ROUNDS.length - 1) { round++; deal(); } else finish(); }, 1400); }
+  } else {
+    wrongs++; bx.classList.remove("no"); void bx.offsetWidth; bx.classList.add("no"); K.sfx.boing(); document.getElementById("ask").textContent = K.t("no"); home(it);
+    if (sel) { sel.el.classList.remove("sel"); sel = null; }
+    setTimeout(() => { if (left) document.getElementById("ask").textContent = K.t(mode === "size" ? "askSize" : "askKind"); }, 1400);
+  }
+}
+function finish() {
+  running = false; const stars = totalWrong <= 1 ? 3 : totalWrong <= 4 ? 2 : 1;
+  document.getElementById("stars").innerHTML = [0, 1, 2].map(i => K.starSVG(i < stars)).join("");
+  document.getElementById("overH").textContent = K.t("overH", stars); document.getElementById("overP").textContent = K.t("overP", ROUNDS.length);
+  document.getElementById("over").hidden = false; K.sfx.tada(); K.confetti(); document.getElementById("againBtn").focus();
+}
+function start() { round = 0; done = 0; totalWrong = 0; running = true; document.getElementById("count").textContent = "0"; document.getElementById("intro").hidden = true; document.getElementById("over").hidden = true; deal(); }
+
+K.initBar(); K.onLang = () => { if (running && left) document.getElementById("ask").textContent = K.t(mode === "size" ? "askSize" : "askKind"); }; K.applyWords();
+function introArt() {
+  const c = document.getElementById("introArt"), x = c.getContext("2d"); x.clearRect(0, 0, c.width, c.height);
+  const pool = toys.length ? toys : null;
+  [[90, 170], [200, 120], [310, 170]].forEach(([cx, cy], i) => {
+    const t = pool && pool[i % pool.length];
+    if (t && t.img) x.drawImage(t.img, cx - 55, cy - 55, 110, 110); else { x.save(); x.translate(cx, cy); x.scale(1.2, 1.2); K.friend(x, { shape: "square", w: 62, h: 62, colour: FALLBACK[i].fake, mood: "happy", lw: 3.5 }); x.restore(); }
+  });
+  x.strokeStyle = K.INK; x.lineWidth = 5; x.setLineDash([10, 8]); x.strokeRect(120, 215, 160, 55);
+}
+introArt();
+document.getElementById("homeBtn").href = window.SHOP_URL ? window.SHOP_URL + (window.SHOP_URL.includes("#") ? "" : "#play") : "/#play";
+K.library().then(list => { toys = list.filter(t => t.img); introArt(); });
+document.getElementById("startBtn").onclick = () => { K.sfx.pop(); K.library().then(start); };
+document.getElementById("againBtn").onclick = () => { K.sfx.pop(); K.library().then(start); };
+</script>
+<!--TAIL-->
