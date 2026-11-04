@@ -1,0 +1,20 @@
+{
+ "id": "parade",
+ "title": "Toy Parade",
+ "hook": "Can you drum\nfor the toy parade?",
+ "captions": {
+  "hop": [
+   "Boom!",
+   "Hop!",
+   "Nice beat!",
+   "Yes!"
+  ],
+  "done": [
+   "Great parade!"
+  ]
+ },
+ "yt_title": "Drum for the toy parade! Free rhythm game for kids #Shorts",
+ "yt_desc": "Toy friends march by. Tap the big drum when one is on the gold spot and watch it hop! Easy enough for a 4-year-old, with no ads and no signing up, and the toys are real models you can 3D print at home.\n\nPlay free in your browser: {url}\nMore free kids' games and a new 3D-printable toy every day: {site}\n\n#Shorts #KidsGames #RhythmGame #3DPrinting #FreeGames",
+ "icons": "/home/user/Daily-Layer/public/products",
+ "toys": "/home/user/Daily-Layer/public/toys.json"
+}

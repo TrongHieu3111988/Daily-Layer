@@ -1,0 +1,140 @@
+<title>Toy Parade</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<!--HEAD-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@500;600;700;800&display=swap">
+<style>
+/*KITCSS*/
+/* Toy Parade: toy friends march past; tap the big drum when one is on the gold spot and it hops. No losing. */
+.stage{background:linear-gradient(#FFE9B8,#FFD1DC 60%,#BDE8FF);display:flex;flex-direction:column;touch-action:manipulation}
+:root[data-theme="dark"] .stage{background:linear-gradient(#1B1F44,#2A1B3F)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .stage{background:linear-gradient(#1B1F44,#2A1B3F)}}
+.ask{text-align:center;font-family:'Baloo 2',sans-serif;font-weight:800;font-size:22px;padding:12px 12px 0;color:var(--outline)}
+#road{flex:1;min-height:0;width:100%;display:block}
+.drumwrap{display:flex;justify-content:center;padding:6px 0 22px}
+.drum{width:148px;height:148px;border-radius:50%;border:5px solid var(--outline);background:radial-gradient(circle at 35% 30%,#FF9A8B,#FF6B57);box-shadow:0 8px 0 #B8402F;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center;font:800 26px 'Baloo 2',sans-serif;color:#fff;text-shadow:0 2px 0 #B8402F}
+.drum:active,.drum.hit{transform:translateY(6px);box-shadow:0 2px 0 #B8402F}
+</style>
+
+
+<div class="app">
+  <header class="bar">
+    <a class="ibtn" id="back" href="/" data-t-label="back" aria-label="Back"></a>
+    <h1 data-t="title">Toy Parade</h1>
+    <span class="score" aria-live="polite"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.8-4.5 4.2 1.2 6L12 16.6 6.5 19.6l1.2-6L3.2 9.4l6.1-.8z" fill="#FFC93C" stroke="#1B2547" stroke-width="2" stroke-linejoin="round"/></svg><span id="count">0</span></span>
+    <button class="ibtn" id="soundBtn" type="button" data-t-label="sound" aria-label="Sound"></button>
+    <button class="ibtn" id="langBtn" type="button" aria-label="Language">VI</button>
+  </header>
+  <main class="stage" id="stage">
+    <div class="ask" id="ask">Tap the drum!</div>
+    <canvas id="road"></canvas>
+    <div class="drumwrap"><button class="drum" id="drum" type="button" data-t-label="drum" aria-label="Drum"><span data-t="drumT">BOOM</span></button></div>
+  </main>
+</div>
+
+<div class="overlay" id="intro">
+  <div class="card">
+    <canvas class="hero" id="introArt" width="400" height="280"></canvas>
+    <h2 data-t="introH">Join the parade!</h2>
+    <p data-t="introP">Toy friends march by. Tap the big drum when a friend is on the gold spot and it hops!</p>
+    <button class="btn coral" type="button" id="startBtn"><span data-t="start">Let's march!</span></button>
+  </div>
+</div>
+<div class="overlay" id="over" hidden>
+  <div class="card">
+    <div class="stars" id="stars"></div>
+    <h2 id="overH">Great parade!</h2>
+    <p id="overP"></p>
+    <div class="row"><button class="btn coral" type="button" id="againBtn"><span data-t="again">Play again</span></button><a class="btn" id="homeBtn" href="/" data-t="home">More games</a></div>
+  </div>
+</div>
+
+
+<script>/*KITJS*/</script>
+<script>
+"use strict";
+K.words.en = { title: "Toy Parade", back: "Back", sound: "Sound on or off", drum: "Drum", drumT: "BOOM", introH: "Join the parade!",
+  introP: "Toy friends march by. Tap the big drum when a friend is on the gold spot and it hops!", start: "Let's march!", again: "March again", home: "More games",
+  ask: "Tap the drum when a friend is on the gold spot!", hop: "Hop! Great beat!", fin: "The parade is over!",
+  overH: s => s >= 3 ? "Super drummer!" : s >= 2 ? "Great parade!" : "What a parade!", overP: n => n + " friends hopped to your beat." };
+K.words.vi = { title: "Diễu Hành Đồ Chơi", back: "Quay lại", sound: "Bật hoặc tắt âm thanh", drum: "Trống", drumT: "TÙNG", introH: "Diễu hành nào!",
+  introP: "Các bạn đồ chơi đi qua. Gõ trống to khi một bạn đứng trên chấm vàng, bạn ấy sẽ nhảy lên!", start: "Đi thôi!", again: "Diễu hành lại", home: "Trò khác",
+  ask: "Gõ trống khi bạn đứng trên chấm vàng!", hop: "Nhảy lên! Nhịp hay quá!", fin: "Diễu hành xong rồi!",
+  overH: s => s >= 3 ? "Tay trống siêu giỏi!" : s >= 2 ? "Diễu hành giỏi lắm!" : "Buổi diễu hành vui quá!", overP: n => n + " bạn đã nhảy theo nhịp trống của bé." };
+const TOTAL = 10, BEAT = 1.25, FALLBACK = ["fox", "frog", "chick", "whale"].map((n, i) => ({ slug: n, title: n, fake: ["#FF6B57", "#3FBF7F", "#FFC93C", "#5DB8FF"][i] }));
+let toys = [], line = [], running = false, hops = 0, t0 = 0, pulse = 0, shown = 0, finishAt = 0, raf = 0;
+const cv = document.getElementById("road"), g = cv.getContext("2d");
+function shuffle(a) { return a.map(x => [Math.random(), x]).sort((p, q) => p[0] - q[0]).map(p => p[1]); }
+function size() { const r = cv.getBoundingClientRect(), d = Math.min(2, devicePixelRatio || 1); cv.width = Math.max(100, Math.round(r.width * d)); cv.height = Math.max(100, Math.round(r.height * d)); }
+function drawToy(t, x, y, s) {
+  if (t.img) { const k = s / Math.max(t.img.width, t.img.height); g.drawImage(t.img, x - t.img.width * k / 2, y - t.img.height * k, t.img.width * k, t.img.height * k); }
+  else { g.save(); g.translate(x, y - s / 2); g.scale(s / 90, s / 90); K.friend(g, { shape: "square", w: 62, h: 62, colour: t.fake, mood: "happy", lw: 3.5 }); g.restore(); }
+}
+function frame(ms) {
+  raf = requestAnimationFrame(frame);
+  const W = cv.width, H = cv.height, d = W / (cv.getBoundingClientRect().width || W), now = (ms - t0) / 1000;
+  g.clearRect(0, 0, W, H);
+  const ground = H * 0.72, cx = W / 2, sz = Math.min(W * 0.2, H * 0.4), speed = W / (BEAT * 5.2);
+  g.fillStyle = "rgba(255,255,255,.55)"; g.fillRect(0, ground, W, H - ground);
+  g.strokeStyle = K.INK; g.lineWidth = 4 * d; g.beginPath(); g.moveTo(0, ground); g.lineTo(W, ground); g.stroke();
+  const pr = 1 + Math.max(0, pulse - ms) / 400 * 0.25;
+  g.fillStyle = "#FFC93C"; g.strokeStyle = K.INK; g.beginPath(); g.ellipse(cx, ground + 14 * d, sz * 0.5 * pr, 14 * d * pr, 0, 0, 7); g.fill(); g.stroke();
+  if (running) {
+    while (shown < TOTAL && now >= shown * BEAT) { line.push({ t: toys.length ? toys[shown % toys.length] : FALLBACK[shown % 4], born: shown * BEAT, hop: -9, ok: false }); shown++; }
+    if (shown >= TOTAL && now > (TOTAL - 1) * BEAT + 5.4 && !finishAt) { finishAt = 1; setTimeout(finish, 300); }
+  }
+  line.forEach(it => {
+    const x = -sz / 2 + (now - it.born) * speed, bob = Math.abs(Math.sin((now - it.born) / BEAT * Math.PI)) * 8 * d;
+    it.x = x; let y = ground - bob;
+    const hp = now - it.hop; if (hp >= 0 && hp < 0.7) y -= Math.sin(hp / 0.7 * Math.PI) * sz * 0.55;
+    if (it.ok) { g.fillStyle = "rgba(255,201,60,.35)"; g.beginPath(); g.arc(x, y - sz * 0.45, sz * 0.62, 0, 7); g.fill(); }
+    drawToy(it.t, x, y, sz);
+  });
+  line = line.filter(it => it.x < W + sz);
+  it_now = now;
+}
+let it_now = 0;
+function drum() {
+  if (!running) return;
+  const d = document.getElementById("drum"); d.classList.add("hit"); setTimeout(() => d.classList.remove("hit"), 110);
+  pulse = performance.now() + 400; K.sfx.pop();
+  const W = cv.width, cx = W / 2, reach = W * 0.22;
+  let best = null;
+  line.forEach(it => { if (!it.ok && Math.abs(it.x - cx) < reach && (!best || Math.abs(it.x - cx) < Math.abs(best.x - cx))) best = it; });
+  if (best) {
+    best.ok = true; best.hop = it_now; hops++; document.getElementById("count").textContent = hops; K.sfx.chime();
+    document.getElementById("ask").textContent = K.t("hop");
+    if (!K.CALM) { const r = cv.getBoundingClientRect(); K.confetti(r.left + r.width / 2, r.top + r.height * 0.5, 12); }
+  }
+}
+function finish() {
+  running = false; const stars = hops >= 8 ? 3 : hops >= 4 ? 2 : 1;
+  document.getElementById("ask").textContent = K.t("fin");
+  document.getElementById("stars").innerHTML = [0, 1, 2].map(i => K.starSVG(i < stars)).join("");
+  document.getElementById("overH").textContent = K.t("overH", stars); document.getElementById("overP").textContent = K.t("overP", hops);
+  document.getElementById("over").hidden = false; K.sfx.tada(); K.confetti(); document.getElementById("againBtn").focus();
+}
+function start() {
+  hops = 0; line = []; shown = 0; finishAt = 0; running = true; t0 = performance.now() + 600; size();
+  document.getElementById("count").textContent = "0"; document.getElementById("intro").hidden = true; document.getElementById("over").hidden = true;
+  document.getElementById("ask").textContent = K.t("ask");
+  const pool = shuffle(toys.length ? toys : FALLBACK); toys = toys.length ? pool : toys;
+}
+K.initBar(); K.onLang = () => { if (running) document.getElementById("ask").textContent = K.t("ask"); }; K.applyWords();
+function introArt() {
+  const c = document.getElementById("introArt"), x = c.getContext("2d"); x.clearRect(0, 0, c.width, c.height);
+  [[80, 190], [200, 160], [320, 190]].forEach(([cx, cy], i) => {
+    const t = toys.length ? toys[i % toys.length] : null;
+    if (t && t.img) x.drawImage(t.img, cx - 55, cy - 100, 110, 110); else { x.save(); x.translate(cx, cy - 45); x.scale(1.2, 1.2); K.friend(x, { shape: "square", w: 62, h: 62, colour: FALLBACK[i].fake, mood: "happy", lw: 3.5 }); x.restore(); }
+  });
+  x.fillStyle = "#FFC93C"; x.strokeStyle = K.INK; x.lineWidth = 4; x.beginPath(); x.ellipse(200, 232, 55, 14, 0, 0, 7); x.fill(); x.stroke();
+}
+introArt(); window.addEventListener("resize", () => { if (cv.clientWidth) size(); });
+document.getElementById("homeBtn").href = window.SHOP_URL ? window.SHOP_URL + (window.SHOP_URL.includes("#") ? "" : "#play") : "/#play";
+const dr = document.getElementById("drum"); dr.addEventListener("pointerdown", e => { e.preventDefault(); drum(); }); dr.addEventListener("keydown", e => { if (e.key === " " || e.key === "Enter") { e.preventDefault(); drum(); } });
+K.library().then(list => { toys = list.filter(t => t.img); introArt(); });
+document.getElementById("startBtn").onclick = () => { K.sfx.pop(); K.library().then(l => { toys = l.filter(t => t.img); start(); }); };
+document.getElementById("againBtn").onclick = () => { K.sfx.pop(); K.library().then(l => { toys = l.filter(t => t.img); start(); }); };
+requestAnimationFrame(frame);
+</script>
+<!--TAIL-->

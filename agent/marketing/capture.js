@@ -94,6 +94,17 @@ const DIRECTORS = {
     }
     await hold(40);
   },
+  // Toy Parade: toys march past; tap the drum each time one is on the gold spot (it hops)
+  async parade(s) {
+    await s.hold(20); await s.tap("#startBtn"); await s.hold(20);
+    let hopsSeen = 0;
+    for (let i = 0; i < 700; i++) {
+      const st = await s.page.evaluate(() => ({ over: !document.getElementById("over").hidden, on: running && line.some(it => !it.ok && Math.abs(it.x - cv.width / 2) < cv.width * 0.05) }));
+      if (st.over) break;
+      if (st.on) { await s.tap("#drum"); s.mark("hop"); hopsSeen++; await s.frame(); await s.frame(); } else await s.frame();
+    }
+    s.mark("done"); await s.hold(60);
+  },
   // Toy Town: put a different toy friend down with each tap, make two of them hop, then take the picture
   async town(s) {
     const pt = async (fx, fy) => { const bb = await (await s.page.$("#town")).boundingBox(); await s.page.mouse.click(bb.x + fx * bb.width, bb.y + fy * bb.height); };

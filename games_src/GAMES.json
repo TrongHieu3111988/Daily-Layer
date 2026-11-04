@@ -55,6 +55,11 @@
    "id": "sort",
    "artifact": "https://claude.ai/artifact/ReimNPbNqBXz5xab4xSAMQ",
    "library": "2d"
+  },
+  {
+   "id": "parade",
+   "artifact": "https://claude.ai/artifact/MPDjxcjsEkhrPrvpkmNGtT",
+   "library": "2d"
   }
  ]
 }
