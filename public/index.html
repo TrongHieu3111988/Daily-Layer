@@ -23,8 +23,7 @@
 <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Daily Layer">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@500;600;700;800&display=swap">
+<link rel="stylesheet" href="/vendor/fonts/fonts.css">
 <style>
 /* Layout: a toy playground. Sky hero (headline + a turntable showing today's toy, with Layo the printer robot),
    then a "what shall we play" game shelf, the toy shelf, a grown-ups corner (how it works, safety, club),
@@ -445,7 +444,7 @@ window.T = {
     coTitle: "Xem trước thanh toán", back: "Về cửa hàng", oneTime: p => p + " một lần", club: "Maker Club · $4 / tháng", pro: "Pro Seller · $12 / tháng", noCat: "Không tải được kệ đồ chơi. Tải lại trang để thử lại." }
 };
 </script>
-<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+<script type="importmap">{"imports":{"three":"/vendor/three/build/three.module.js","three/addons/":"/vendor/three/examples/jsm/"}}</script>
 <script type="module">
 const $ = (s, el = document) => el.querySelector(s);
 const HOST = window.HOST || "artifact";

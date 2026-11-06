@@ -16,8 +16,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "VideoGame", "name": "Doodle Puff", "description": "Kids draw anything and it puffs up into a squishy 3D toy you can download as a colour 3MF or STL and print at home.", "url": "https://dailylayer.funny3dprint.workers.dev/doodle/", "genre": "Educational", "gamePlatform": "Web browser", "applicationCategory": "Game", "audience": {"@type": "PeopleAudience", "suggestedMinAge": 3}, "isAccessibleForFree": true, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}}</script>
 <!--/seo-->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@500;600;700;800&display=swap">
+<link rel="stylesheet" href="/vendor/fonts/fonts.css">
 <style>
 /* Layout: one-screen app. Top bar (back, name, undo/redo, the big "make it 3D" button), a square sheet of
    paper in the middle, and a crayon tray at the bottom within thumb reach. The 3D view replaces the paper
@@ -1397,7 +1396,7 @@ loadDraft().then(ok => { if (!ok) { ctx.clearRect(0, 0, DS, DS); TPL[0](); colou
   else { let id = ""; try { id = localStorage.getItem("doodle-theme") || ""; } catch (e) {} if (id) setTheme(id); }
   fxOn = true; paintAll(); syncTools(); syncUndo(); });
 </script>
-<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+<script type="importmap">{"imports":{"three":"/vendor/three/build/three.module.js","three/addons/":"/vendor/three/examples/jsm/"}}</script>
 <script type="module">
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";

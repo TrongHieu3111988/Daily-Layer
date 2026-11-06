@@ -16,8 +16,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "VideoGame", "name": "Sculpt Studio", "description": "Squish, pinch and paint digital clay in your browser, then download a print-ready STL or colour 3MF. Free, no sign-up.", "url": "https://dailylayer.funny3dprint.workers.dev/sculpt/", "genre": "Educational", "gamePlatform": "Web browser", "applicationCategory": "Game", "audience": {"@type": "PeopleAudience", "suggestedMinAge": 3}, "isAccessibleForFree": true, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}}</script>
 <!--/seo-->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@500;600;700;800&display=swap">
+<link rel="stylesheet" href="/vendor/fonts/fonts.css">
 <style>
 /* Layout: one-screen studio. Top bar (back, title, resolution, undo/redo, print), canvas in the middle,
    a scrollable brush shelf plus size/intensity and modifiers at the bottom within thumb reach. */
@@ -1028,7 +1027,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 
 window.SHOP_URL = "/";
 </script>
-<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+<script type="importmap">{"imports":{"three":"/vendor/three/build/three.module.js","three/addons/":"/vendor/three/examples/jsm/"}}</script>
 <script type="module">
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
