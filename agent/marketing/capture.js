@@ -94,6 +94,27 @@ const DIRECTORS = {
     }
     await hold(40);
   },
+  // Jigsaw Friends: drag each piece to its dotted spot (one wrong try first, it springs back); rounds 1 and 2
+  async jigsaw(s) {
+    const fr = async () => { await s.page.evaluate(dt => { for (const a of document.getAnimations()) { if (a.playState === "finished") continue; a.pause(); const end = a.effect.getComputedTiming().endTime; a.currentTime = Math.min((a.currentTime || 0) + dt, end); if (a.currentTime >= end) a.finish(); } }, DT); await s.frame(); };
+    const hold = async k => { for (let i = 0; i < k; i++) await fr(); };
+    const drag = async (from, to, steps) => { await s.page.mouse.move(from[0], from[1]); await s.page.mouse.down(); await fr();
+      for (let k = 1; k <= steps; k++) { await s.page.mouse.move(from[0] + (to[0] - from[0]) * k / steps, from[1] + (to[1] - from[1]) * k / steps); await fr(); } await s.page.mouse.up(); };
+    await hold(20); await s.tap("#startBtn"); await hold(40);
+    for (let r = 0; r < 2; r++) {
+      const n = await s.page.evaluate(() => pieces.length);
+      for (let i = 0; i < n; i++) {
+        const t = await s.page.evaluate(wrong => { const o = pieces.find(x => !x.placed), a = o.el.getBoundingClientRect(), st = stage.getBoundingClientRect();
+          let sl = o.slot; if (wrong) sl = slots.find(x => x !== o.slot && !x.piece);
+          return [a.x + a.width / 2, a.y + a.height / 2, st.left + lay.bx + sl.col * lay.c + lay.c / 2, st.top + lay.by + sl.row * lay.c + lay.c / 2 + 24]; }, r === 0 && i === 0);
+        await drag([t[0], t[1]], [t[2], t[3]], r === 0 ? 14 : 9);
+        if (r === 0 && i === 0) { await hold(20); const u = await s.page.evaluate(() => { const o = pieces.find(x => !x.placed), a = o.el.getBoundingClientRect(), st = stage.getBoundingClientRect(), sl = o.slot;
+            return [a.x + a.width / 2, a.y + a.height / 2, st.left + lay.bx + sl.col * lay.c + lay.c / 2, st.top + lay.by + sl.row * lay.c + lay.c / 2 + 24]; }); await drag([u[0], u[1]], [u[2], u[3]], 14); }
+        s.mark("place"); await hold(r === 0 ? 14 : 8);
+      }
+      s.mark("done"); await hold(r === 0 ? 70 : 50);
+    }
+  },
   // Toy Parade: toys march past; tap the drum each time one is on the gold spot (it hops)
   async parade(s) {
     await s.hold(20); await s.tap("#startBtn"); await s.hold(20);

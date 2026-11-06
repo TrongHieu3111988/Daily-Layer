@@ -60,6 +60,11 @@
    "id": "parade",
    "artifact": "https://claude.ai/artifact/MPDjxcjsEkhrPrvpkmNGtT",
    "library": "2d"
+  },
+  {
+   "id": "jigsaw",
+   "artifact": "https://claude.ai/artifact/5t9dCduZ5Zr5dGCKNbmXPP",
+   "library": "2d"
   }
  ]
 }

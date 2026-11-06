@@ -1,0 +1,234 @@
+<title>Jigsaw Friends</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<!--HEAD-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@500;600;700;800&display=swap">
+<style>
+/*KITCSS*/
+/* Jigsaw Friends: drag (or tap, then tap the dotted spot) each piece to rebuild a toy's picture. 4, then 6, then 9 pieces. */
+.stage{background:linear-gradient(#E4F6FF,#FFF1D6);position:relative;overflow:hidden;touch-action:none}
+:root[data-theme="dark"] .stage{background:linear-gradient(#1B1F44,#2A1B3F)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .stage{background:linear-gradient(#1B1F44,#2A1B3F)}}
+.round{position:absolute;left:0;right:0;top:8px;display:flex;justify-content:center;gap:8px;z-index:1}
+.round i{width:14px;height:14px;border-radius:50%;border:2.5px solid var(--outline);background:var(--paper)}
+.round i.on{background:var(--grass)}.round i.now{background:var(--sun)}
+.slot{position:absolute;border:3px dashed rgba(27,37,71,.35);border-radius:12px;background-color:rgba(255,255,255,.35);-webkit-tap-highlight-color:transparent}
+:root[data-theme="dark"] .slot{border-color:rgba(255,255,255,.4);background-color:rgba(255,255,255,.08)}
+.slot.hint{animation:pulse .7s ease 3}
+.slot.no{animation:wig .4s ease}
+.tray{position:absolute;left:8px;right:8px;bottom:6px;border-radius:18px;background:rgba(255,255,255,.45);border:3px solid rgba(27,37,71,.15)}
+:root[data-theme="dark"] .tray{background:rgba(255,255,255,.08)}
+.piece{position:absolute;border-radius:12px;box-shadow:inset 0 0 0 3px var(--outline),0 3px 0 rgba(27,37,71,.5);cursor:grab;touch-action:none;transform-origin:50% 50%;transition:left .25s cubic-bezier(.3,1.3,.6,1),top .25s cubic-bezier(.3,1.3,.6,1),transform .2s;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+.piece.drag{transition:transform .15s;z-index:20;cursor:grabbing;box-shadow:inset 0 0 0 3px var(--outline),0 10px 18px rgba(27,37,71,.35)}
+.piece.sel{outline:4px solid var(--sun);outline-offset:2px}
+.piece.placed{cursor:default;box-shadow:inset 0 0 0 2px rgba(27,37,71,.35);animation:snap .35s ease}
+.piece.no{animation:wig .4s ease}
+@keyframes snap{40%{filter:brightness(1.25)}}
+@keyframes wig{25%{margin-left:-6px}75%{margin-left:6px}}
+@keyframes pulse{50%{background-color:rgba(255,201,60,.7);border-color:var(--sun)}}
+@media (prefers-reduced-motion:reduce){.piece{transition:none}.slot.hint,.slot.no,.piece.no,.piece.placed{animation:none}}
+.tap{position:absolute;left:0;right:0;top:30px;text-align:center;font-weight:800;font-size:14px;color:var(--muted)}
+</style>
+
+<div class="app">
+  <header class="bar">
+    <a class="ibtn" id="back" href="/" data-t-label="back" aria-label="Back"></a>
+    <h1 data-t="title">Jigsaw Friends</h1>
+    <span class="score" aria-live="polite"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h5a2 2 0 114 0h5v5a2 2 0 100 4v4H4z" fill="#5DB8FF" stroke="#1B2547" stroke-width="2" stroke-linejoin="round"/></svg><span id="count">0</span></span>
+    <button class="ibtn" id="soundBtn" type="button" data-t-label="sound" aria-label="Sound"></button>
+    <button class="ibtn" id="langBtn" type="button" aria-label="Language">VI</button>
+  </header>
+  <main class="stage" id="stage">
+    <div class="round" id="round" aria-hidden="true"></div>
+    <div class="tap" id="tapHint" data-t="tap">Drag each piece to its spot!</div>
+    <div class="tray" id="tray"></div>
+    <div class="toast" id="toast" hidden></div>
+  </main>
+</div>
+
+<div class="overlay" id="intro">
+  <div class="card">
+    <canvas class="hero" id="introArt" width="400" height="280"></canvas>
+    <h2 data-t="introH">Build the picture!</h2>
+    <p data-t="introP">A toy friend broke into pieces. Drag each piece to its dotted spot, or tap a piece and then tap its spot.</p>
+    <p id="bestLine"></p>
+    <button class="btn coral" type="button" id="startBtn"><span data-t="start">Let's play!</span></button>
+  </div>
+</div>
+<div class="overlay" id="over" hidden>
+  <div class="card">
+    <div class="stars" id="stars"></div>
+    <h2 id="overH">All built!</h2>
+    <p id="overP"></p>
+    <div class="row"><button class="btn coral" type="button" id="againBtn"><span data-t="again">Play again</span></button><a class="btn" id="homeBtn" href="/" data-t="home">More games</a></div>
+  </div>
+</div>
+
+<script>/*KITJS*/</script>
+<script>
+"use strict";
+K.words.en = { title: "Jigsaw Friends", back: "Back", sound: "Sound on or off", tap: "Drag each piece to its spot!", introH: "Build the picture!",
+  introP: "A toy friend broke into pieces. Drag each piece to its dotted spot, or tap a piece and then tap its spot.", start: "Let's play!", again: "Play again", home: "More games",
+  done: name => name + " is all built!", next: "More pieces!", miss: "Not there. Try another spot!", best: n => "Your best: " + n + " tries",
+  overH: s => s >= 3 ? "Puzzle star!" : s >= 2 ? "Great building!" : "All built!", overP: n => "You built 3 puzzles with " + n + " wrong tries." };
+K.words.vi = { title: "Ghép Hình Bạn Bè", back: "Quay lại", sound: "Bật hoặc tắt âm thanh", tap: "Kéo mỗi mảnh vào đúng chỗ!", introH: "Ghép bức tranh nào!",
+  introP: "Một bạn đồ chơi bị vỡ thành nhiều mảnh. Kéo mỗi mảnh vào chỗ chấm chấm, hoặc chạm mảnh rồi chạm chỗ của nó.", start: "Chơi thôi!", again: "Chơi lại", home: "Trò khác",
+  done: name => name + " ghép xong rồi!", next: "Thêm mảnh nào!", miss: "Chưa đúng chỗ. Thử chỗ khác nhé!", best: n => "Kỷ lục của bé: " + n + " lần thử",
+  overH: s => s >= 3 ? "Siêu sao ghép hình!" : s >= 2 ? "Ghép giỏi lắm!" : "Ghép xong rồi!", overP: n => "Bé ghép xong 3 bức tranh, sai " + n + " lần." };
+
+const ROUNDS = [[2, 2], [3, 2], [3, 3]];       // columns x rows: 4, 6, then 9 pieces
+const PAINTED = ["#FF6B57", "#FFC93C", "#3FBF7F", "#5DB8FF", "#8C6BF2", "#FF8FB8", "#FF9B3D", "#B8834F"];
+let toys = [], round = 0, pieces = [], slots = [], sel = null, wrong = 0, total = 0, best = K.store.get("jigsaw-best", 0), running = false, cur = null, lay = null, bgUrl = "", usedKeys = [];
+const stage = document.getElementById("stage"), tray = document.getElementById("tray");
+let toastT = 0;
+function toast(m) { const e = document.getElementById("toast"); e.textContent = m; e.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => (e.hidden = true), 1600); }
+function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; }
+
+function pickToy() {
+  if (toys.length) { let pool = toys.filter(t => !usedKeys.includes(t.slug)); if (!pool.length) pool = toys; const t = pool[(Math.random() * pool.length) | 0]; usedKeys.push(t.slug); return { toy: t, colour: t.colour, name: K.toyName(t) }; }
+  const c = PAINTED[(Math.random() * PAINTED.length) | 0]; return { toy: null, colour: c, name: "★" };
+}
+// the whole picture, drawn once: the toy's own sticker on a soft colour
+function drawPicture(w, h, item) {
+  const d = Math.min(2, devicePixelRatio || 1), c = document.createElement("canvas"); c.width = Math.round(w * d); c.height = Math.round(h * d);
+  const g = c.getContext("2d"); g.scale(d, d);
+  const grad = g.createLinearGradient(0, 0, 0, h); grad.addColorStop(0, "#FFFFFF"); grad.addColorStop(1, item.colour + "55"); g.fillStyle = grad; g.fillRect(0, 0, w, h);
+  g.fillStyle = item.colour + "33"; g.beginPath(); g.ellipse(w * 0.5, h * 0.9, w * 0.38, h * 0.07, 0, 0, Math.PI * 2); g.fill();
+  const s = Math.min(w, h) * 0.9;
+  if (item.toy && item.toy.img) { const im = item.toy.img, k = s / Math.max(im.width, im.height); g.drawImage(im, (w - im.width * k) / 2, (h - im.height * k) / 2, im.width * k, im.height * k); }
+  else { g.save(); g.translate(w / 2, h / 2); const k = s / 90; g.scale(k, k); K.friend(g, { shape: "square", w: 62, h: 62, colour: item.colour, mood: "happy", lw: 3.5 }); g.restore(); }
+  return c.toDataURL("image/png");
+}
+function compute() {
+  const [cols, rows] = ROUNDS[round], n = cols * rows, W = stage.clientWidth, H = stage.clientHeight, TS = 0.6, top = 52;
+  let c = 150, L = null;
+  for (; c >= 40; c -= 2) {
+    const per = Math.max(1, Math.floor((W - 28) / (c * TS + 6))), trows = Math.ceil(n / per), trayH = trows * (c * TS + 6) + 14;
+    const need = top + rows * c + 14 + trayH + 16;
+    if (need <= H && cols * c <= W - 20) { L = { c, per, trayH }; break; }
+  }
+  if (!L) L = { c: 40, per: 4, trayH: 120 };
+  L.cols = cols; L.rows = rows; L.TS = TS; L.bx = Math.round((W - cols * L.c) / 2); L.by = top + Math.max(0, Math.round((H - L.trayH - 16 - top - rows * L.c) * 0.4)); return L;
+}
+function build() {
+  const [cols, rows] = ROUNDS[round]; lay = compute(); const c = lay.c;
+  stage.querySelectorAll(".piece,.slot").forEach(e => e.remove()); pieces = []; slots = []; sel = null;
+  const item = cur = pickToy(); bgUrl = drawPicture(cols * c, rows * c, item);
+  const H = stage.clientHeight; tray.style.height = lay.trayH + "px";
+  for (let r = 0; r < rows; r++) for (let q = 0; q < cols; q++) {
+    const s = document.createElement("div"); s.className = "slot"; s.style.cssText = `left:${lay.bx + q * c}px;top:${lay.by + r * c}px;width:${c}px;height:${c}px;background-image:url(${bgUrl});background-size:${cols * c}px ${rows * c}px;background-position:${-q * c}px ${-r * c}px;background-blend-mode:soft-light;`;
+    s.style.backgroundImage = `linear-gradient(rgba(255,255,255,.78),rgba(255,255,255,.78)),url(${bgUrl})`; s.style.backgroundSize = `100% 100%,${cols * c}px ${rows * c}px`; s.style.backgroundPosition = `0 0,${-q * c}px ${-r * c}px`;
+    stage.insertBefore(s, tray); const o = { el: s, col: q, row: r, piece: null }; slots.push(o);
+    s.addEventListener("click", () => tapSlot(o));
+  }
+  const order = shuffle(slots.map((_, i) => i));
+  order.forEach((si, k) => {
+    const sl = slots[si], p = document.createElement("div"); p.className = "piece"; p.setAttribute("role", "button"); p.setAttribute("aria-label", "Piece " + (k + 1));
+    p.style.cssText = `width:${c}px;height:${c}px;background-image:url(${bgUrl});background-size:${cols * c}px ${rows * c}px;background-position:${-sl.col * c}px ${-sl.row * c}px;`;
+    const o = { el: p, slot: sl, placed: false, k }; pieces.push(o); stage.appendChild(p); wire(o);
+  });
+  pieces.forEach(toTray);
+  document.getElementById("round").innerHTML = ROUNDS.map((_, i) => `<i class="${i < round ? "on" : i === round ? "now" : ""}"></i>`).join("");
+}
+function trayPos(o) {
+  const w = lay.c * lay.TS + 6, W = stage.clientWidth, H = stage.clientHeight, row = Math.floor(o.k / lay.per), inRow = Math.min(lay.per, pieces.length - row * lay.per), col = o.k % lay.per;
+  const x0 = (W - inRow * w) / 2 + col * w + 3, y0 = H - 6 - lay.trayH + 7 + row * w + 3;
+  return { x: x0 - (lay.c - lay.c * lay.TS) / 2, y: y0 - (lay.c - lay.c * lay.TS) / 2 };   // element is full size, scaled about its centre
+}
+function toTray(o) { const p = trayPos(o); o.el.style.left = p.x + "px"; o.el.style.top = p.y + "px"; o.el.style.transform = `scale(${lay.TS})`; o.el.style.zIndex = 5; }
+function place(o) {
+  const s = o.slot; o.placed = true; s.piece = o; o.el.classList.remove("drag", "sel"); o.el.classList.add("placed");
+  o.el.style.left = lay.bx + s.col * lay.c + "px"; o.el.style.top = lay.by + s.row * lay.c + "px"; o.el.style.transform = "scale(1)"; o.el.style.zIndex = 2;
+  s.el.style.visibility = "hidden"; if (sel === o) sel = null;
+  total++; document.getElementById("count").textContent = total; K.sfx.chime();
+  const r = o.el.getBoundingClientRect(); if (!K.CALM) K.confetti(r.left + r.width / 2, r.top + r.height / 2, 14);
+  document.getElementById("tapHint").hidden = true;
+  if (pieces.every(x => x.placed)) roundDone();
+}
+function miss(o, slotObj) {
+  wrong++; K.sfx.boing(); o.el.classList.remove("no"); void o.el.offsetWidth; o.el.classList.add("no"); if (slotObj) { slotObj.el.classList.remove("no"); void slotObj.el.offsetWidth; slotObj.el.classList.add("no"); }
+  if (wrong % 3 === 0) { o.slot.el.classList.remove("hint"); void o.slot.el.offsetWidth; o.slot.el.classList.add("hint"); toast(K.t("miss")); }
+}
+function select(o) {
+  if (sel) sel.el.classList.remove("sel");
+  sel = sel === o ? null : o; if (sel) { sel.el.classList.add("sel"); K.sfx.pop(); }
+}
+function tapSlot(sl) {
+  if (!running || sl.piece || !sel) return;
+  if (sel.slot === sl) place(sel); else miss(sel, sl);
+}
+function wire(o) {
+  const el = o.el; let sx = 0, sy = 0, ox = 0, oy = 0, moved = false, id = null;
+  el.addEventListener("pointerdown", e => {
+    if (!running || o.placed) return; id = e.pointerId; el.setPointerCapture(id); moved = false;
+    const r = stage.getBoundingClientRect(); sx = e.clientX; sy = e.clientY; const cr = el.getBoundingClientRect();
+    const cx = cr.left + cr.width / 2 - r.left, cy = cr.top + cr.height / 2 - r.top;
+    ox = cx - lay.c / 2; oy = cy - lay.c / 2; o.dx = e.clientX - r.left - cx; o.dy = e.clientY - r.top - cy;
+    e.preventDefault();
+  });
+  el.addEventListener("pointermove", e => {
+    if (id !== e.pointerId) return;
+    if (!moved && Math.hypot(e.clientX - sx, e.clientY - sy) < 8) return;
+    if (!moved) { moved = true; el.classList.add("drag"); el.style.transform = "scale(1)"; }
+    const r = stage.getBoundingClientRect(); el.style.left = (e.clientX - r.left - lay.c / 2 - (o.dx || 0) * 0) + "px"; el.style.top = (e.clientY - r.top - lay.c / 2 - 24) + "px";   // lifted above the finger so it stays visible
+  });
+  const end = e => {
+    if (id !== e.pointerId) return; id = null;
+    if (!moved) { select(o); return; }
+    el.classList.remove("drag");
+    const px = parseFloat(el.style.left) + lay.c / 2, py = parseFloat(el.style.top) + lay.c / 2;
+    const gx = lay.bx + o.slot.col * lay.c + lay.c / 2, gy = lay.by + o.slot.row * lay.c + lay.c / 2;
+    if (Math.hypot(px - gx, py - gy) < lay.c * 0.62) place(o);
+    else {
+      const near = slots.find(s => !s.piece && Math.abs(px - (lay.bx + s.col * lay.c + lay.c / 2)) < lay.c / 2 && Math.abs(py - (lay.by + s.row * lay.c + lay.c / 2)) < lay.c / 2);
+      toTray(o); if (near) miss(o, near);
+    }
+  };
+  el.addEventListener("pointerup", end); el.addEventListener("pointercancel", end);
+}
+function roundDone() {
+  const name = cur.name;
+  if (round < ROUNDS.length - 1) {
+    setTimeout(() => { K.confetti(); K.sfx.tada(); toast(K.t("done", name)); }, 300);
+    setTimeout(() => { round++; build(); }, 1900);
+  } else {
+    running = false;
+    const newBest = !best || wrong < best; if (newBest) { best = wrong; K.store.set("jigsaw-best", best); }
+    const stars = wrong <= 3 ? 3 : wrong <= 9 ? 2 : 1;
+    document.getElementById("stars").innerHTML = [0, 1, 2].map(i => K.starSVG(i < stars)).join("");
+    document.getElementById("overH").textContent = K.t("overH", stars);
+    document.getElementById("overP").textContent = K.t("overP", wrong);
+    setTimeout(() => { document.getElementById("over").hidden = false; K.sfx.tada(); K.confetti(); document.getElementById("againBtn").focus(); }, 1300);
+  }
+}
+function start() {
+  round = 0; total = 0; wrong = 0; usedKeys = []; running = true; document.getElementById("count").textContent = "0";
+  document.getElementById("intro").hidden = true; document.getElementById("over").hidden = true; document.getElementById("tapHint").hidden = false; build();
+}
+addEventListener("resize", () => { if (running) { const keep = usedKeys.slice(); usedKeys.pop(); build(); usedKeys = keep; } });
+
+/* ---------- boot ---------- */
+K.initBar();
+K.onLang = () => { document.getElementById("bestLine").textContent = best ? K.t("best", best) : ""; };
+K.applyWords();
+function introArt() {
+  const c = document.getElementById("introArt"), x = c.getContext("2d"); x.clearRect(0, 0, c.width, c.height);
+  const t = toys[0], u = 96, ox = 52, oy = 40;
+  const pic = drawPicture(u * 2, u * 2, t ? { toy: t, colour: t.colour } : { toy: null, colour: PAINTED[0] });
+  const im = new Image(); im.onload = () => {
+    const pos = [[0, 0, 0, 0, -0.1, 0], [1, 0, 150, 6, 0.08, 0], [0, 1, 20, 150, 0.12, 0], [1, 1, 170, 132, -0.07, 0]];
+    for (const [q, r, dx, dy, rot] of pos) {
+      const cx = (q === 0 && r === 0 ? ox : q === 1 && r === 0 ? ox + 190 + 0 : q === 0 && r === 1 ? ox + 20 : ox + 190 + 20) , cy = (r === 0 ? oy : oy + 110);
+      x.save(); x.translate(cx + 48, cy + 48 - (r ? 0 : 0)); x.rotate(rot); x.beginPath(); x.roundRect(-48 + 0, -48, 96, 96, 12); x.clip();
+      const d = im.width / 2; x.drawImage(im, q * d, r * d, d, d, -48, -48, 96, 96); x.restore();
+      x.save(); x.translate(cx + 48, cy + 48); x.rotate(rot); x.lineWidth = 4; x.strokeStyle = K.INK; x.beginPath(); x.roundRect(-48, -48, 96, 96, 12); x.stroke(); x.restore();
+    }
+  }; im.src = pic;
+}
+introArt();
+document.getElementById("homeBtn").href = window.SHOP_URL ? window.SHOP_URL + (window.SHOP_URL.includes("#") ? "" : "#play") : "/#play";
+K.library().then(list => { toys = list.filter(t => t.img); introArt(); });
+document.getElementById("startBtn").onclick = () => { K.sfx.pop(); K.library().then(start); };
+document.getElementById("againBtn").onclick = () => { K.sfx.pop(); K.library().then(start); };
+</script>
+<!--TAIL-->

@@ -1,0 +1,21 @@
+{
+ "id": "jigsaw",
+ "title": "Jigsaw Friends",
+ "hook": "Can you rebuild\nthe toy friend?",
+ "captions": {
+  "place": [
+   "Drag it!",
+   "Click!",
+   "Nice!",
+   "Yes!"
+  ],
+  "done": [
+   "All built!",
+   "Puzzle star!"
+  ]
+ },
+ "yt_title": "Rebuild the toy friend! Free jigsaw game for kids #Shorts",
+ "yt_desc": "A toy friend broke into pieces! Drag each piece to its dotted spot to build the picture again: 4 pieces, then 6, then 9. Easy enough for a 4-year-old, with no ads and no signing up, and the toys are real models you can 3D print at home.\n\nPlay free in your browser: {url}\nMore free kids' games and a new 3D-printable toy every day: {site}\n\n#Shorts #KidsGames #Jigsaw #3DPrinting #FreeGames",
+ "icons": "/home/user/Daily-Layer/public/products",
+ "toys": "/home/user/Daily-Layer/public/toys.json"
+}
