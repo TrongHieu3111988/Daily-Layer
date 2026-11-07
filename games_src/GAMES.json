@@ -65,6 +65,11 @@
    "id": "jigsaw",
    "artifact": "https://claude.ai/artifact/5t9dCduZ5Zr5dGCKNbmXPP",
    "library": "2d"
+  },
+  {
+   "id": "spin",
+   "artifact": "https://claude.ai/artifact/FKQ5znniZ4fnTJ21DwZNLx",
+   "library": "3d"
   }
  ]
 }

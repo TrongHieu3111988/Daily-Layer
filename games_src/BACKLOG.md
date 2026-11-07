@@ -19,5 +19,5 @@ model is made for a game only when the game needs a kind of model the library la
 - [x] 2026-11-03 Sort the Toys (sort) https://claude.ai/artifact/ReimNPbNqBXz5xab4xSAMQ — drag (or tap, then tap the box) each toy into the box showing its friend; round 2 sorts big and small, round 3 uses three boxes.
 - [x] 2026-11-04 Toy Parade (parade) https://claude.ai/artifact/MPDjxcjsEkhrPrvpkmNGtT — toys march past on a beat; tap the big drum when one is on the gold spot and it hops; no fail state.
 - [x] 2026-11-06 Jigsaw Friends (jigsaw) https://claude.ai/artifact/5t9dCduZ5Zr5dGCKNbmXPP — 4 / 6 / 9 piece jigsaw of a toy sticker; drag a piece to its dotted spot, or tap the piece then the spot; a spot pulses after 3 wrong tries.
-- [ ] Spin to Match (spin) — rotate a 3D toy until it matches a target pose (spatial reasoning).
+- [x] 2026-11-07 Spin to Match (spin) https://claude.ai/artifact/FKQ5znniZ4fnTJ21DwZNLx — rotate a 3D toy until it matches a target pose (spatial reasoning).
 - [ ] Toy Train (train) — load toys onto train cars by a rule shown with pictures, train leaves with a toot.

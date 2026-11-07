@@ -115,6 +115,24 @@ const DIRECTORS = {
       s.mark("done"); await hold(r === 0 ? 70 : 50);
     }
   },
+  // Spin to Match: tap the arrows (and one drag) to turn the toy to the picture's pose, five rounds
+  async spin(s) {
+    await s.waitFor(() => window.__game && window.__game.ready());
+    await s.hold(20); await s.tap("#startBtn"); await s.hold(30);
+    const bb = await (await s.page.$("#view")).boundingBox();
+    for (let r = 0; r < 5; r++) {
+      for (let i = 0; i < 12; i++) {
+        const st = await s.page.evaluate(() => { let a = __game.target() - __game.angle(); a = ((a + Math.PI) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI) - Math.PI; return { d: a, busy: __game.busy() }; });
+        if (st.busy) break;
+        if (r === 2 && i === 0) { const px = st.d / 0.012; await s.page.mouse.move(bb.x + bb.width / 2, bb.y + bb.height * 0.62); await s.page.mouse.down();
+          for (let k = 1; k <= 14; k++) { await s.page.mouse.move(bb.x + bb.width / 2 + px * k / 14, bb.y + bb.height * 0.62); await s.frame(); } await s.page.mouse.up(); }
+        else { if (r === 0 && i === 0) s.mark("turn"); await s.tap(st.d > 0 ? "#rightBtn" : "#leftBtn"); }
+        await s.hold(14);
+      }
+      await s.hold(6); s.mark("match"); await s.hold(r === 4 ? 70 : 52);
+    }
+    s.mark("done"); await s.hold(30);
+  },
   // Toy Parade: toys march past; tap the drum each time one is on the gold spot (it hops)
   async parade(s) {
     await s.hold(20); await s.tap("#startBtn"); await s.hold(20);

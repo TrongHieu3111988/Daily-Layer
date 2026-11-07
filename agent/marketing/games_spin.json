@@ -1,0 +1,24 @@
+{
+ "id": "spin",
+ "title": "Spin to Match",
+ "hook": "Can you turn the toy\nto match the picture?",
+ "captions": {
+  "turn": [
+   "Turn it!"
+  ],
+  "match": [
+   "Match!",
+   "Just right!",
+   "Perfect!",
+   "Yes!",
+   "Nailed it!"
+  ],
+  "done": [
+   "Spin star!"
+  ]
+ },
+ "yt_title": "Turn the toy to match the picture! Free 3D game for kids #Shorts",
+ "yt_desc": "A toy friend stands on a turntable. Look at the little picture, then turn your friend until it faces the same way. Drag it or tap the arrows: easy enough for a 4-year-old, no ads, no signing up, and every toy is a real model you can 3D print at home.\n\nPlay free in your browser: {url}\nMore free kids' games and a new 3D-printable toy every day: {site}\n\n#Shorts #KidsGames #3DPrinting #Puzzle #FreeGames",
+ "icons": "/home/user/Daily-Layer/public/products",
+ "toys": "/home/user/Daily-Layer/public/toys.json"
+}
