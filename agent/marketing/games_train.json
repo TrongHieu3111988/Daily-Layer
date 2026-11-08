@@ -1,0 +1,21 @@
+{
+ "id": "train",
+ "title": "Toy Train",
+ "hook": "All aboard the\ntoy train!",
+ "captions": {
+  "loaded": [
+   "All aboard!",
+   "Hop on!",
+   "Nice!",
+   "Yes!"
+  ],
+  "round": [
+   "Next train!",
+   "Another one!"
+  ]
+ },
+ "yt_title": "All aboard the toy train! Free matching game for kids #Shorts",
+ "yt_desc": "Every train car shows a picture. Put the matching toy friend on board, then toot toot, off it goes! Easy enough for a 4-year-old, with no ads and no signing up, and the toys are real models you can 3D print at home.\n\nPlay free in your browser: {url}\nMore free kids' games and a new 3D-printable toy every day: {site}\n\n#Shorts #TrainGame #KidsGames #3DPrinting #FreeGames",
+ "icons": "/home/user/Daily-Layer/public/products",
+ "toys": "/home/user/Daily-Layer/public/toys.json"
+}

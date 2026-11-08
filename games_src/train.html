@@ -1,0 +1,198 @@
+<title>Toy Train</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<!--HEAD-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@500;600;700;800&display=swap">
+<style>
+/*KITCSS*/
+/* Toy Train: each car shows a picture; put the matching toy friends on board, then the train toots and leaves. */
+.stage{background:linear-gradient(#CFEFFF 0,#E8F8FF 55%,#BFE8A8 55%,#9AD67F 100%);display:flex;flex-direction:column;touch-action:none;overflow:hidden}
+:root[data-theme="dark"] .stage{background:linear-gradient(#1B1F44 0,#2A2A55 55%,#2F5A3F 55%,#244A33 100%)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .stage{background:linear-gradient(#1B1F44 0,#2A2A55 55%,#2F5A3F 55%,#244A33 100%)}}
+.ask{text-align:center;font-family:'Baloo 2',sans-serif;font-weight:800;font-size:22px;padding:12px 12px 0;color:var(--outline)}
+.round{display:flex;justify-content:center;gap:8px;padding:10px 12px 0}
+.round i{width:14px;height:14px;border-radius:50%;border:2.5px solid var(--outline);background:var(--paper)}
+.round i.on{background:var(--grass)}.round i.now{background:var(--sun)}
+.track{position:relative;margin-top:14px;padding:0 6px 22px;transition:transform 1.5s cubic-bezier(.5,0,.9,.6)}
+.track.out{transform:translateX(130%)}.track.in0{transform:translateX(-130%);transition:none}
+.track::after{content:"";position:absolute;left:-10px;right:-10px;bottom:10px;height:8px;background:repeating-linear-gradient(90deg,#8a5a3c 0 14px,transparent 14px 24px);border-top:4px solid var(--outline);opacity:.8}
+.train{display:flex;gap:6px;align-items:flex-end;justify-content:center}
+.car{position:relative;flex:1;max-width:120px;min-width:0;height:118px;border:4px solid var(--outline);border-radius:14px 14px 8px 8px;background:var(--c,#FF6B57);cursor:pointer;touch-action:manipulation;margin-bottom:10px}
+.car.engine{flex:0 0 78px;background:#5DB8FF;border-radius:14px 28px 8px 8px}
+.car.engine::before{content:"";position:absolute;left:14px;top:-26px;width:22px;height:22px;background:#444;border:4px solid var(--outline);border-radius:6px 6px 2px 2px}
+.car::after{content:"";position:absolute;left:12%;right:12%;bottom:-16px;height:14px;background:radial-gradient(circle at 10px 7px,#333 0 7px,transparent 8px),radial-gradient(circle at calc(100% - 10px) 7px,#333 0 7px,transparent 8px)}
+.car .sign{position:absolute;left:50%;top:6px;width:58px;height:58px;transform:translateX(-50%);background:#fff;border:3px solid var(--outline);border-radius:12px}
+.car .sign canvas{width:100%;height:100%;display:block}
+.car .seats{position:absolute;left:3px;right:3px;bottom:3px;display:flex;justify-content:center;gap:2px}
+.car .seat{width:34px;height:34px;border:3px dashed var(--outline);border-radius:50%;background:rgba(255,255,255,.55)}
+.car .seat canvas{width:100%;height:100%;display:block}
+.car .seat.full{border-style:solid;background:none;border-color:transparent;animation:hop .45s ease}
+.car.hot{outline:4px solid #FFC93C;outline-offset:2px}
+.car.no{animation:shk .4s ease}
+.pile{position:relative;flex:1;min-height:0;margin:6px 12px 12px}
+.pile .toy{position:absolute;border:0;background:none;padding:0;cursor:grab;touch-action:none;-webkit-tap-highlight-color:transparent;transition:left .35s,top .35s,transform .2s}
+.pile .toy.drag{transition:none;z-index:9;cursor:grabbing;transform:scale(1.12)}
+.pile .toy.sel{transform:scale(1.15);filter:drop-shadow(0 0 8px #FFC93C)}
+.toy canvas{width:100%;height:100%;display:block;pointer-events:none}
+@keyframes hop{40%{transform:translateY(-10px) scale(1.05)}}
+@keyframes shk{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.track.go .seat.full{animation:hop .5s ease infinite}
+@media (prefers-reduced-motion:reduce){.car.no,.seat.full,.track.go .seat.full{animation:none}.pile .toy{transition:none}.track{transition:none}}
+</style>
+
+<div class="app">
+  <header class="bar">
+    <a class="ibtn" id="back" href="/" data-t-label="back" aria-label="Back"></a>
+    <h1 data-t="title">Toy Train</h1>
+    <span class="score" aria-live="polite"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.8-4.5 4.2 1.2 6L12 16.6 6.5 19.6l1.2-6L3.2 9.4l6.1-.8z" fill="#FFC93C" stroke="#1B2547" stroke-width="2" stroke-linejoin="round"/></svg><span id="count">0</span></span>
+    <button class="ibtn" id="soundBtn" type="button" data-t-label="sound" aria-label="Sound"></button>
+    <button class="ibtn" id="langBtn" type="button" aria-label="Language">VI</button>
+  </header>
+  <main class="stage" id="stage">
+    <div class="round" id="round" aria-hidden="true"></div>
+    <div class="ask" id="ask">All aboard!</div>
+    <div class="track" id="track"><div class="train" id="train"></div></div>
+    <div class="pile" id="pile"></div>
+  </main>
+</div>
+
+<div class="overlay" id="intro">
+  <div class="card">
+    <canvas class="hero" id="introArt" width="400" height="280"></canvas>
+    <h2 data-t="introH">All aboard!</h2>
+    <p data-t="introP">Every train car shows a picture. Put the matching toy friend on board: drag it, or tap it and then tap the car.</p>
+    <button class="btn coral" type="button" id="startBtn"><span data-t="start">Let's go!</span></button>
+  </div>
+</div>
+<div class="overlay" id="over" hidden>
+  <div class="card">
+    <div class="stars" id="stars"></div>
+    <h2 id="overH">Great loading!</h2>
+    <p id="overP"></p>
+    <div class="row"><button class="btn coral" type="button" id="againBtn"><span data-t="again">Play again</span></button><a class="btn" id="homeBtn" href="/" data-t="home">More games</a></div>
+  </div>
+</div>
+
+
+<script>/*KITJS*/</script>
+<script>
+"use strict";
+K.words.en = { title: "Toy Train", back: "Back", sound: "Sound on or off", introH: "All aboard!",
+  introP: "Every train car shows a picture. Put the matching toy friend on board: drag it, or tap it and then tap the car.", start: "Let's go!", again: "Play again", home: "More games",
+  ask: "Who goes in which car?", yes: "All aboard!", no: "Try another car!", toot: "Toot toot! Off we go!",
+  overH: s => s >= 3 ? "Super train driver!" : s >= 2 ? "Great train driver!" : "Choo choo, well done!", overP: n => "You sent off " + n + " trains." };
+K.words.vi = { title: "Tàu Hỏa Đồ Chơi", back: "Quay lại", sound: "Bật hoặc tắt âm thanh", introH: "Lên tàu nào!",
+  introP: "Mỗi toa tàu có một bức tranh. Đưa đúng bạn đồ chơi lên toa: kéo bạn ấy, hoặc chạm bạn ấy rồi chạm toa.", start: "Đi thôi!", again: "Chơi lại", home: "Trò khác",
+  ask: "Bạn nào lên toa nào?", yes: "Lên tàu rồi!", no: "Thử toa khác nhé!", toot: "Tu tu! Tàu chạy rồi!",
+  overH: s => s >= 3 ? "Bác tài siêu giỏi!" : s >= 2 ? "Bác tài giỏi lắm!" : "Tu tu, giỏi quá!", overP: n => "Bé đã tiễn " + n + " chuyến tàu." };
+
+const ROUNDS = [[2, 1], [3, 1], [3, 2]];   // [cars, toys per car]
+const COLS = ["#FF6B57", "#3FBF7F", "#FFC93C", "#B48CFF"];
+const FALLBACK = ["fox", "frog", "chick", "whale"].map((n, i) => ({ slug: n, title: n, fake: ["#FF6B57", "#3FBF7F", "#FFC93C", "#5DB8FF"][i] }));
+let toys = [], round = 0, kinds = [], items = [], left = 0, wrongs = 0, totalWrong = 0, running = false, done = 0, sel = null, busy = false;
+const pile = document.getElementById("pile"), trainEl = document.getElementById("train"), trackEl = document.getElementById("track");
+function shuffle(a) { return a.map(x => [Math.random(), x]).sort((p, q) => p[0] - q[0]).map(p => p[1]); }
+function paint(c, t, k) {
+  const r = c.getBoundingClientRect(), d = Math.min(2, devicePixelRatio || 1);
+  c.width = Math.max(40, Math.round((r.width || 80) * d)); c.height = Math.max(40, Math.round((r.height || 80) * d));
+  const g = c.getContext("2d"), W = c.width, H = c.height;
+  if (t.img) { const im = t.img, s = Math.min(W, H) * 0.96 / Math.max(im.width, im.height) * (k || 1); g.drawImage(im, (W - im.width * s) / 2, (H - im.height * s) / 2, im.width * s, im.height * s); }
+  else { const s = Math.min(W, H) / 90 * (k || 1); g.save(); g.translate(W / 2, H / 2); g.scale(s, s); K.friend(g, { shape: "square", w: 62, h: 62, colour: t.fake, mood: "happy", lw: 3.5 }); g.restore(); }
+}
+function deal() {
+  const [nb, per] = ROUNDS[round]; sel = null; wrongs = 0; busy = false;
+  const pool = toys.length >= nb ? toys : FALLBACK;
+  kinds = shuffle(pool).slice(0, nb);
+  items = []; kinds.forEach((t, bi) => { for (let i = 0; i < per; i++) items.push({ box: bi, t }); });
+  items = shuffle(items); left = items.length;
+  document.getElementById("ask").textContent = K.t("ask");
+  document.getElementById("round").innerHTML = ROUNDS.map((_, i) => `<i class="${i < round ? "on" : i === round ? "now" : ""}"></i>`).join("");
+  trainEl.innerHTML = "";
+  const eng = document.createElement("div"); eng.className = "car engine"; trainEl.appendChild(eng);
+  kinds.forEach((t, bi) => {
+    const c = document.createElement("div"); c.className = "car"; c.dataset.i = bi; c.style.setProperty("--c", COLS[bi % COLS.length]); c.setAttribute("role", "button"); c.setAttribute("aria-label", K.toyName(t));
+    const sg = document.createElement("div"); sg.className = "sign"; const cv = document.createElement("canvas"); sg.appendChild(cv); c.appendChild(sg);
+    const seats = document.createElement("div"); seats.className = "seats"; for (let i = 0; i < per; i++) { const s = document.createElement("div"); s.className = "seat"; seats.appendChild(s); } c.appendChild(seats);
+    c.onclick = () => { if (sel) drop(sel, bi); };
+    trainEl.appendChild(c); requestAnimationFrame(() => paint(cv, t));
+  });
+  trackEl.className = "track in0"; void trackEl.offsetWidth; trackEl.className = "track";
+  pile.innerHTML = "";
+  requestAnimationFrame(() => requestAnimationFrame(layout));
+}
+function layout() {
+  const W = pile.clientWidth, H = pile.clientHeight, n = items.length;
+  const cols = Math.ceil(Math.sqrt(n * W / H)), rows = Math.ceil(n / cols), cw = W / cols, ch = H / rows;
+  const cells = shuffle([...Array(cols * rows).keys()]);
+  items.forEach((it, i) => {
+    const size = Math.min(96, cw - 8, ch - 8), cell = cells[i], r = Math.floor(cell / cols), c = cell % cols;
+    const b = document.createElement("button"); b.type = "button"; b.className = "toy"; b.setAttribute("aria-label", K.toyName(it.t));
+    b.style.width = b.style.height = size + "px";
+    it.hx = c * cw + (cw - size) / 2; it.hy = r * ch + (ch - size) / 2; b.style.left = it.hx + "px"; b.style.top = it.hy + "px";
+    const cv = document.createElement("canvas"); b.appendChild(cv); it.el = b; pile.appendChild(b); paint(cv, it.t);
+    wire(it);
+  });
+}
+function carAt(x, y) { return [...trainEl.querySelectorAll(".car:not(.engine)")].findIndex(b => { const r = b.getBoundingClientRect(); return x >= r.left - 6 && x <= r.right + 6 && y >= r.top - 30 && y <= r.bottom + 30; }); }
+function carEl(k) { return trainEl.querySelectorAll(".car:not(.engine)")[k]; }
+function wire(it) {
+  const b = it.el; let sx, sy, ox, oy, moved = false, id = null;
+  b.addEventListener("pointerdown", e => { if (!running || busy || it.in) return; id = e.pointerId; b.setPointerCapture(id); sx = e.clientX; sy = e.clientY; ox = parseFloat(b.style.left); oy = parseFloat(b.style.top); moved = false; K.sfx.tick(); });
+  b.addEventListener("pointermove", e => {
+    if (id !== e.pointerId) return;
+    if (!moved && Math.hypot(e.clientX - sx, e.clientY - sy) > 8) { moved = true; b.classList.add("drag"); if (sel) { sel.el.classList.remove("sel"); sel = null; } }
+    if (moved) { b.style.left = ox + e.clientX - sx + "px"; b.style.top = oy + e.clientY - sy + "px"; const k = carAt(e.clientX, e.clientY); [...trainEl.querySelectorAll(".car:not(.engine)")].forEach((x, i) => x.classList.toggle("hot", i === k)); }
+  });
+  const end = e => {
+    if (id !== e.pointerId) return; id = null; b.classList.remove("drag"); trainEl.querySelectorAll(".car").forEach(x => x.classList.remove("hot"));
+    if (moved) { const k = carAt(e.clientX, e.clientY); if (k >= 0) drop(it, k); else home(it); }
+    else { if (sel) sel.el.classList.remove("sel"); sel = sel === it ? null : it; if (sel) b.classList.add("sel"); K.sfx.pop(); }
+  };
+  b.addEventListener("pointerup", end); b.addEventListener("pointercancel", e => { if (id === e.pointerId) { id = null; b.classList.remove("drag"); home(it); } });
+}
+function home(it) { it.el.style.left = it.hx + "px"; it.el.style.top = it.hy + "px"; }
+function drop(it, k) {
+  if (it.in || busy) return;
+  const car = carEl(k);
+  if (it.box === k) {
+    it.in = true; it.el.classList.remove("sel"); sel = null; it.el.style.display = "none";
+    const seat = car.querySelector(".seat:not(.full)"); seat.classList.add("full"); const cv = document.createElement("canvas"); seat.appendChild(cv); paint(cv, it.t);
+    K.sfx.chime(); document.getElementById("ask").textContent = K.t("yes");
+    if (!K.CALM) { const r = car.getBoundingClientRect(); K.confetti(r.left + r.width / 2, r.top, 12); }
+    if (--left === 0) { busy = true; done++; document.getElementById("count").textContent = done; totalWrong += wrongs;
+      setTimeout(() => { document.getElementById("ask").textContent = K.t("toot"); K.sfx.tada(); K.sfx.boing(); trackEl.classList.add("go", "out"); }, 700);
+      setTimeout(() => { if (round < ROUNDS.length - 1) { round++; deal(); } else finish(); }, 2500); }
+  } else {
+    wrongs++; car.classList.remove("no"); void car.offsetWidth; car.classList.add("no"); K.sfx.boing(); document.getElementById("ask").textContent = K.t("no"); home(it);
+    if (sel) { sel.el.classList.remove("sel"); sel = null; }
+    setTimeout(() => { if (left) document.getElementById("ask").textContent = K.t("ask"); }, 1400);
+  }
+}
+function finish() {
+  running = false; const stars = totalWrong <= 1 ? 3 : totalWrong <= 4 ? 2 : 1;
+  document.getElementById("stars").innerHTML = [0, 1, 2].map(i => K.starSVG(i < stars)).join("");
+  document.getElementById("overH").textContent = K.t("overH", stars); document.getElementById("overP").textContent = K.t("overP", ROUNDS.length);
+  document.getElementById("over").hidden = false; K.sfx.tada(); K.confetti(); document.getElementById("againBtn").focus();
+}
+function start() { round = 0; done = 0; totalWrong = 0; running = true; document.getElementById("count").textContent = "0"; document.getElementById("intro").hidden = true; document.getElementById("over").hidden = true; deal(); }
+
+K.initBar(); K.onLang = () => { if (running && left) document.getElementById("ask").textContent = K.t("ask"); }; K.applyWords();
+function introArt() {
+  const c = document.getElementById("introArt"), x = c.getContext("2d"); x.clearRect(0, 0, c.width, c.height);
+  x.fillStyle = "#8a5a3c"; x.fillRect(10, 232, 380, 8);
+  const body = ["#5DB8FF", ...COLS.slice(0, 2)];
+  [[20, 5], [135, 0], [255, 1]].forEach(([cx], i) => {
+    x.fillStyle = body[i]; x.strokeStyle = K.INK; x.lineWidth = 5; x.beginPath(); x.roundRect(cx, 130, 110, 90, 12); x.fill(); x.stroke();
+    x.fillStyle = "#333"; [cx + 22, cx + 88].forEach(w => { x.beginPath(); x.arc(w, 224, 11, 0, 7); x.fill(); });
+    const t = toys.length ? toys[i % toys.length] : null;
+    if (i && t && t.img) x.drawImage(t.img, cx + 20, 60, 70, 70);
+    else if (i) { x.save(); x.translate(cx + 55, 95); K.friend(x, { shape: "square", w: 62, h: 62, colour: FALLBACK[i].fake, mood: "happy", lw: 3.5 }); x.restore(); }
+  });
+}
+introArt();
+document.getElementById("homeBtn").href = window.SHOP_URL ? window.SHOP_URL + (window.SHOP_URL.includes("#") ? "" : "#play") : "/#play";
+K.library().then(list => { toys = list.filter(t => t.img); introArt(); });
+document.getElementById("startBtn").onclick = () => { K.sfx.pop(); K.library().then(start); };
+document.getElementById("againBtn").onclick = () => { K.sfx.pop(); K.library().then(start); };
+</script>
+<!--TAIL-->

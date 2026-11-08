@@ -70,6 +70,11 @@
    "id": "spin",
    "artifact": "https://claude.ai/artifact/FKQ5znniZ4fnTJ21DwZNLx",
    "library": "3d"
+  },
+  {
+   "id": "train",
+   "artifact": "https://claude.ai/artifact/62Jzc1tx5A1r9HqxdmMJYr",
+   "library": "2d"
   }
  ]
 }
