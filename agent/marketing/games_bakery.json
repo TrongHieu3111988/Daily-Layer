@@ -1,0 +1,25 @@
+{
+ "id": "bakery",
+ "title": "Toy Bakery",
+ "hook": "Bake a cake for\nyour toy friend!",
+ "captions": {
+  "top": [
+   "Pick a topping!",
+   "Yum!",
+   "Pretty!",
+   "Sparkle!",
+   "Nice one!",
+   "Look!"
+  ],
+  "ding": [
+   "Ding! Cake is ready!",
+   "Yay!",
+   "So yummy!",
+   "Ding!"
+  ]
+ },
+ "yt_title": "Bake a cake for the toy friend! Free kids baking game #Shorts",
+ "yt_desc": "A toy friend orders a cake by picture. Tap the toppings it asked for, hear the oven ding and watch the toy hop! Easy enough for a 4-year-old, with no ads and no signing up, and the toys are real models you can 3D print at home.\n\nPlay free in your browser: {url}\nMore free kids' games and a new 3D-printable toy every day: {site}\n\n#Shorts #BakingGame #KidsGames #3DPrinting #FreeGames",
+ "icons": "/home/user/Daily-Layer/public/products",
+ "toys": "/home/user/Daily-Layer/public/toys.json"
+}

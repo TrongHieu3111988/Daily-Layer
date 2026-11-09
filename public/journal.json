@@ -1,6 +1,10 @@
 {
  "entries": [
   {
+   "at": "2026-11-09 08:54",
+   "text": "New Christmas decor: Animal Friends Tree Ornaments, four flat 3 mm plaques of our own design (a fox, a penguin, a bear and an owl) with a built-in hang hole and raised light and dark colour details that need only one filament swap, no supports. Why now: Christmas ornaments are the strongest seasonal 3D-print search (about 9,900 searches a month for '3d printed ornament' in Nov-Dec 2025 against 880 in January, per RankHero, and Amazon ornament sales up 200% in the Nov 3 - Dec 2 window, per Jungle Scout), and Printables ornament packs hold 6,400+ likes. Checks: all 12 parts watertight with 0 bad edges; the four plaques are exactly one shell each, the light and dark detail layers have one to three shells each because eyes, nose and belly patches are separate islands of one colour. Not a figure, so the game library is unchanged. Today's game, Toy Bakery, lets a toy friend order a cake by picture. Behind the scenes: the workshop still lacks scikit-image, so this model was meshed with a small marching-tetrahedra replacement written in numpy; the checks above are on that mesh."
+  },
+  {
    "at": "2026-11-01 08:53",
    "text": "New free model for the Christmas baking weeks: the Christmas Cookie Cutter Set, three cutters of our own design (a gingerbread friend, a Christmas tree and a five-point star) with a wide pusher flange, a cutting edge that thins from 1.5 mm to 0.8 mm and a flat print bed, so no supports. Why now: Christmas cookie cutter sets hold 4.8+ star ratings on Etsy at roughly 9-12 USD printed, 3D-printable Christmas cutter STL files sell for 2.50-5.50 USD each, and Jungle Scout expects Amazon holiday decor searches to jump in the Nov 3 - Dec 2 window; a free set brings gift-season visitors to the shop. Checks: all three cutters watertight, 0 bad edges, exactly one shell each (76-98 mm wide, 14 mm tall). Printing note: PLA is not guaranteed food safe, so the page says to use them for dough and play dough, or with a food-safe filament and baking paper. Today's game, Toy Town, lets children put every toy friend on a little town and take a picture."
   },

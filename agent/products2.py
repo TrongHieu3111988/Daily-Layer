@@ -600,3 +600,65 @@ def xmas_cutters(step=0.32):
 CATALOG2["xmas-cookie-cutters-3"] = (xmas_cutters, dict(title="Christmas Cookie Cutter Set (3 shapes)", title_vi="Bộ 3 Khuôn Bánh Giáng Sinh", price=0.0,
     blurb="Gingerbread friend, Christmas tree and star cutters with a wide pusher flange, a thin cutting edge and a flat print bed. No supports. Free for the holidays.",
     tags=["christmas", "cookie-cutter", "gingerbread", "baking", "play-dough", "holiday", "free"]))
+
+# ---------- Animal Friends tree ornaments (decor, 2026-11-09) ----------
+# Four flat 3 mm plaques (fox, penguin, bear, owl) with a built-in hang hole and raised 1.2 mm colour details
+# (light and dark layers sit 0.6 mm into the plaque so they fuse when printed). Flat on the bed, no supports.
+OR_T, OR_D0, OR_D1 = 3.0, 2.4, 3.6
+
+def _or_shapes(kind):
+    """returns (outline sdf, hole centre, light sdf, dark sdf, body colour)"""
+    if kind == "fox":
+        def body(p):
+            d = ell2(p, (0, 0), 24, 18)
+            for s in (1, -1): d = _smin(d, poly2(p, np.array([(s * 9, 11), (s * 24, 8), (s * 21, 29)], float)) - 1.5, 3)
+            return _smin(d, circ2(p, (0, 21), 6.5), 3)
+        light = lambda p: np.minimum(ell2(p, (0, -8), 13, 9), ell2(p, (0, -3), 5, 7))
+        dark = lambda p: np.minimum.reduce([circ2(p, (0, -12), 3.0), circ2(p, (-9, 3), 2.3), circ2(p, (9, 3), 2.3)])
+        return body, (0, 21.5), light, dark, "#E07B39"
+    if kind == "penguin":
+        def body(p):
+            d = _smin(ell2(p, (0, -4), 20, 28), circ2(p, (0, 22), 13), 7)
+            for s in (1, -1): d = np.minimum(d, ell2(p, (s * 10, -31), 9, 4.5))
+            return _smin(d, circ2(p, (0, 36), 6.5), 3)
+        light = lambda p: np.minimum(ell2(p, (0, -7), 12, 19), ell2(p, (0, 22), 8, 7))
+        dark = lambda p: np.minimum.reduce([circ2(p, (-4.5, 23), 2.0), circ2(p, (4.5, 23), 2.0), poly2(p, np.array([(-3.5, 17), (3.5, 17), (0, 12)], float)) - 0.8])
+        return body, (0, 36.5), light, dark, "#34507A"
+    if kind == "bear":
+        def body(p):
+            d = circ2(p, (0, 0), 21)
+            for s in (1, -1): d = _smin(d, circ2(p, (s * 16, 16), 7.5), 2)
+            return _smin(d, circ2(p, (0, 21), 6.5), 3)
+        light = lambda p: np.minimum(ell2(p, (0, -7), 11, 8.5), np.minimum(circ2(p, (-16, 16), 3.8), circ2(p, (16, 16), 3.8)))
+        dark = lambda p: np.minimum.reduce([circ2(p, (0, -4), 3.2), circ2(p, (-8, 5), 2.3), circ2(p, (8, 5), 2.3)])
+        return body, (0, 21.5), light, dark, "#9B6A43"
+    def body(p):   # owl
+        d = _smin(ell2(p, (0, -2), 21, 27), circ2(p, (0, 14), 17), 8)
+        for s in (1, -1): d = _smin(d, poly2(p, np.array([(s * 8, 26), (s * 20, 24), (s * 18, 38)], float)) - 1.5, 3)
+        return _smin(d, circ2(p, (0, 31), 6.0), 3)
+    light = lambda p: np.minimum.reduce([circ2(p, (-8.5, 12), 8.2), circ2(p, (8.5, 12), 8.2), ell2(p, (0, -12), 11, 11)])
+    dark = lambda p: np.minimum.reduce([circ2(p, (-8.5, 12), 3.8), circ2(p, (8.5, 12), 3.8), poly2(p, np.array([(-3, 6), (3, 6), (0, -1)], float)) - 0.8])
+    return body, (0, 31.5), light, dark, "#7B5B3A"
+
+def animal_ornaments(step=0.5):
+    kinds = [("fox", (-42, 38)), ("penguin", (42, 38)), ("bear", (-42, -42)), ("owl", (42, -42))]
+    parts = []
+    for k, (ox, oy) in kinds:
+        body, hole, light, dark, col = _or_shapes(k)
+        def plaque(p, body=body, hole=hole):
+            d = body(p) ; d = np.maximum(d, -(circ2(p, hole, 2.3)))
+            return extrude(d, p, 0, OR_T)
+        def feat(fn, top, body=body):
+            def f(p): return extrude(np.maximum(fn(p), body(p) + 1.2), p, OR_D0, top)
+            return f
+        lo, hi = (-30, -36, 0), (30, 46, OR_D1 + 0.6)
+        for nm, fn, c in ((k, plaque, col), (k + "_light", feat(light, OR_D1), "#FFF4E2"), (k + "_dark", feat(dark, OR_D1 + 0.6), "#2B2E3A")):
+            v, f = mesh(fn, lo, hi, step)
+            v = v.copy(); v[:, 0] += ox; v[:, 1] += oy
+            parts.append((nm, v, f, c))
+    return dict(parts=parts, print_parts=parts, meta=dict(view=(52, -35), line="decor",
+        print_hint="Print flat as shown, no supports, no brim. 0.2 mm layers, 3 walls. Four plaques of 3 mm with raised colour details: swap filament at layer 12 (2.4 mm) for the light and dark details, or print the plaque in one colour. Thread string or ribbon through the 4.6 mm hang hole. Decoration for the tree, not a toy for children under 3."))
+
+CATALOG2["animal-ornaments-4"] = (animal_ornaments, dict(title="Animal Friends Tree Ornaments (4 pack)", title_vi="Bộ 4 Đồ Treo Cây Thông Hình Thú", price=1.99,
+    blurb="Fox, penguin, bear and owl: four flat 3D-printed tree ornaments with raised colour details and a built-in hang hole. No supports, one colour swap.",
+    tags=["christmas", "ornament", "fox", "penguin", "bear", "owl", "decor", "holiday", "gift"]))

@@ -77,6 +77,19 @@ const DIRECTORS = {
     }
     await hold(40);
   },
+  // Toy Bakery: a toy orders a cake by picture; tap the toppings in its bubble (round 1 slowly, one wrong tap in round 2), oven dings, toy hops
+  async bakery(s) {
+    const fr = async () => { await s.page.evaluate(dt => { for (const a of document.getAnimations()) { if (a.playState === "finished") continue; a.pause(); const end = a.effect.getComputedTiming().endTime; a.currentTime = Math.min((a.currentTime || 0) + dt, end); if (a.currentTime >= end) a.finish(); } }, DT); await s.frame(); };
+    const hold = async k => { for (let i = 0; i < k; i++) await fr(); };
+    await hold(24); await s.tap("#startBtn"); await hold(44);
+    for (let r = 0; r < 4; r++) {
+      const order = await s.page.evaluate(() => order.slice());
+      if (r === 1) { const bad = await s.page.evaluate(() => KINDS.find(k => !order.includes(k))); await s.tap(`#tops button[data-k="${bad}"]`); await hold(26); }
+      for (const k of order) { await s.tap(`#tops button[data-k="${k}"]`); s.mark("top"); await hold(r === 0 ? 24 : 16); }
+      s.mark("ding"); await hold(r === 0 ? 96 : 82);
+    }
+    await hold(20);
+  },
   // Sort the Toys: drag each toy into the box that shows its friend (or its size); 3 rounds, shown in full for round 1 and quicker after
   async sort(s) {
     const fr = async () => { await s.page.evaluate(dt => { for (const a of document.getAnimations()) { if (a.playState === "finished") continue; a.pause(); const end = a.effect.getComputedTiming().endTime; a.currentTime = Math.min((a.currentTime || 0) + dt, end); if (a.currentTime >= end) a.finish(); } }, DT); await s.frame(); };

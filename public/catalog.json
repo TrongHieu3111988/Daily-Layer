@@ -3,6 +3,264 @@
  "started": "2026-10-28",
  "products": [
   {
+   "slug": "animal-ornaments-4",
+   "title": "Animal Friends Tree Ornaments (4 pack)",
+   "title_vi": "B\u1ed9 4 \u0110\u1ed3 Treo C\u00e2y Th\u00f4ng H\u00ecnh Th\u00fa",
+   "price": 1.99,
+   "blurb": "Fox, penguin, bear and owl: four flat 3D-printed tree ornaments with raised colour details and a built-in hang hole. No supports, one colour swap.",
+   "tags": [
+    "christmas",
+    "ornament",
+    "fox",
+    "penguin",
+    "bear",
+    "owl",
+    "decor",
+    "holiday",
+    "gift"
+   ],
+   "line": "decor",
+   "print_hint": "Print flat as shown, no supports, no brim. 0.2 mm layers, 3 walls. Four plaques of 3 mm with raised colour details: swap filament at layer 12 (2.4 mm) for the light and dark details, or print the plaque in one colour. Thread string or ribbon through the 4.6 mm hang hole. Decoration for the tree, not a toy for children under 3.",
+   "parts": [
+    {
+     "name": "fox",
+     "triangles": 140508,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 5.43,
+     "size_mm": [
+      51.0,
+      48.5,
+      3.0
+     ],
+     "min_z": -0.0
+    },
+    {
+     "name": "fox_light",
+     "triangles": 27708,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 0.46,
+     "size_mm": [
+      26.0,
+      20.8,
+      1.2
+     ],
+     "min_z": 2.4
+    },
+    {
+     "name": "fox_dark",
+     "triangles": 6944,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 3,
+     "volume_cm3": 0.11,
+     "size_mm": [
+      22.6,
+      20.3,
+      1.8
+     ],
+     "min_z": 2.4
+    },
+    {
+     "name": "penguin",
+     "triangles": 174472,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 6.93,
+     "size_mm": [
+      40.0,
+      78.0,
+      3.0
+     ],
+     "min_z": -0.0
+    },
+    {
+     "name": "penguin_light",
+     "triangles": 63192,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 2,
+     "volume_cm3": 1.06,
+     "size_mm": [
+      24.0,
+      55.0,
+      1.2
+     ],
+     "min_z": 2.4
+    },
+    {
+     "name": "penguin_dark",
+     "triangles": 6860,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 3,
+     "volume_cm3": 0.1,
+     "size_mm": [
+      13.0,
+      13.8,
+      1.8
+     ],
+     "min_z": 2.4
+    },
+    {
+     "name": "bear",
+     "triangles": 128264,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 5.03,
+     "size_mm": [
+      47.0,
+      48.5,
+      3.0
+     ],
+     "min_z": -0.0
+    },
+    {
+     "name": "bear_light",
+     "triangles": 29128,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 3,
+     "volume_cm3": 0.45,
+     "size_mm": [
+      39.6,
+      35.3,
+      1.2
+     ],
+     "min_z": 2.4
+    },
+    {
+     "name": "bear_dark",
+     "triangles": 7200,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 3,
+     "volume_cm3": 0.11,
+     "size_mm": [
+      20.6,
+      14.5,
+      1.8
+     ],
+     "min_z": 2.4
+    },
+    {
+     "name": "owl",
+     "triangles": 176236,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 7.01,
+     "size_mm": [
+      43.0,
+      68.5,
+      3.0
+     ],
+     "min_z": -0.0
+    },
+    {
+     "name": "owl_light",
+     "triangles": 58880,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 3,
+     "volume_cm3": 0.95,
+     "size_mm": [
+      33.4,
+      43.2,
+      1.2
+     ],
+     "min_z": 2.4
+    },
+    {
+     "name": "owl_dark",
+     "triangles": 12680,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 3,
+     "volume_cm3": 0.23,
+     "size_mm": [
+      24.6,
+      17.6,
+      1.8
+     ],
+     "min_z": 2.4
+    }
+   ],
+   "watertight": true,
+   "web": [
+    {
+     "file": "products/animal-ornaments-4/web_fox.bin",
+     "color": "#E07B39",
+     "name": "fox"
+    },
+    {
+     "file": "products/animal-ornaments-4/web_fox_light.bin",
+     "color": "#FFF4E2",
+     "name": "fox_light"
+    },
+    {
+     "file": "products/animal-ornaments-4/web_fox_dark.bin",
+     "color": "#2B2E3A",
+     "name": "fox_dark"
+    },
+    {
+     "file": "products/animal-ornaments-4/web_penguin.bin",
+     "color": "#34507A",
+     "name": "penguin"
+    },
+    {
+     "file": "products/animal-ornaments-4/web_penguin_light.bin",
+     "color": "#FFF4E2",
+     "name": "penguin_light"
+    },
+    {
+     "file": "products/animal-ornaments-4/web_penguin_dark.bin",
+     "color": "#2B2E3A",
+     "name": "penguin_dark"
+    },
+    {
+     "file": "products/animal-ornaments-4/web_bear.bin",
+     "color": "#9B6A43",
+     "name": "bear"
+    },
+    {
+     "file": "products/animal-ornaments-4/web_bear_light.bin",
+     "color": "#FFF4E2",
+     "name": "bear_light"
+    },
+    {
+     "file": "products/animal-ornaments-4/web_bear_dark.bin",
+     "color": "#2B2E3A",
+     "name": "bear_dark"
+    },
+    {
+     "file": "products/animal-ornaments-4/web_owl.bin",
+     "color": "#7B5B3A",
+     "name": "owl"
+    },
+    {
+     "file": "products/animal-ornaments-4/web_owl_light.bin",
+     "color": "#FFF4E2",
+     "name": "owl_light"
+    },
+    {
+     "file": "products/animal-ornaments-4/web_owl_dark.bin",
+     "color": "#2B2E3A",
+     "name": "owl_dark"
+    }
+   ],
+   "download": "",
+   "cover": "products/animal-ornaments-4/cover.jpg",
+   "build_seconds": 17.3,
+   "download_bytes": 8514670,
+   "dropped": "2026-11-09"
+  },
+  {
    "slug": "xmas-cookie-cutters-3",
    "title": "Christmas Cookie Cutter Set (3 shapes)",
    "title_vi": "B\u1ed9 3 Khu\u00f4n B\u00e1nh Gi\u00e1ng Sinh",
@@ -2222,6 +2480,6 @@
   "members": 0,
   "costs_usd": 0.0
  },
- "updated": "2026-11-01 08:53",
- "featured": "xmas-cookie-cutters-3"
+ "updated": "2026-11-09 08:54",
+ "featured": "animal-ornaments-4"
 }

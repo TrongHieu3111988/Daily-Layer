@@ -75,6 +75,11 @@
    "id": "train",
    "artifact": "https://claude.ai/artifact/62Jzc1tx5A1r9HqxdmMJYr",
    "library": "2d"
+  },
+  {
+   "id": "bakery",
+   "artifact": "https://claude.ai/artifact/M4GZ7zupp3r9ZsyPmi1ynX",
+   "library": "2d"
   }
  ]
 }
