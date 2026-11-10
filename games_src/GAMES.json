@@ -80,6 +80,11 @@
    "id": "bakery",
    "artifact": "https://claude.ai/artifact/M4GZ7zupp3r9ZsyPmi1ynX",
    "library": "2d"
+  },
+  {
+   "id": "bubbles",
+   "artifact": "https://claude.ai/artifact/Vx4MFHg2ikDgi783RwYz1T",
+   "library": "2d"
   }
  ]
 }

@@ -53,6 +53,7 @@ def hexrgb(h): return [int(h[i:i + 2], 16) for i in (1, 3, 5)]
 # --- what every game needs to show a toy without loading it in 3D: a body colour, a picture, a Vietnamese name, a 2D look ---
 VI = {"sculpt-gingerbread": "Bánh Gừng", "sculpt-penguin": "Chim Cánh Cụt", "sculpt-kitten": "Mèo Mướp", "sculpt-frog": "Ếch Cười", "sculpt-fox": "Cáo Con",
       "sculpt-chick": "Gà Con", "sculpt-bunny": "Thỏ Tròn", "sculpt-bear": "Gấu Con", "sculpt-axolotl": "Kỳ Giông", "chibi-whale-4part": "Cá Voi"}
+NOT_TOYS = {"dragon-egg-baby-dragon"}   # multi-part sets that are not a single figure (egg halves + dragon)
 LOOK = {"penguin": "penguin", "kitten": "kitten", "cat": "kitten", "frog": "frog", "fox": "fox", "chick": "chick", "bunny": "bunny", "rabbit": "bunny",
         "bear": "bear", "axolotl": "axolotl", "whale": "whale"}   # 2D games paint these animals' ears, beaks and patches on their blocks
 
@@ -104,7 +105,7 @@ def main():
     cat = json.load(open(os.path.join(site, "catalog.json")))
     toys = []
     for p in cat["products"]:
-        if p["line"] != "figure": continue
+        if p["line"] != "figure" or p["slug"] in NOT_TOYS: continue
         d = os.path.join(site, "products", p["slug"])
         b64 = lambda path: base64.b64decode(open(os.path.join(site, path)).read())
         if p.get("preview"):

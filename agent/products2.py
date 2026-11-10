@@ -662,3 +662,72 @@ def animal_ornaments(step=0.5):
 CATALOG2["animal-ornaments-4"] = (animal_ornaments, dict(title="Animal Friends Tree Ornaments (4 pack)", title_vi="Bộ 4 Đồ Treo Cây Thông Hình Thú", price=1.99,
     blurb="Fox, penguin, bear and owl: four flat 3D-printed tree ornaments with raised colour details and a built-in hang hole. No supports, one colour swap.",
     tags=["christmas", "ornament", "fox", "penguin", "bear", "owl", "decor", "holiday", "gift"]))
+
+# ---------- Dragon Egg with a baby dragon inside (figure, 2026-11-10) ----------
+# Two egg halves (lip fit, 0.25 mm clearance) and a loose baby dragon that sits inside. Bottom half prints base-down,
+# the top half prints rim-down (dome up), the dragon prints on its feet. No supports. Dragon is 4 cm tall: not for under 3.
+EG_R, EG_H, EG_W = 30.0, 40.0, 2.4      # egg radius, half-height, wall
+EG_FLAT = -33.0                          # flat foot of the egg
+EG_LIP = 4.5
+
+def _egg_out(p): return ellipsoid(p, np.zeros(3), (EG_R, EG_R, EG_H))
+def _egg_in(p): return ellipsoid(p, np.zeros(3), (EG_R - EG_W, EG_R - EG_W, EG_H - EG_W))
+
+def egg_bottom_sdf(p):
+    z = p[..., 2]; rr = np.linalg.norm(p[..., :2], axis=-1)
+    shell = np.maximum(_egg_out(p), z)                       # outer, cut at the seam z=0
+    shell = np.maximum(shell, EG_FLAT - z)                   # flat foot
+    cav = np.maximum(_egg_in(p), (EG_FLAT + EG_W) - z)
+    cav = np.maximum(cav, np.where(z > -3.0, rr - 25.2, -1.0))   # inward shoulder below the seam
+    cav = np.maximum(cav, z - 0.0)
+    body = np.maximum(shell, -cav)
+    tube = np.maximum(np.maximum(rr - 27.3, 25.2 - rr), np.maximum(-z, z - EG_LIP))
+    return np.minimum(body, tube)
+
+def egg_top_sdf(p):
+    z = p[..., 2]; rr = np.linalg.norm(p[..., :2], axis=-1)
+    shell = np.maximum(_egg_out(p), -z)
+    cav = np.minimum(_egg_in(p), np.maximum(rr - 27.55, np.maximum(-z - 0.0, z - (EG_LIP + 0.3))))
+    return np.maximum(shell, -cav)
+
+def _dragon_sdf(P):
+    P = P * np.array([1.0, -1.0, 1.0])   # the dragon looks toward -y (toward the viewer)
+    x, y, z = P[..., 0], P[..., 1], P[..., 2]
+    ax = np.abs(x)
+    d = ellipsoid(P, np.array([0, 0, 13.0]), (10.5, 9.5, 13.0))                      # body
+    d = sunion(d, ellipsoid(P, np.array([0, 3.0, 27.0]), (7.5, 7.0, 6.5)), 4)       # neck
+    d = sunion(d, ellipsoid(P, np.array([0, 5.5, 33.0]), (8.8, 8.8, 7.8)), 3)        # head
+    d = sunion(d, ellipsoid(P, np.array([0, 13.5, 31.0]), (5.2, 6.0, 4.0)), 2.5)     # snout
+    for s in (1, -1):
+        d = sunion(d, ellipsoid(P, np.array([s * 7.0, 7.0, 4.0]), (4.6, 6.5, 4.0)), 3)    # front feet
+        d = sunion(d, ellipsoid(P, np.array([s * 8.5, -3.0, 4.0]), (4.6, 6.0, 4.0)), 3)   # back feet
+        d = np.minimum(d, cyl_axis(P, (s * 5.0, 6.0, 38.0), (s * 8.0, 0.5, 46.0), 1.7))   # horns
+    wing = np.array([(3, 12), (21, 34), (16, 25), (21, 21), (14, 17), (17, 11)], float)   # bat wing outline in (|x|, z)
+    wd = poly2(np.stack([ax, z, np.zeros_like(z)], -1), wing)
+    d = np.minimum(d, np.maximum(wd - 1.2, np.abs(y + 7.8) - 1.2))
+    for i, (cy, cz, r) in enumerate([(-8.5, 12, 2.6), (-9.0, 18, 2.4), (-8.0, 24, 2.2)]):
+        d = sunion(d, ellipsoid(P, np.array([0, cy, cz]), (1.6, r, r)), 2)       # back ridge
+    tail = [(0, -9, 5, 5.0), (3, -15, 4, 4.2), (9, -19, 3.6, 3.5), (16, -19, 3, 2.7), (21, -15, 2.5, 2.0), (23, -10, 2.2, 1.5)]
+    for (tx, ty, tz, r) in tail:
+        d = np.minimum(d, sphere(P, np.array([tx, ty, tz]), r))
+    for a, b in zip(tail[:-1], tail[1:]):
+        d = np.minimum(d, cyl_axis(P, a[:3], b[:3], b[3]))
+    for s in (1, -1):   # eye pits
+        d = np.maximum(d, -sphere(P, np.array([s * 5.2, 11.0, 35.5]), 1.5))
+    return np.maximum(d, -z)
+
+def dragon_egg(step=0.8, egg_step=1.3):
+    def part(fn, lo, hi, ox, oy, st):
+        v, f = mesh(fn, lo, hi, st)
+        v = v.copy(); v[:, 0] += ox; v[:, 1] += oy
+        return v, f
+    parts = []
+    v, f = part(egg_bottom_sdf, (-31, -31, -34), (31, 31, EG_LIP + 1), -36, 20, egg_step); parts.append(("egg_bottom", drop_to_bed(v), f, "#6A4FA3"))
+    v, f = part(egg_top_sdf, (-31, -31, -1), (31, 31, 41), 36, 20, egg_step); parts.append(("egg_top", drop_to_bed(v), f, "#4F9FA3"))
+    v, f = part(_dragon_sdf, (-28, -24, -1), (14, 22, 48), 0, -42, step); parts.append(("baby_dragon", drop_to_bed(v), f, "#E0643A"))
+    return dict(parts=parts, print_parts=parts, meta=dict(view=(34, -25), line="figure",
+        print_hint="No supports. Bottom half base-down, top half rim-down with the dome up, dragon on its feet; 0.2 mm layers, 3 walls, 15% infill. The two halves click together over a 0.25 mm lip: a dab of glue is optional. The dragon is about 4.7 cm tall and sits loose inside. Contains small parts: not for children under 3."))
+
+CATALOG2["dragon-egg-baby-dragon"] = (dragon_egg, dict(title="Dragon Egg with Baby Dragon Inside", title_vi="Trứng Rồng Có Rồng Con Bên Trong", price=2.99,
+    blurb="A two-part dragon egg that clicks shut around a loose 4.7 cm baby dragon. Prints without supports. Great Christmas stocking surprise.",
+    tags=["dragon", "dragon-egg", "surprise", "christmas", "stocking-stuffer", "fantasy", "figure", "gift"]))

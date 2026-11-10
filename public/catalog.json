@@ -3,6 +3,92 @@
  "started": "2026-10-28",
  "products": [
   {
+   "slug": "dragon-egg-baby-dragon",
+   "title": "Dragon Egg with Baby Dragon Inside",
+   "title_vi": "Tr\u1ee9ng R\u1ed3ng C\u00f3 R\u1ed3ng Con B\u00ean Trong",
+   "price": 2.99,
+   "blurb": "A two-part dragon egg that clicks shut around a loose 4.7 cm baby dragon. Prints without supports. Great Christmas stocking surprise.",
+   "tags": [
+    "dragon",
+    "dragon-egg",
+    "surprise",
+    "christmas",
+    "stocking-stuffer",
+    "fantasy",
+    "figure",
+    "gift"
+   ],
+   "line": "figure",
+   "print_hint": "No supports. Bottom half base-down, top half rim-down with the dome up, dragon on its feet; 0.2 mm layers, 3 walls, 15% infill. The two halves click together over a 0.25 mm lip: a dab of glue is optional. The dragon is about 4.7 cm tall and sits loose inside. Contains small parts: not for children under 3.",
+   "parts": [
+    {
+     "name": "egg_bottom",
+     "triangles": 77312,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 17.88,
+     "size_mm": [
+      60.0,
+      60.0,
+      37.5
+     ],
+     "min_z": 0.0
+    },
+    {
+     "name": "egg_top",
+     "triangles": 70752,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 15.21,
+     "size_mm": [
+      60.0,
+      60.0,
+      40.0
+     ],
+     "min_z": 0.0
+    },
+    {
+     "name": "baby_dragon",
+     "triangles": 63560,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 12.67,
+     "size_mm": [
+      37.9,
+      42.0,
+      47.0
+     ],
+     "min_z": 0.0
+    }
+   ],
+   "watertight": true,
+   "web": [
+    {
+     "file": "products/dragon-egg-baby-dragon/web_egg_bottom.bin",
+     "color": "#6A4FA3",
+     "name": "egg_bottom"
+    },
+    {
+     "file": "products/dragon-egg-baby-dragon/web_egg_top.bin",
+     "color": "#4F9FA3",
+     "name": "egg_top"
+    },
+    {
+     "file": "products/dragon-egg-baby-dragon/web_baby_dragon.bin",
+     "color": "#E0643A",
+     "name": "baby_dragon"
+    }
+   ],
+   "download": "",
+   "cover": "products/dragon-egg-baby-dragon/cover.jpg",
+   "build_seconds": 11.6,
+   "download_bytes": 9902226,
+   "dropped": "2026-11-10"
+  },
+  {
    "slug": "animal-ornaments-4",
    "title": "Animal Friends Tree Ornaments (4 pack)",
    "title_vi": "B\u1ed9 4 \u0110\u1ed3 Treo C\u00e2y Th\u00f4ng H\u00ecnh Th\u00fa",
@@ -2480,6 +2566,6 @@
   "members": 0,
   "costs_usd": 0.0
  },
- "updated": "2026-11-09 08:54",
- "featured": "animal-ornaments-4"
+ "updated": "2026-11-10 08:52",
+ "featured": "dragon-egg-baby-dragon"
 }

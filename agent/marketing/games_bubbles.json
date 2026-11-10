@@ -1,0 +1,20 @@
+{
+ "id": "bubbles",
+ "title": "Bubble Pop",
+ "hook": "Pop the bubble with\nthe toy friend!",
+ "captions": {
+  "pop": [
+   "Found it! Pop!",
+   "Yay!",
+   "Hooray!",
+   "Pop pop!"
+  ],
+  "oops": [
+   "Oops, try another!"
+  ]
+ },
+ "yt_title": "Pop the bubble with the toy friend! Free kids game #Shorts",
+ "yt_desc": "Look at the toy friend at the top, then tap the bubble that holds it. Pop pop hooray! Easy enough for a 4-year-old, with no ads and no signing up, and the toys are real models you can 3D print at home.\n\nPlay free in your browser: {url}\nMore free kids' games and a new 3D-printable toy every day: {site}\n\n#Shorts #KidsGames #BubbleGame #3DPrinting #FreeGames",
+ "icons": "/home/user/Daily-Layer/public/products",
+ "toys": "/home/user/Daily-Layer/public/toys.json"
+}

@@ -77,6 +77,19 @@ const DIRECTORS = {
     }
     await hold(40);
   },
+  // Bubble Pop: the sky names a toy friend; tap the bubble that holds it (round 2 shows one wrong bubble first), it pops and hops
+  async bubbles(s) {
+    const fr = async () => { await s.page.evaluate(dt => { for (const a of document.getAnimations()) { if (a.playState === "finished") continue; a.pause(); const end = a.effect.getComputedTiming().endTime; a.currentTime = Math.min((a.currentTime || 0) + dt, end); if (a.currentTime >= end) a.finish(); } }, DT); await s.frame(); };
+    const hold = async k => { for (let i = 0; i < k; i++) await fr(); };
+    await hold(24); await s.tap("#startBtn"); await hold(44);
+    for (let r = 0; r < 4; r++) {
+      if (r === 1) { const bad = await s.page.evaluate(() => [...document.querySelectorAll(".bub")].find(x => x.dataset.slug !== target.slug).dataset.slug); await s.tap(`.bub[data-slug="${bad}"]`); s.mark("oops"); await hold(30); }
+      await hold(r === 0 ? 40 : 14);
+      const slug = await s.page.evaluate(() => target.slug);
+      await s.tap(`.bub[data-slug="${slug}"]`); s.mark("pop"); await hold(r === 0 ? 70 : 60);
+    }
+    await hold(20);
+  },
   // Toy Bakery: a toy orders a cake by picture; tap the toppings in its bubble (round 1 slowly, one wrong tap in round 2), oven dings, toy hops
   async bakery(s) {
     const fr = async () => { await s.page.evaluate(dt => { for (const a of document.getAnimations()) { if (a.playState === "finished") continue; a.pause(); const end = a.effect.getComputedTiming().endTime; a.currentTime = Math.min((a.currentTime || 0) + dt, end); if (a.currentTime >= end) a.finish(); } }, DT); await s.frame(); };

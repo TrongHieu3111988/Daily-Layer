@@ -22,3 +22,7 @@ model is made for a game only when the game needs a kind of model the library la
 - [x] 2026-11-07 Spin to Match (spin) https://claude.ai/artifact/FKQ5znniZ4fnTJ21DwZNLx — rotate a 3D toy until it matches a target pose (spatial reasoning).
 - [x] 2026-11-08 Toy Train (train) https://claude.ai/artifact/62Jzc1tx5A1r9HqxdmMJYr — each car shows a toy picture; drag (or tap, then tap the car) the matching toy aboard; when full the train toots and leaves; 3 trains (2, 3, 3 cars).
 - [x] 2026-11-09 Toy Bakery (bakery) https://claude.ai/artifact/M4GZ7zupp3r9ZsyPmi1ynX — a toy friend orders a cake by picture; tap the right toppings (3 big buttons), the oven dings, the toy hops with its cake.
+- [x] 2026-11-10 Bubble Pop (bubbles) https://claude.ai/artifact/Vx4MFHg2ikDgi783RwYz1T — the top shows a toy friend from the library; tap the bubble that holds it (2 to 5 bubbles, 6 rounds); a wrong bubble wiggles, a hint glows after 3 misses; no fail state.
+- [ ] Peekaboo Boxes (peek): toys hide under 3 cups, one peeks out; tap the cup the named toy is under.
+- [ ] Toy Dress-up Hats (hats): drag one of 3 hats onto the toy that matches its colour.
+- [ ] Toy Echo Pattern (echo): toys light up in a short sequence; tap them in the same order.
