@@ -7,7 +7,7 @@ const fs = require("fs"), path = require("path");
 const COL = { orange: "#F28C3A", white: "#FBFBF8", ink: "#24283A", pink: "#F7A1B5", cream: "#F4E9D4",
               green: "#7CC56B", lime: "#D9F0B5", rose: "#F7A9C4", magenta: "#E0609A", grey: "#A9AFBF", slate: "#7C8396", brown: "#7A4E33", ginger: "#C27C43", red: "#D9443F", pine: "#2F8A57" };
 const NAMES = Object.keys(COL), L = n => NAMES.indexOf(n);
-const BASE = { fox: "orange", frog: "green", axolotl: "rose", kitten: "grey", gingerbread: "ginger" };
+const BASE = { fox: "orange", frog: "green", axolotl: "rose", kitten: "grey", gingerbread: "ginger", reindeer: "ginger" };
 
 function kit(s) {
   const k = {
@@ -39,6 +39,33 @@ function kit(s) {
 }
 
 const ANIMALS = {
+  reindeer(s, k) {
+    // chibi reindeer (our own design): round fawn body, cream muzzle and belly, branching antlers, red berry nose, green knitted scarf
+    k.blob([0, -0.32, 0], 0.37, "ginger");                                                       // body
+    k.blob([0, 0.06, 0.04], 0.33, "ginger");                                                     // head
+    k.mirror(sx => k.line([0.26 * sx, 0.18, 0.0], [0.43 * sx, 0.27, -0.03], 0.075, 0.03, "ginger", 12));   // leaf ears
+    k.mirror(sx => k.stroke("pinch", [[0.41 * sx, 0.26]], 0.06, 0.6, { from: [0, 0.2, 1] }));
+    k.mirror(sx => { for (let t = 0; t <= 1; t += 0.25) k.paint([0.3 * sx + 0.1 * sx * t, 0.2 + 0.06 * t, 0.07], 0.045, "pink"); });
+    // antlers: a main beam and two tines each side, thick enough to print (about 4 mm)
+    k.mirror(sx => {
+      k.line([0.11 * sx, 0.32, -0.04], [0.2 * sx, 0.6, -0.06], 0.055, 0.042, "brown", 14);
+      k.line([0.15 * sx, 0.45, -0.05], [0.3 * sx, 0.53, -0.06], 0.045, 0.038, "brown", 10);
+      k.line([0.19 * sx, 0.56, -0.06], [0.12 * sx, 0.66, -0.06], 0.04, 0.036, "brown", 8);
+    });
+    k.line([0, 0.02, 0.28], [0, 0.0, 0.4], 0.12, 0.09, "cream", 10);                          // muzzle
+    const muzzle = []; for (let x = -0.11; x <= 0.1101; x += 0.025) for (let y = -0.08; y <= 0.08; y += 0.025) muzzle.push([x, y]);
+    k.stroke("paint", muzzle, 0.045, 1, { color: "cream" });
+    k.blob([0, 0.05, 0.47], 0.055, "red");                                                        // berry nose
+    k.mirror(sx => k.eye(0.13 * sx, 0.17, 0.3, 0.047));
+    k.mirror(sx => k.paint([0.22 * sx, 0.02, 0.26], 0.055, "pink"));                             // rosy cheeks
+    k.smile(k.arc(0, -0.03, 0.055, 0.03, Math.PI * 1.15, Math.PI * 1.85, 10), 0.03);
+    for (let y = -0.62; y <= -0.3; y += 0.06) k.paint([0, y, 0.34], 0.15, "cream");               // belly
+    // knitted scarf round the neck with a tail down the front
+    for (let a = 0; a < 26; a++) { const t = a / 26 * Math.PI * 2; k.blob([0.31 * Math.sin(t), -0.24 + 0.015 * Math.cos(2 * t), 0.3 * Math.cos(t)], 0.07, "pine"); }
+    k.line([0.14, -0.26, 0.29], [0.2, -0.42, 0.31], 0.065, 0.055, "pine", 10);
+    k.mirror(sx => { k.line([0.15 * sx, -0.63, 0.16], [0.17 * sx, -0.66, 0.3], 0.085, 0.075, "ginger", 6); k.paint([0.17 * sx, -0.64, 0.36], 0.08, "brown"); });   // hooves
+    k.blob([0, -0.4, -0.37], 0.08, "cream");                                                     // little tail
+  },
   gingerbread(s, k) {
     // chubby gingerbread buddy (our own design): round head, stubby limbs, white icing trim, gumdrop buttons, knitted scarf
     k.blob([0, -0.24, 0], 0.31, "ginger");                        // body

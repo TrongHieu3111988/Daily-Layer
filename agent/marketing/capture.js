@@ -77,6 +77,24 @@ const DIRECTORS = {
     }
     await hold(40);
   },
+  // Peekaboo Cups: friends hide under cups (they swap in round 3); tap the cup with the named friend; round 2 lifts a wrong cup first
+  async peek(s) {
+    const fr = async () => { await s.page.evaluate(dt => { for (const a of document.getAnimations()) { if (a.playState === "finished") continue; a.pause(); const end = a.effect.getComputedTiming().endTime; a.currentTime = Math.min((a.currentTime || 0) + dt, end); if (a.currentTime >= end) a.finish(); } }, DT); await s.frame(); };
+    const hold = async k => { for (let i = 0; i < k; i++) await fr(); };
+    const until = async (fn, max = 400) => { for (let i = 0; i < max; i++) { if (await s.page.evaluate(fn)) return; await fr(); } };
+    await hold(24); await s.tap("#startBtn");
+    for (let r = 0; r < 4; r++) {
+      await until(() => document.querySelector(".spot.down:not(.up)"));
+      s.mark("hide");
+      if (r === 2) { await until(() => /Watch|Nhìn/.test(document.getElementById("ask").textContent) || !locked); s.mark("mix"); }
+      await until(() => !locked && document.querySelector("#pic img")); await hold(r === 0 ? 30 : 18);
+      if (r === 1) { const bad = await s.page.evaluate(() => spots.findIndex(o => o.toy !== target)); await s.tap(`.spot:nth-of-type(${bad + 1})`); s.mark("oops");
+        await until(() => !locked); await hold(14); }
+      const i = await s.page.evaluate(() => spots.findIndex(o => o.toy === target));
+      await s.tap(`.spot:nth-of-type(${i + 1})`); s.mark("found"); await hold(r === 3 ? 80 : 50);
+    }
+    await hold(10);
+  },
   // Bubble Pop: the sky names a toy friend; tap the bubble that holds it (round 2 shows one wrong bubble first), it pops and hops
   async bubbles(s) {
     const fr = async () => { await s.page.evaluate(dt => { for (const a of document.getAnimations()) { if (a.playState === "finished") continue; a.pause(); const end = a.effect.getComputedTiming().endTime; a.currentTime = Math.min((a.currentTime || 0) + dt, end); if (a.currentTime >= end) a.finish(); } }, DT); await s.frame(); };

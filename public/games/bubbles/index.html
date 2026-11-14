@@ -12,7 +12,7 @@
 <meta property="og:title" content="Bubble Pop – free kids&#x27; game | Daily Layer">
 <meta property="og:description" content="Look at the toy friend at the top, then tap the bubble that holds it. Pop, pop, hooray! A free bubble game for small kids, from our 3D-printable toy shop.">
 <meta property="og:url" content="https://dailylayer.funny3dprint.workers.dev/games/bubbles/">
-<meta property="og:image" content="https://dailylayer.funny3dprint.workers.dev/products/dragon-egg-baby-dragon/cover.jpg">
+<meta property="og:image" content="https://dailylayer.funny3dprint.workers.dev/products/sculpt-reindeer/cover.jpg">
 <meta name="twitter:card" content="summary_large_image">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "VideoGame", "name": "Bubble Pop", "description": "Look at the toy friend at the top, then tap the bubble that holds it. Pop, pop, hooray! A free bubble game for small kids, from our 3D-printable toy shop.", "url": "https://dailylayer.funny3dprint.workers.dev/games/bubbles/", "genre": "Educational", "gamePlatform": "Web browser", "applicationCategory": "Game", "audience": {"@type": "PeopleAudience", "suggestedMinAge": 3}, "isAccessibleForFree": true, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}}</script>
 <!--/seo-->
@@ -73,7 +73,7 @@ canvas#confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:non
 @media (max-width:420px){.bar h1{font-size:18px}.ibtn{width:40px;height:40px}.score{font-size:16px;padding:3px 10px}}
 @media (prefers-reduced-motion:reduce){.card{animation:none}.btn,.ibtn{transition:none}}
 
-/* Bubble Pop: the sky shows which toy friend to find; tap the bubble that holds it. */
+/* Bubble Pop Friends: the sky shows which toy friend to find; tap the bubble that holds it. */
 .stage{background:linear-gradient(#BDE6FF,#E9F7FF 60%,#D6F0E4);display:flex;flex-direction:column;align-items:center;overflow:hidden}
 :root[data-theme="dark"] .stage{background:linear-gradient(#16264F,#1B3B5E)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .stage{background:linear-gradient(#16264F,#1B3B5E)}}
@@ -103,7 +103,7 @@ canvas#confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:non
 <div class="app">
   <header class="bar">
     <a class="ibtn" id="back" href="/" data-t-label="back" aria-label="Back"></a>
-    <h1 data-t="title">Bubble Pop</h1>
+    <h1 data-t="title">Bubble Pop Friends</h1>
     <span class="score" aria-live="polite"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.8-4.5 4.2 1.2 6L12 16.6 6.5 19.6l1.2-6L3.2 9.4l6.1-.8z" fill="#FFC93C" stroke="#1B2547" stroke-width="2" stroke-linejoin="round"/></svg><span id="count">0</span></span>
     <button class="ibtn" id="soundBtn" type="button" data-t-label="sound" aria-label="Sound"></button>
     <button class="ibtn" id="langBtn" type="button" aria-label="Language">VI</button>
@@ -374,9 +374,9 @@ canvas#confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:non
 </script>
 <script>
 "use strict";
-K.words.en = { title: "Bubble Pop", back: "Back", sound: "Sound on or off", introH: "Pop the right bubble!", introP: "Look at the toy friend at the top, then tap the bubble that holds it.", start: "Let's pop!", again: "Play again", home: "More games",
+K.words.en = { title: "Bubble Pop Friends", back: "Back", sound: "Sound on or off", introH: "Pop the right bubble!", introP: "Look at the toy friend at the top, then tap the bubble that holds it.", start: "Let's pop!", again: "Play again", home: "More games",
   find: n => "Pop the " + n + "!", no: "Try another bubble!", yay: n => "You found the " + n + "!", overH: s => s >= 3 ? "Pop pop hooray!" : s >= 2 ? "Well done!" : "All popped!", overP: n => "You popped " + n + " bubbles and found every friend." };
-K.words.vi = { title: "Chọc Bong Bóng", back: "Quay lại", sound: "Bật hoặc tắt âm thanh", introH: "Chọc đúng bong bóng nhé!", introP: "Nhìn bạn đồ chơi ở trên cùng, rồi chạm vào bong bóng có bạn ấy.", start: "Chọc bóng thôi!", again: "Chơi lại", home: "Trò khác",
+K.words.vi = { title: "Bong Bóng Bạn Đồ Chơi", back: "Quay lại", sound: "Bật hoặc tắt âm thanh", introH: "Chọc đúng bong bóng nhé!", introP: "Nhìn bạn đồ chơi ở trên cùng, rồi chạm vào bong bóng có bạn ấy.", start: "Chọc bóng thôi!", again: "Chơi lại", home: "Trò khác",
   find: n => "Chọc bóng có " + n + "!", no: "Thử bong bóng khác nhé!", yay: n => "Bé tìm được " + n + " rồi!", overH: s => s >= 3 ? "Giỏi quá đi!" : s >= 2 ? "Tuyệt vời!" : "Chọc xong hết rồi!", overP: n => "Bé đã chọc " + n + " bong bóng và tìm đủ các bạn." };
 
 const COUNTS = [2, 3, 3, 4, 4, 5];

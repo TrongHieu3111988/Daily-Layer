@@ -85,6 +85,11 @@
    "id": "bubbles",
    "artifact": "https://claude.ai/artifact/Vx4MFHg2ikDgi783RwYz1T",
    "library": "2d"
+  },
+  {
+   "id": "peek",
+   "artifact": "https://claude.ai/artifact/4Uew8RK7y4UKG6eRuKidPf",
+   "library": "2d"
   }
  ]
 }

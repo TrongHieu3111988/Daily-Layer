@@ -6,7 +6,7 @@ Run it as the LAST step before every push (after make_cf.py / build_shop.py / bu
 because those rewrite the pages this script adds tags to. Safe to run any number of times:
 it rewrites toys/ and the files between <!--seo--> markers, nothing else.
 """
-import html, json, pathlib, re, sys, datetime
+import html, json, os, pathlib, re, sys, datetime
 
 SITE = "https://dailylayer.funny3dprint.workers.dev"
 PUB = pathlib.Path(sys.argv[1] if len(sys.argv) > 1 else "public")
@@ -15,6 +15,7 @@ E = lambda s: html.escape(str(s), quote=True)
 
 LINES = {"figure": "Cute figures", "print-in-place": "Moving toys", "functional": "Handy things", "decor": "Decor"}
 GAMES = {  # path: (name, description) - keep in step with the `games` words in site_src/shop.html
+    "games/peek": ("Peekaboo Cups", "Toy friends hide under cups. Watch closely, then tap the cup where your friend is hiding. Peekaboo! A free hide-and-find game for small kids, from our 3D-printable toy shop."),
     "games/bubbles": ("Bubble Pop", "Look at the toy friend at the top, then tap the bubble that holds it. Pop, pop, hooray! A free bubble game for small kids, from our 3D-printable toy shop."),
     "games/bakery": ("Toy Bakery", "A cute toy friend orders a cake by picture. Tap the toppings it asked for, hear the oven ding and watch it hop! A free baking game for small kids, from our 3D-printable toy shop."),
     "games/train": ("Toy Train", "Put each cute toy friend on the train car that shows its picture, then toot toot, off it goes! A free matching game for small kids, from our 3D-printable toy shop."),
@@ -208,7 +209,9 @@ def main():
     cover = products[0]["cover"] if products else "icons/icon-512.png"
     site_ld = [{"@context": "https://schema.org", "@type": "WebSite", "name": "Daily Layer", "url": SITE + "/"},
                {"@context": "https://schema.org", "@type": "Organization", "name": "Daily Layer", "url": SITE + "/",
-                "logo": f"{SITE}/icons/icon-512.png", "email": "tronghieu3111988@gmail.com"}]
+                "logo": f"{SITE}/icons/icon-512.png"}]
+    if os.environ.get("DL_CONTACT_EMAIL"):   # contact address for the Organization record; set it in the environment, not in code
+        site_ld[1]["email"] = os.environ["DL_CONTACT_EMAIL"]
     home_t = "Daily Layer – free kids' games and 3D printable toys"
     inject(PUB / "index.html", tag_block(home_t, HOME_DESC, "", cover, site_ld), home_t)
     for path, (name, desc) in GAMES.items():

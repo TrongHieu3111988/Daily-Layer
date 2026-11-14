@@ -3,6 +3,206 @@
  "started": "2026-10-28",
  "products": [
   {
+   "slug": "sculpt-reindeer",
+   "title": "Chibi Reindeer",
+   "price": 2.49,
+   "blurb": "Chibi reindeer with branching antlers, a red berry nose, a cream muzzle and a green knitted scarf. One solid piece, colour-split for AMS.",
+   "tags": [
+    "figure",
+    "cute",
+    "animal",
+    "reindeer",
+    "christmas",
+    "stocking-stuffer",
+    "kids",
+    "multicolor"
+   ],
+   "line": "figure",
+   "print_hint": "Sculpted in Sculpt Studio. Painted OBJ/3MF (Bambu Studio maps the colours to your filaments on import), colour-split 3MF and single-colour STL; 0.12-0.16 mm layers.",
+   "parts": [
+    {
+     "name": "body",
+     "triangles": 176336,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 47.95,
+     "size_mm": [
+      47.2,
+      50.1,
+      70.1
+     ],
+     "min_z": 0.0
+    }
+   ],
+   "colour_parts": [
+    {
+     "name": "cream",
+     "triangles": 30564,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 3,
+     "volume_cm3": 2.44,
+     "size_mm": [
+      13.3,
+      48.6,
+      38.6
+     ],
+     "min_z": 3.56
+    },
+    {
+     "name": "ginger",
+     "triangles": 183376,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 38.15,
+     "size_mm": [
+      47.2,
+      40.7,
+      54.6
+     ],
+     "min_z": -0.03
+    },
+    {
+     "name": "pine",
+     "triangles": 58456,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 5.26,
+     "size_mm": [
+      39.1,
+      38.3,
+      17.1
+     ],
+     "min_z": 10.05
+    },
+    {
+     "name": "brown",
+     "triangles": 27416,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 4,
+     "volume_cm3": 1.61,
+     "size_mm": [
+      34.8,
+      25.1,
+      70.1
+     ],
+     "min_z": -0.04
+    },
+    {
+     "name": "pink",
+     "triangles": 3296,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 4,
+     "volume_cm3": 0.07,
+     "size_mm": [
+      35.4,
+      13.1,
+      13.2
+     ],
+     "min_z": 33.39
+    },
+    {
+     "name": "ink",
+     "triangles": 5476,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 3,
+     "volume_cm3": 0.2,
+     "size_mm": [
+      19.3,
+      12.4,
+      16.2
+     ],
+     "min_z": 30.2
+    },
+    {
+     "name": "white",
+     "triangles": 608,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 2,
+     "volume_cm3": 0.01,
+     "size_mm": [
+      16.8,
+      1.8,
+      2.3
+     ],
+     "min_z": 42.96
+    },
+    {
+     "name": "red",
+     "triangles": 3064,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 0.14,
+     "size_mm": [
+      7.2,
+      6.3,
+      6.4
+     ],
+     "min_z": 33.71
+    }
+   ],
+   "watertight": true,
+   "smooth": true,
+   "web": [
+    {
+     "file": null,
+     "color": "#F4E9D4",
+     "name": "cream"
+    },
+    {
+     "file": null,
+     "color": "#C27C43",
+     "name": "ginger"
+    },
+    {
+     "file": null,
+     "color": "#2F8A57",
+     "name": "pine"
+    },
+    {
+     "file": null,
+     "color": "#7A4E33",
+     "name": "brown"
+    },
+    {
+     "file": null,
+     "color": "#F7A1B5",
+     "name": "pink"
+    },
+    {
+     "file": null,
+     "color": "#24283A",
+     "name": "ink"
+    },
+    {
+     "file": null,
+     "color": "#FBFBF8",
+     "name": "white"
+    },
+    {
+     "file": null,
+     "color": "#D9443F",
+     "name": "red"
+    }
+   ],
+   "preview": "products/sculpt-reindeer/preview_fc.bin",
+   "preview_face": true,
+   "download": "",
+   "cover": "products/sculpt-reindeer/cover.jpg",
+   "build_seconds": 0,
+   "download_bytes": 11303019,
+   "dropped": "2026-11-14",
+   "title_vi": "Tu\u1ea7n L\u1ed9c M\u0169m M\u0129m"
+  },
+  {
    "slug": "dragon-egg-baby-dragon",
    "title": "Dragon Egg with Baby Dragon Inside",
    "title_vi": "Tr\u1ee9ng R\u1ed3ng C\u00f3 R\u1ed3ng Con B\u00ean Trong",
@@ -2566,6 +2766,6 @@
   "members": 0,
   "costs_usd": 0.0
  },
- "updated": "2026-11-10 08:52",
- "featured": "dragon-egg-baby-dragon"
+ "updated": "2026-11-14 08:49",
+ "featured": "sculpt-reindeer"
 }

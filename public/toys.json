@@ -1,7 +1,21 @@
 {
- "updated": "2026-10-30 08:55",
- "featured": "rainbow-wiggle-snake",
+ "updated": "2026-11-14 08:49",
+ "featured": "sculpt-reindeer",
  "toys": [
+  {
+   "slug": "sculpt-reindeer",
+   "title": "Chibi Reindeer",
+   "title_vi": "Tu\u1ea7n L\u1ed9c M\u0169m M\u0129m",
+   "price": 2.49,
+   "dropped": "2026-11-14",
+   "height_mm": 70.2,
+   "game": "products/sculpt-reindeer/game.bin",
+   "cover": "products/sculpt-reindeer/cover.jpg",
+   "icon": "products/sculpt-reindeer/icon.png",
+   "colour": "#C27C43",
+   "look": null,
+   "featured": true
+  },
   {
    "slug": "sculpt-gingerbread",
    "title": "Gingerbread Buddy",
