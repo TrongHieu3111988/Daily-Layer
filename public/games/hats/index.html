@@ -1,0 +1,542 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Toy Dress-up Hats – free kids&#x27; game | Daily Layer</title>
+<!--seo-->
+<meta name="description" content="Every hat has the colour of one toy friend: drag each hat onto the friend of the same colour. A free colour-matching game for small kids, from our 3D-printable toy shop.">
+<link rel="canonical" href="https://dailylayer.funny3dprint.workers.dev/games/hats/">
+<meta property="og:site_name" content="Daily Layer">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Toy Dress-up Hats – free kids&#x27; game | Daily Layer">
+<meta property="og:description" content="Every hat has the colour of one toy friend: drag each hat onto the friend of the same colour. A free colour-matching game for small kids, from our 3D-printable toy shop.">
+<meta property="og:url" content="https://dailylayer.funny3dprint.workers.dev/games/hats/">
+<meta property="og:image" content="https://dailylayer.funny3dprint.workers.dev/products/wiggle-axolotl/cover.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "VideoGame", "name": "Toy Dress-up Hats", "description": "Every hat has the colour of one toy friend: drag each hat onto the friend of the same colour. A free colour-matching game for small kids, from our 3D-printable toy shop.", "url": "https://dailylayer.funny3dprint.workers.dev/games/hats/", "genre": "Educational", "gamePlatform": "Web browser", "applicationCategory": "Game", "audience": {"@type": "PeopleAudience", "suggestedMinAge": 3}, "isAccessibleForFree": true, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}}</script>
+<!--/seo-->
+<meta name="theme-color" content="#FFC93C">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/icons/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="stylesheet" href="/vendor/fonts/fonts.css">
+<style>
+/* Daily Layer game kit: the same chunky toy-block look as the shop. One-screen apps: bar on top, stage fills the rest. */
+:root{
+  --sky:#DCF0FF; --sky2:#C9E8FF; --paper:#FFFFFF; --ink:#1B2547; --muted:#55608A; --outline:#1B2547;
+  --sun:#FFC93C; --coral:#FF6B57; --grass:#3FBF7F; --grape:#8C6BF2; --bubble:#5DB8FF; --pink:#FF8FB8; --wood:#E9B97A; --wood2:#C98E4F;
+  --good:#1C9A5E; --bad:#E04A3A; --pop:0 5px 0 var(--outline); --pop-sm:0 3px 0 var(--outline);
+  --f-display:"Baloo 2","Nunito",ui-rounded,system-ui,sans-serif;
+  --f-body:"Nunito",ui-rounded,system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --sky:#101A3A; --sky2:#14204A; --paper:#1A2550; --ink:#EEF2FF; --muted:#AAB4DA; --outline:#070B1F;
+  --sun:#FFCF4D; --coral:#FF7A66; --grass:#4FD08F; --grape:#A487FF; --bubble:#6CC2FF; --pink:#FF9DC3; --wood:#B98A55; --wood2:#8E6234;
+  --good:#4FD08F; --bad:#FF7A66; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --sky:#101A3A; --sky2:#14204A; --paper:#1A2550; --ink:#EEF2FF; --muted:#AAB4DA; --outline:#070B1F;
+  --sun:#FFCF4D; --coral:#FF7A66; --grass:#4FD08F; --grape:#A487FF; --bubble:#6CC2FF; --pink:#FF9DC3; --wood:#B98A55; --wood2:#8E6234;
+  --good:#4FD08F; --bad:#FF7A66; color-scheme:dark}
+body{margin:0}[hidden]{display:none!important}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--sky);color:var(--ink);font-family:var(--f-body);font-size:16px;overflow:hidden;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--grape);outline-offset:3px}
+.app{height:100%;display:flex;flex-direction:column}
+.bar{display:flex;align-items:center;gap:8px;padding-block:8px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.bar h1{font-family:var(--f-display);font-weight:800;font-size:22px;margin:0 auto 0 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.ibtn{width:44px;height:44px;flex:none;border-radius:14px;border:2.5px solid var(--outline);background:var(--paper);display:grid;place-items:center;box-shadow:var(--pop-sm);text-decoration:none;color:var(--ink);font-family:var(--f-display);font-weight:800;font-size:14px}
+.ibtn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--outline)}
+.ibtn svg{width:22px;height:22px}
+.score{flex:none;display:flex;align-items:center;gap:6px;background:var(--sun);color:#3A2A00;border:2.5px solid var(--outline);border-radius:14px;padding:4px 12px;font-family:var(--f-display);font-weight:800;font-size:18px;box-shadow:var(--pop-sm);font-variant-numeric:tabular-nums}
+.score svg{width:20px;height:20px}
+.stage{position:relative;flex:1;min-height:0;margin:0 max(16px,env(safe-area-inset-right,0px)) 12px max(16px,env(safe-area-inset-left,0px));border:3px solid var(--outline);border-radius:26px;overflow:hidden;box-shadow:0 6px 0 var(--outline);background:var(--paper)}
+.btn{text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:9px;border:2.5px solid var(--outline);border-radius:18px;padding:12px 22px;font-family:var(--f-display);font-weight:800;font-size:20px;line-height:1;background:var(--paper);color:var(--ink);box-shadow:var(--pop);transition:transform .12s,box-shadow .12s}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 var(--outline)}
+.btn.coral{background:var(--coral);color:#fff}.btn.grass{background:var(--grass);color:#06301B}.btn.sun{background:var(--sun);color:#3A2A00}
+.btn svg{width:24px;height:24px}
+.overlay{position:fixed;inset:0;z-index:30;display:grid;place-items:center;background:rgba(9,14,34,.45);padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.card{background:var(--paper);border:3px solid var(--outline);border-radius:28px;box-shadow:0 8px 0 var(--outline);padding:22px 22px 24px;max-width:420px;width:100%;display:grid;gap:14px;text-align:center;justify-items:center;animation:popin .35s cubic-bezier(.34,1.56,.64,1)}
+.card h2{font-family:var(--f-display);font-weight:800;font-size:32px;line-height:1.05;margin:0}
+.card p{margin:0;color:var(--muted);font-weight:700;line-height:1.45}
+.card canvas.hero{width:200px;height:140px}
+.card .row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.stars{display:flex;gap:6px}
+.stars svg{width:44px;height:44px}
+@keyframes popin{0%{transform:scale(.7);opacity:0}100%{transform:scale(1);opacity:1}}
+.toast{position:absolute;left:50%;top:14px;transform:translateX(-50%);z-index:5;background:var(--paper);border:2.5px solid var(--outline);border-radius:16px;padding:6px 14px;font-family:var(--f-display);font-weight:800;font-size:18px;box-shadow:var(--pop-sm);white-space:nowrap;pointer-events:none;transition:opacity .3s,transform .3s}
+.toast[hidden]{display:block!important;opacity:0;transform:translate(-50%,-10px)}
+canvas#confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:40}
+@media (max-width:420px){.bar h1{font-size:18px}.ibtn{width:40px;height:40px}.score{font-size:16px;padding:3px 10px}}
+@media (prefers-reduced-motion:reduce){.card{animation:none}.btn,.ibtn{transition:none}}
+
+/* Toy Dress-up Hats: each hat has the colour of one toy friend; drag it (or tap it, then tap the friend) onto the friend of the same colour. */
+.stage{background:linear-gradient(#DDF3FF,#F4FBFF 50%,#FFE7F0);display:flex;flex-direction:column;align-items:center;overflow:hidden;touch-action:none}
+:root[data-theme="dark"] .stage{background:linear-gradient(#1E2A44,#283656 50%,#3A2840)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .stage{background:linear-gradient(#1E2A44,#283656 50%,#3A2840)}}
+.round{display:flex;justify-content:center;gap:8px;padding:10px 12px 0}
+.round i{width:14px;height:14px;border-radius:50%;border:2.5px solid var(--outline);background:var(--paper)}
+.round i.on{background:var(--grass)}.round i.now{background:var(--sun)}
+.say{margin:10px 14px 0;padding:8px 18px;background:var(--paper);border:3px solid var(--outline);border-radius:26px;box-shadow:var(--pop-sm);font-family:'Baloo 2',sans-serif;font-weight:800;font-size:21px;line-height:1.2;color:var(--outline);text-align:center;min-height:50px;display:flex;align-items:center}
+.say:empty{visibility:hidden}
+.rack{display:flex;justify-content:center;gap:14px;margin-top:14px;padding:10px 14px 6px;min-height:112px;border-bottom:8px solid #B9875A;border-radius:0 0 6px 6px;width:min(92%,460px)}
+.hat{width:96px;height:92px;padding:0;border:0;background:none;touch-action:none;cursor:grab;transition:transform .25s,opacity .25s}
+.hat svg{width:100%;height:100%;display:block;overflow:visible;pointer-events:none}
+.hat.sel svg{filter:drop-shadow(0 0 7px #FFC93C) drop-shadow(0 0 3px #FFC93C)}
+.hat.sel{transform:translateY(-8px) scale(1.08)}
+.hat.used{opacity:0;pointer-events:none}
+.hat.back{animation:shk .4s ease}
+.ghost{position:fixed;width:96px;height:92px;pointer-events:none;z-index:40;transform:translate(-50%,-60%) scale(1.1)}
+.ghost svg{width:100%;height:100%;display:block;overflow:visible}
+.floor{position:relative;flex:1;min-height:0;width:100%}
+.mat{position:absolute;left:2%;right:2%;bottom:18%;height:30%;border-radius:50%;background:radial-gradient(ellipse at 50% 40%,#C9E9A8,#8FCB6A);border:3px solid rgba(27,37,71,.4);opacity:.9}
+:root[data-theme="dark"] .mat{opacity:.55}
+.pal{position:absolute;padding:0;border:0;background:none;touch-action:none}
+.pal .disc{position:absolute;left:6%;right:6%;bottom:-4%;height:20%;border-radius:50%;border:3px solid var(--outline)}
+.pal .toy{position:absolute;left:4%;right:4%;bottom:4%;height:84%}
+.pal .toy img{width:100%;height:100%;object-fit:contain;object-position:50% 100%;display:block;pointer-events:none}
+.pal .on{position:absolute;left:24%;width:52%;top:-14%;height:42%;pointer-events:none;transform-origin:50% 100%}
+.pal .on svg{width:100%;height:100%;display:block;overflow:visible}
+.pal .on:empty{display:none}
+.pal.drop .on{animation:plop .5s cubic-bezier(.3,1.6,.5,1)}
+.pal.hop .toy,.pal.hop .on{animation:hop .8s ease}
+.pal.no{animation:shk .4s ease}
+.pal.hint .disc{animation:glow 1s ease-in-out infinite}
+.pal.over .disc{box-shadow:0 0 0 6px rgba(255,201,60,.8)}
+@keyframes glow{0%,100%{box-shadow:0 0 0 0 rgba(255,201,60,.9)}50%{box-shadow:0 0 0 12px rgba(255,201,60,.9)}}
+@keyframes plop{0%{transform:translateY(-60%) scale(1.3)}100%{transform:none}}
+@keyframes shk{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+@keyframes hop{0%,100%{transform:translateY(0)}40%{transform:translateY(-22%)}70%{transform:translateY(0) scale(1.03,.97)}}
+@media (prefers-reduced-motion:reduce){.hat,.pal .on{transition:none}.pal.drop .on,.pal.hop .toy,.pal.hop .on,.pal.no,.hat.back,.pal.hint .disc{animation:none}.pal.hint .disc{box-shadow:0 0 0 8px rgba(255,201,60,.9)}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="bar">
+    <a class="ibtn" id="back" href="/" data-t-label="back" aria-label="Back"></a>
+    <h1 data-t="title">Toy Dress-up Hats</h1>
+    <span class="score" aria-live="polite"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.8-4.5 4.2 1.2 6L12 16.6 6.5 19.6l1.2-6L3.2 9.4l6.1-.8z" fill="#FFC93C" stroke="#1B2547" stroke-width="2" stroke-linejoin="round"/></svg><span id="count">0</span></span>
+    <button class="ibtn" id="soundBtn" type="button" data-t-label="sound" aria-label="Sound"></button>
+    <button class="ibtn" id="langBtn" type="button" aria-label="Language">VI</button>
+  </header>
+  <main class="stage" id="stage">
+    <div class="round" id="round" aria-hidden="true"></div>
+    <div class="say" id="say" aria-live="polite"></div>
+    <div class="rack" id="rack"></div>
+    <div class="floor" id="floor"><div class="mat"></div></div>
+  </main>
+</div>
+
+<div class="overlay" id="intro">
+  <div class="card">
+    <canvas id="introArt" width="400" height="260" style="width:100%;max-width:320px;height:auto"></canvas>
+    <h2 data-t="introH">Hats on!</h2>
+    <p data-t="introP">Every hat has the colour of one toy friend. Drag a hat onto the friend with the same colour, or tap the hat and then the friend.</p>
+    <button class="btn coral" type="button" id="startBtn"><span data-t="start">Let's dress up!</span></button>
+  </div>
+</div>
+<div class="overlay" id="over" hidden>
+  <div class="card">
+    <div class="stars" id="stars"></div>
+    <h2 id="overH">What a hat party!</h2>
+    <p id="overP"></p>
+    <div class="row"><button class="btn coral" type="button" id="againBtn"><span data-t="again">Play again</span></button><a class="btn" id="homeBtn" href="/" data-t="home">More games</a></div>
+  </div>
+</div>
+
+<script>
+/* Daily Layer game kit: words, sound, confetti and the "toy friends" every game draws. */
+(function () {
+  "use strict";
+  const K = {};
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+  };
+  K.store = store;
+  K.CALM = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---------- words ---------- */
+  // English first; Vietnamese on Vietnamese devices, or whatever was last picked in the shop or any game (one shared setting)
+  K.lang = (() => { let v = ""; try { v = (localStorage.getItem("dl-lang") || "").replace(/"/g, ""); } catch (e) {} return v === "vi" || v === "en" ? v : /^vi/i.test(navigator.language || "") ? "vi" : "en"; })();
+  K.words = { en: {}, vi: {} };
+  K.t = (k, ...a) => { const v = K.words[K.lang][k] ?? K.words.en[k] ?? k; return typeof v === "function" ? v(...a) : v; };
+  K.applyWords = () => {
+    document.documentElement.lang = K.lang;
+    document.querySelectorAll("[data-t]").forEach(el => { el.textContent = K.t(el.dataset.t); });
+    document.querySelectorAll("[data-t-label]").forEach(el => { el.setAttribute("aria-label", K.t(el.dataset.tLabel)); });
+    const b = document.getElementById("langBtn"); if (b) b.textContent = K.lang === "vi" ? "EN" : "VI";
+    K.onLang && K.onLang();
+  };
+  K.toggleLang = () => { K.lang = K.lang === "vi" ? "en" : "vi"; store.set("dl-lang", K.lang); K.applyWords(); };
+
+  /* ---------- sound: tiny synth blips, only after the child has touched the screen ---------- */
+  let ac = null; K.muted = store.get("dl-muted", false);
+  function ctx() { if (K.muted) return null; if (!ac) { try { ac = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return null; } } if (ac.state === "suspended") ac.resume(); return ac; }
+  function tone(f0, f1, dur, type = "sine", vol = 0.18, delay = 0) {
+    const a = ctx(); if (!a) return;
+    const t0 = a.currentTime + delay, o = a.createOscillator(), g = a.createGain();
+    o.type = type; o.frequency.setValueAtTime(f0, t0); o.frequency.exponentialRampToValueAtTime(Math.max(30, f1), t0 + dur);
+    g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(vol, t0 + 0.015); g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    o.connect(g).connect(a.destination); o.start(t0); o.stop(t0 + dur + 0.02);
+  }
+  K.sfx = {
+    pop: () => tone(520, 880, 0.12, "triangle", 0.16),
+    thud: () => tone(180, 90, 0.14, "sine", 0.22),
+    boing: () => { tone(300, 120, 0.25, "square", 0.06); tone(150, 260, 0.2, "sine", 0.12, 0.05); },
+    chime: () => { [660, 880, 1320].forEach((f, i) => tone(f, f * 1.01, 0.22, "triangle", 0.12, i * 0.07)); },
+    tada: () => { [523, 659, 784, 1046].forEach((f, i) => tone(f, f, 0.3, "triangle", 0.14, i * 0.09)); },
+    tick: () => tone(1200, 900, 0.04, "square", 0.04)
+  };
+  K.setMuted = m => { K.muted = m; store.set("dl-muted", m); const b = document.getElementById("soundBtn"); if (b) b.innerHTML = m ? K.ICON.mute : K.ICON.sound; };
+
+  /* ---------- confetti ---------- */
+  let cc = null, cg = null, bits = [], craf = 0;
+  const CONF = ["#FF6B57", "#FFC93C", "#3FBF7F", "#5DB8FF", "#8C6BF2", "#FF8FB8"];
+  K.confetti = (x, y, n = 60) => {
+    if (K.CALM) return;
+    if (!cc) { cc = document.createElement("canvas"); cc.id = "confetti"; document.body.appendChild(cc); cg = cc.getContext("2d"); }
+    const d = Math.min(devicePixelRatio || 1, 2); cc.width = innerWidth * d; cc.height = innerHeight * d;
+    x = x ?? innerWidth / 2; y = y ?? innerHeight / 3;
+    for (let i = 0; i < n; i++) { const a = Math.random() * Math.PI * 2, s = 4 + Math.random() * 7;
+      bits.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s - 5, r: Math.random() * 6, vr: (Math.random() - .5) * .4, w: 6 + Math.random() * 6, h: 4 + Math.random() * 4, c: CONF[i % CONF.length], life: 0 }); }
+    if (!craf) craf = requestAnimationFrame(step);
+    function step() {
+      const d = cc.width / innerWidth; cg.clearRect(0, 0, cc.width, cc.height);
+      for (let i = bits.length - 1; i >= 0; i--) { const b = bits[i]; b.life++; b.vy += 0.25; b.vx *= 0.99; b.x += b.vx; b.y += b.vy; b.r += b.vr;
+        if (b.y > innerHeight + 20 || b.life > 240) { bits.splice(i, 1); continue; }
+        cg.save(); cg.translate(b.x * d, b.y * d); cg.rotate(b.r); cg.fillStyle = b.c; cg.fillRect(-b.w * d / 2, -b.h * d / 2, b.w * d, b.h * d); cg.restore(); }
+      craf = bits.length ? requestAnimationFrame(step) : 0;
+    }
+  };
+
+  /* ---------- toy friends: our own little characters, drawn with canvas ---------- */
+  K.COLS = { coral: "#FF6B57", sun: "#FFC93C", grass: "#3FBF7F", sky: "#5DB8FF", grape: "#8C6BF2", pink: "#FF8FB8", orange: "#FF9B3D", mint: "#7FE0C2" };
+  K.INK = "#1B2547";
+  function shapePath(g, shape, w, h) {
+    g.beginPath();
+    const r = Math.min(w, h) * 0.22;
+    if (shape === "ball") { g.ellipse(0, 0, w / 2, h / 2, 0, 0, Math.PI * 2); }
+    else if (shape === "tri") { g.moveTo(0, -h / 2); g.lineTo(w / 2, h / 2); g.lineTo(-w / 2, h / 2); g.closePath(); }
+    else if (shape === "dome") { g.moveTo(-w / 2, h / 2); g.lineTo(-w / 2, 0); g.ellipse(0, 0, w / 2, h / 2, 0, Math.PI, 0); g.lineTo(w / 2, h / 2); g.closePath(); }
+    else if (shape === "star") { for (let k = 0; k < 10; k++) { const a = -Math.PI / 2 + k * Math.PI / 5, rr = k % 2 ? 0.42 : 1; g.lineTo(Math.cos(a) * w / 2 * rr, Math.sin(a) * h / 2 * rr * 1.05 + h * 0.04); } g.closePath(); }
+    else if (shape === "heart") { const s = w / 2; g.moveTo(0, h * 0.42); g.bezierCurveTo(-s * 1.4, -h * 0.05, -s * 0.55, -h * 0.62, 0, -h * 0.2); g.bezierCurveTo(s * 0.55, -h * 0.62, s * 1.4, -h * 0.05, 0, h * 0.42); }
+    else { g.roundRect ? g.roundRect(-w / 2, -h / 2, w, h, r) : g.rect(-w / 2, -h / 2, w, h); }
+  }
+  K.shapePath = shapePath;
+  /* Each block colour belongs to one of the shop's animals, so a colour still means the same friend in every puzzle.
+     The block keeps its shape (the physics and the puzzles use it); the animal is painted on: ears, patches, nose, beak. */
+  K.ANIMALS = {
+    fox: { ears: "point", tip: "#1B2547", inner: "#FFE3D6", muzzle: "#FFFFFF", nose: true },
+    chick: { tuft: true, belly: "#FFE58A", beak: "#FF9B3D" },
+    frog: { bumps: true, belly: "#BFF0C9", wide: true },
+    whale: { spout: true, belly: "#D6EEFF", lines: true },
+    penguin: { mask: "#FFFFFF", beak: "#FFB13D" },
+    axolotl: { gills: "#E0457B", spots: "#FF6FA0" },
+    kitten: { ears: "point", inner: "#FFC4D6", stripes: "rgba(27,37,71,.32)", nose: "#FF8FB8", whiskers: true },
+    bear: { ears: "round", inner: "#E8C9A0", muzzle: "#E8C9A0", nose: true },
+    bunny: { ears: "long", inner: "#FFC4D6", nose: "#FF8FB8", whiskers: true }
+  };
+  K.ANIMAL_OF = { "#ff6b57": "fox", "#ffc93c": "chick", "#3fbf7f": "frog", "#5db8ff": "whale", "#8c6bf2": "penguin", "#ff8fb8": "axolotl",
+    "#ff9b3d": "kitten", "#b8834f": "bear", "#f4effa": "bunny", "#7fe0c2": "frog" };
+  // y of the top edge of a shape at x (for ears and bumps); null where there is no flat-ish top
+  function topAt(shape, w, h, x) {
+    const u = Math.min(1, Math.abs(x) / (w / 2));
+    if (shape === "ball" || shape === "dome") return -(h / 2) * Math.sqrt(1 - u * u);
+    if (shape === "tri") return -h / 2 + h * u;
+    if (shape === "star" || shape === "heart") return null;
+    return -h / 2;
+  }
+  function blob(g, x, y, rx, ry, rot, fill, lw) { g.beginPath(); g.ellipse(x, y, rx, ry, rot || 0, 0, Math.PI * 2); g.fillStyle = fill; g.fill(); if (lw) { g.lineWidth = lw; g.strokeStyle = K.INK; g.stroke(); } }
+  // behind the body: ears, gills, bumps, tuft, spout
+  function animalBack(g, a, o, w, h, s, lw, colour) {
+    const sh = o.shape, tri = sh === "tri", ex = tri ? w * 0.15 : Math.min(w * 0.3, w / 2 - s * 0.14), ear = s * (tri ? 0.18 : 0.22);
+    const T = x => topAt(sh, w, h, x);
+    if (a.ears && T(ex) !== null) for (const sx of [-1, 1]) {
+      const x = sx * ex, y = T(x) + ear * 0.25;
+      g.save(); g.translate(x, y); g.rotate(sx * (tri ? 0.75 : a.ears === "long" ? 0.12 : 0.28));
+      if (a.ears === "point") {
+        g.beginPath(); g.moveTo(-ear * 0.62, ear * 0.3); g.lineTo(0, -ear * 1.05); g.lineTo(ear * 0.62, ear * 0.3); g.closePath(); g.fillStyle = colour; g.fill(); g.lineWidth = lw; g.strokeStyle = K.INK; g.lineJoin = "round"; g.stroke();
+        g.beginPath(); g.moveTo(-ear * 0.3, ear * 0.15); g.lineTo(0, -ear * 0.6); g.lineTo(ear * 0.3, ear * 0.15); g.closePath(); g.fillStyle = a.inner; g.fill();
+        if (a.tip) { g.save(); g.beginPath(); g.moveTo(-ear * 0.62, ear * 0.3); g.lineTo(0, -ear * 1.05); g.lineTo(ear * 0.62, ear * 0.3); g.closePath(); g.clip(); g.fillStyle = a.tip; g.fillRect(-ear, -ear * 1.2, ear * 2, ear * 0.55); g.restore(); }
+      } else if (a.ears === "round") { blob(g, 0, -ear * 0.2, ear * 0.55, ear * 0.55, 0, colour, lw); blob(g, 0, -ear * 0.2, ear * 0.28, ear * 0.28, 0, a.inner); }
+      else { blob(g, 0, -ear * 1.0, ear * 0.42, ear * 1.25, 0, colour, lw); blob(g, 0, -ear * 0.95, ear * 0.2, ear * 0.85, 0, a.inner); }
+      g.restore();
+    }
+    if (a.gills) for (const sx of [-1, 1]) {
+      const bx = sx * (sh === "tri" ? w * 0.3 : w / 2), by = sh === "tri" ? h * 0.12 : -h * 0.12;
+      for (let k = -1; k <= 1; k++) { g.save(); g.translate(bx, by + k * s * 0.13); g.rotate(sx * (Math.PI / 2 + k * 0.5) - Math.PI / 2 * sx + sx * 0.0); blob(g, sx * s * 0.11, 0, s * 0.13, s * 0.055, k * 0.45 * sx, a.gills, lw * 0.8); g.restore(); }
+    }
+    if (a.tuft && T(0) !== null) { g.lineWidth = lw; g.strokeStyle = K.INK; g.lineCap = "round"; const y = T(0);
+      for (const k of [-1, 0, 1]) { g.beginPath(); g.moveTo(k * s * 0.05, y + 1); g.quadraticCurveTo(k * s * 0.12, y - s * 0.12, k * s * 0.09 + s * 0.04, y - s * 0.17); g.stroke(); } }
+    if (a.spout && T(0) !== null) { const y = T(0) - s * 0.05; g.lineWidth = lw * 0.9; g.strokeStyle = K.INK; g.fillStyle = "#BDE6FF";
+      for (const sx of [-1, 1]) { g.beginPath(); g.moveTo(0, y); g.quadraticCurveTo(sx * s * 0.05, y - s * 0.2, sx * s * 0.17, y - s * 0.17); g.stroke(); }
+      for (const sx of [-1, 0, 1]) blob(g, sx * s * 0.19, y - s * (sx ? 0.15 : 0.26), s * 0.045, s * 0.055, 0, "#BDE6FF", lw * 0.6); }
+  }
+  // inside the body (clipped): patches, belly, stripes
+  function animalPatches(g, a, o, w, h, s, fy, ey, ex) {
+    if (a.belly) blob(g, 0, h / 2, w * (a.wide ? 0.42 : 0.34), h * 0.4, 0, a.belly);
+    if (a.lines) { g.strokeStyle = "rgba(27,37,71,.18)"; g.lineWidth = Math.max(1, s * 0.025); for (const k of [-1, 0, 1]) { g.beginPath(); g.moveTo(k * w * 0.12, h * 0.2); g.lineTo(k * w * 0.12, h / 2); g.stroke(); } }
+    if (a.mask) { blob(g, -ex * 0.95, ey + s * 0.02, s * 0.2, s * 0.22, 0, a.mask); blob(g, ex * 0.95, ey + s * 0.02, s * 0.2, s * 0.22, 0, a.mask); blob(g, 0, ey + s * 0.16, s * 0.24, s * 0.16, 0, a.mask); blob(g, 0, h / 2, w * 0.32, h * 0.36, 0, a.mask); }
+    if (a.muzzle) blob(g, 0, ey + s * 0.13, s * 0.21, s * 0.13, 0, a.muzzle);
+    if (a.stripes) { g.strokeStyle = a.stripes; g.lineWidth = Math.max(1.5, s * 0.05); g.lineCap = "round"; const y = ey - s * 0.2;
+      for (const k of [-1, 0, 1]) { g.beginPath(); g.moveTo(k * s * 0.1, y - s * 0.06 + Math.abs(k) * s * 0.03); g.lineTo(k * s * 0.1, y + s * 0.04); g.stroke(); }
+      for (const sx of [-1, 1]) for (const k of [0, 1]) { g.beginPath(); g.moveTo(sx * w / 2, ey + k * s * 0.12); g.lineTo(sx * (w / 2 - s * 0.12), ey + k * s * 0.12 + s * 0.02); g.stroke(); } }
+    if (a.spots) for (const [x, y, r] of [[-0.3, -0.25, 0.05], [0.32, -0.18, 0.04], [0.25, 0.3, 0.05], [-0.28, 0.28, 0.035]]) blob(g, x * w, y * h + fy, s * r, s * r, 0, a.spots);
+  }
+  /* ---------- the toy library: every model the shop has made (toys.json), so games grow with the shop ----------
+     Each toy brings its body colour, a front-view sticker (icon.png), its Vietnamese name and, for known animals, a 2D look.
+     After K.library() resolves, K.TOYS[slug] is set and a slug can be passed anywhere a colour goes. */
+  K.TOYS = {};
+  K.library = (timeout = 5000) => K._lib || (K._lib = new Promise(res => {
+    const base = window.ASSETS || "/", done = list => res(list), timer = setTimeout(() => done([]), timeout);
+    fetch(base + "toys.json").then(r => r.ok ? r.json() : { toys: [] }).then(async j => {
+      const list = await Promise.all((j.toys || []).map(t => new Promise(r2 => {
+        const toy = { ...t, img: null }; K.TOYS[t.slug] = toy;
+        if (!t.icon) return r2(toy);
+        const im = new Image(); im.onload = () => { toy.img = im; r2(toy); }; im.onerror = () => r2(toy); im.src = base + t.icon;
+      })));
+      clearTimeout(timer); done(list);
+    }).catch(() => { clearTimeout(timer); done([]); });
+  }));
+  K.toyName = t => (K.lang === "vi" && t.title_vi ? t.title_vi : (t.title || "").replace(/\s*\(.*\)\s*/, ""));
+  // draw a friend centred at (0,0); opts: shape, colour (or a toy slug from the library), w, h, mood ("happy" | "wow" | "sleepy" | "sad"), lw, animal (defaults from the colour)
+  K.friend = (g, o) => {
+    const toy = o.toy || K.TOYS[o.colour];
+    const { shape = "square", w = 60, h = 60, mood = "happy" } = o, colour = toy ? toy.colour : (o.colour || "#FFC93C"), lw = o.lw ?? Math.max(2, Math.min(w, h) * 0.07);
+    const name = toy ? toy.look : o.animal === undefined ? K.ANIMAL_OF[String(colour).toLowerCase()] : o.animal, a = name ? K.ANIMALS[name] : null;
+    if (toy && !a && toy.img) return stickerFriend(g, toy, shape, colour, w, h, lw);
+    const s = Math.min(w, h), fy = shape === "tri" ? h * 0.18 : shape === "dome" ? h * 0.08 : 0, ex = s * 0.17, ey = fy - s * 0.04, er = Math.max(1.6, s * 0.065);
+    g.save();
+    if (a) animalBack(g, a, o, w, h, s, lw, colour);
+    shapePath(g, shape, w, h); g.fillStyle = colour; g.fill();
+    // soft highlight, animal patches and a little shade, all inside the shape
+    g.save(); shapePath(g, shape, w, h); g.clip();
+    if (a) animalPatches(g, a, o, w, h, s, fy, ey, ex);
+    g.fillStyle = "rgba(255,255,255,.28)"; g.beginPath(); g.ellipse(-w * 0.22, -h * 0.28, w * 0.28, h * 0.16, -0.5, 0, Math.PI * 2); g.fill();
+    g.fillStyle = "rgba(0,0,0,.08)"; g.fillRect(-w, h * 0.22, w * 2, h); g.restore();
+    shapePath(g, shape, w, h); g.lineWidth = lw; g.strokeStyle = K.INK; g.lineJoin = "round"; g.stroke();
+    // frog eyes sit on bumps on top of the head
+    let eY = ey; const T0 = topAt(shape, w, h, ex);
+    if (a && a.bumps && T0 !== null && shape !== "tri") { eY = T0 + s * 0.02; for (const sx of [-1, 1]) blob(g, sx * ex, eY, s * 0.15, s * 0.14, 0, colour, lw);
+      g.save(); g.beginPath(); g.rect(-w, T0 + lw / 2, w * 2, h); g.clip(); for (const sx of [-1, 1]) blob(g, sx * ex, eY, s * 0.15 - lw / 2, s * 0.14 - lw / 2, 0, colour); g.restore();
+      for (const sx of [-1, 1]) blob(g, sx * ex, eY - s * 0.01, s * 0.1, s * 0.1, 0, "#FFFFFF"); }
+    // face
+    g.fillStyle = K.INK; g.strokeStyle = K.INK; g.lineCap = "round"; g.lineWidth = Math.max(1.5, s * 0.05);
+    if (mood === "sleepy") { for (const sx of [-1, 1]) { g.beginPath(); g.arc(sx * ex, eY, er, 0.1 * Math.PI, 0.9 * Math.PI); g.stroke(); } }
+    else for (const sx of [-1, 1]) { g.beginPath(); g.ellipse(sx * ex, eY, er, er * (mood === "wow" ? 1.35 : 1.15), 0, 0, Math.PI * 2); g.fill();
+      g.fillStyle = "#fff"; g.beginPath(); g.arc(sx * ex - er * 0.3, eY - er * 0.35, er * 0.38, 0, Math.PI * 2); g.fill(); g.fillStyle = K.INK; }
+    g.fillStyle = "rgba(255,120,150,.55)";
+    for (const sx of [-1, 1]) { g.beginPath(); g.ellipse(sx * ex * 1.75, ey + s * 0.1, s * 0.07, s * 0.045, 0, 0, Math.PI * 2); g.fill(); }
+    let my = ey + s * 0.07;
+    if (a && a.beak) { my = ey + s * 0.16; g.beginPath(); g.moveTo(-s * 0.075, ey + s * 0.05); g.lineTo(s * 0.075, ey + s * 0.05); g.lineTo(0, ey + s * 0.14); g.closePath(); g.fillStyle = a.beak; g.fill(); g.lineWidth = Math.max(1.2, s * 0.03); g.stroke(); g.lineWidth = Math.max(1.5, s * 0.05); }
+    if (a && a.nose) { my = ey + s * 0.1; blob(g, 0, ey + s * 0.065, s * 0.045, s * 0.032, 0, a.nose === true ? K.INK : a.nose); }
+    if (a && a.whiskers) { g.lineWidth = Math.max(1, s * 0.022); for (const sx of [-1, 1]) for (const k of [-1, 1]) { g.beginPath(); g.moveTo(sx * s * 0.13, ey + s * 0.11); g.lineTo(sx * s * 0.3, ey + s * 0.11 + k * s * 0.04); g.stroke(); } g.lineWidth = Math.max(1.5, s * 0.05); }
+    g.fillStyle = K.INK; g.beginPath();
+    const mr = a && a.wide ? s * 0.15 : s * 0.09;
+    if (mood === "wow") { g.ellipse(0, my + s * 0.08, s * 0.05, s * 0.065, 0, 0, Math.PI * 2); g.fill(); }
+    else if (mood === "sad") { g.arc(0, my + s * 0.15, s * 0.08, 1.15 * Math.PI, 1.85 * Math.PI); g.stroke(); }
+    else { g.arc(0, my - (a && a.wide ? s * 0.06 : 0), mr, 0.15 * Math.PI, 0.85 * Math.PI); g.stroke(); }
+    g.restore();
+  };
+  // a toy without a painted 2D look (a new model) wears its own picture on the block
+  function stickerFriend(g, toy, shape, colour, w, h, lw) {
+    g.save();
+    shapePath(g, shape, w, h); g.fillStyle = colour; g.fill();
+    g.save(); shapePath(g, shape, w, h); g.clip();
+    g.fillStyle = "rgba(255,255,255,.55)"; g.beginPath(); g.ellipse(0, shape === "tri" ? h * 0.18 : 0, Math.min(w, h) * 0.44, Math.min(w, h) * 0.44, 0, 0, Math.PI * 2); g.fill();
+    const s = Math.min(w, h) * (shape === "tri" ? 0.62 : 0.86), cy = shape === "tri" ? h * 0.16 : shape === "dome" ? h * 0.06 : 0;
+    g.drawImage(toy.img, -s / 2, cy - s / 2, s, s);
+    g.fillStyle = "rgba(0,0,0,.08)"; g.fillRect(-w, h * 0.3, w * 2, h); g.restore();
+    shapePath(g, shape, w, h); g.lineWidth = lw; g.strokeStyle = K.INK; g.lineJoin = "round"; g.stroke();
+    g.restore();
+  }
+  K.star = (g, x, y, r, fill = "#FFC93C") => {
+    g.save(); g.beginPath();
+    for (let k = 0; k < 10; k++) { const a = -Math.PI / 2 + k * Math.PI / 5, rr = k % 2 ? r * 0.45 : r; g.lineTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr); }
+    g.closePath(); g.fillStyle = fill; g.fill(); g.lineWidth = Math.max(2, r * 0.18); g.strokeStyle = K.INK; g.lineJoin = "round"; g.stroke(); g.restore();
+  };
+  K.starSVG = on => `<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M20 3l5 10.3 11.3 1.5-8.3 7.8 2.1 11.2L20 28.3 9.9 33.8 12 22.6 3.7 14.8 15 13.3z" fill="${on ? "#FFC93C" : "rgba(127,140,180,.25)"}" stroke="#1B2547" stroke-width="3" stroke-linejoin="round"/></svg>`;
+
+  /* ---------- canvas helper: crisp at any pixel density ---------- */
+  K.fit = (canvas, onSize) => {
+    const ro = new ResizeObserver(() => { const r = canvas.getBoundingClientRect(), d = Math.min(devicePixelRatio || 1, 2.5);
+      if (!r.width) return; canvas.width = Math.round(r.width * d); canvas.height = Math.round(r.height * d); onSize && onSize(r.width, r.height, d); });
+    ro.observe(canvas);
+  };
+
+  K.ICON = {
+    back: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>',
+    sound: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor" fill-opacity=".2"/><path d="M16.5 9a4 4 0 010 6M19 6.5a7.5 7.5 0 010 11"/></svg>',
+    mute: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor" fill-opacity=".2"/><path d="M17 9l5 6M22 9l-5 6"/></svg>',
+    star: '<svg viewBox="0 0 24 24"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z" fill="#fff" stroke="#1B2547" stroke-width="2" stroke-linejoin="round"/></svg>',
+    replay: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 108-8H8"/><path d="M8 1L5 4l3 3"/></svg>',
+    play: '<svg viewBox="0 0 24 24"><path d="M7 4.5v15l12.5-7.5z" fill="currentColor"/></svg>'
+  };
+  // shared bar wiring: back link, sound, language
+  K.initBar = () => {
+    const back = document.getElementById("back"); if (back) { back.innerHTML = K.ICON.back; back.href = window.SHOP_URL || "/"; }
+    const s = document.getElementById("soundBtn"); if (s) { s.innerHTML = K.muted ? K.ICON.mute : K.ICON.sound; s.onclick = () => { K.setMuted(!K.muted); if (!K.muted) K.sfx.pop(); }; }
+    const l = document.getElementById("langBtn"); if (l) l.onclick = K.toggleLang;
+  };
+  window.K = K;
+})();
+
+</script>
+<script>
+"use strict";
+K.words.en = { title: "Toy Dress-up Hats", back: "Back", sound: "Sound on or off", introH: "Hats on!", introP: "Every hat has the colour of one toy friend. Drag a hat onto the friend with the same colour, or tap the hat and then the friend.", start: "Let's dress up!", again: "Play again", home: "More games",
+  pick: "Which friend has this colour?", go: "Give each friend a hat!", no: n => "The " + n + " is another colour. Try again!", yay: n => "A hat for the " + n + "!", party: "Hat party!",
+  overH: s => s >= 3 ? "What a hat party!" : s >= 2 ? "Great dressing up!" : "Everyone has a hat!", overP: n => "You gave out " + n + " hats." };
+K.words.vi = { title: "Đội Mũ Cho Bạn", back: "Quay lại", sound: "Bật hoặc tắt âm thanh", introH: "Đội mũ nào!", introP: "Mỗi chiếc mũ có màu của một bạn đồ chơi. Kéo mũ đến bạn cùng màu, hoặc chạm vào mũ rồi chạm vào bạn.", start: "Đội mũ thôi!", again: "Chơi lại", home: "Trò khác",
+  pick: "Bạn nào có màu này?", go: "Đội mũ cho từng bạn nhé!", no: n => n + " có màu khác. Thử lại nhé!", yay: n => "Mũ đẹp cho " + n + "!", party: "Tiệc mũ!",
+  overH: s => s >= 3 ? "Tiệc mũ thật vui!" : s >= 2 ? "Bé chọn mũ giỏi lắm!" : "Bạn nào cũng có mũ rồi!", overP: n => "Bé đã đội " + n + " chiếc mũ." };
+
+const ROUNDS = [2, 2, 3, 3, 3];
+const STYLES = ["party", "beanie", "top", "crown", "sun"];
+let toys = [], round = 0, pals = [], hats = [], sel = null, drag = null, wrongs = 0, totalWrong = 0, given = 0, running = false, locked = true, timers = [];
+const wait = ms => new Promise(r => timers.push(setTimeout(r, K.CALM ? Math.min(ms, 400) : ms)));
+function shuffle(a) { return a.slice().sort(() => Math.random() - .5); }
+function rgb(h) { h = String(h || "#888888").replace("#", ""); return [0, 2, 4].map(i => parseInt(h.slice(i, i + 2), 16)); }
+function dist(a, b) { const p = rgb(a), q = rgb(b); return Math.hypot(p[0] - q[0], p[1] - q[1], p[2] - q[2]); }
+function shade(h, k) { return "rgb(" + rgb(h).map(v => Math.round(k < 0 ? v * (1 + k) : v + (255 - v) * k)).join(",") + ")"; }
+// pick n toys whose colours are easy to tell apart
+function pickToys(n) {
+  for (let tries = 0; tries < 40; tries++) {
+    const out = [];
+    for (const t of shuffle(toys)) if (out.every(o => dist(o.colour, t.colour) > 90)) { out.push(t); if (out.length === n) return out; }
+  }
+  const out = []; for (const t of shuffle(toys)) if (out.every(o => dist(o.colour, t.colour) > 30)) out.push(t);
+  return out.slice(0, Math.max(2, Math.min(n, out.length)));
+}
+function hatSVG(style, c) {
+  const ink = "#1B2547", lt = shade(c, .55), dk = shade(c, -.3);
+  const S = `stroke="${ink}" stroke-width="5" stroke-linejoin="round"`;
+  if (style === "party") return `<svg viewBox="0 0 100 96" aria-hidden="true"><path d="M50 8 L82 86 Q50 96 18 86 Z" fill="${c}" ${S}/><path d="M36 50 Q50 54 64 50 M28 70 Q50 76 72 70" stroke="${lt}" stroke-width="7" fill="none" stroke-linecap="round"/><circle cx="50" cy="9" r="9" fill="#FFF3B0" ${S}/></svg>`;
+  if (style === "beanie") return `<svg viewBox="0 0 100 96" aria-hidden="true"><path d="M14 74 Q14 22 50 22 Q86 22 86 74 Z" fill="${c}" ${S}/><path d="M34 34 L34 70 M50 28 L50 70 M66 34 L66 70" stroke="${dk}" stroke-width="4" stroke-linecap="round"/><rect x="8" y="68" width="84" height="20" rx="9" fill="${lt}" ${S}/><circle cx="50" cy="16" r="12" fill="${lt}" ${S}/></svg>`;
+  if (style === "top") return `<svg viewBox="0 0 100 96" aria-hidden="true"><rect x="26" y="10" width="48" height="66" rx="6" fill="${c}" ${S}/><rect x="26" y="56" width="48" height="12" fill="${lt}" stroke="${ink}" stroke-width="4"/><ellipse cx="50" cy="80" rx="44" ry="10" fill="${c}" ${S}/></svg>`;
+  if (style === "crown") return `<svg viewBox="0 0 100 96" aria-hidden="true"><path d="M12 84 L12 30 L32 52 L50 18 L68 52 L88 30 L88 84 Z" fill="${c}" ${S}/><rect x="12" y="70" width="76" height="14" fill="${lt}" stroke="${ink}" stroke-width="4"/><circle cx="50" cy="18" r="6" fill="#FFF3B0" stroke="${ink}" stroke-width="4"/><circle cx="12" cy="30" r="5" fill="#FFF3B0" stroke="${ink}" stroke-width="4"/><circle cx="88" cy="30" r="5" fill="#FFF3B0" stroke="${ink}" stroke-width="4"/></svg>`;
+  return `<svg viewBox="0 0 100 96" aria-hidden="true"><ellipse cx="50" cy="76" rx="48" ry="14" fill="${c}" ${S}/><path d="M24 76 Q24 30 50 30 Q76 30 76 76 Z" fill="${c}" ${S}/><path d="M25 64 Q50 70 75 64" stroke="${lt}" stroke-width="9" fill="none" stroke-linecap="round"/><circle cx="68" cy="56" r="7" fill="#FFF3B0" stroke="${ink}" stroke-width="4"/></svg>`;
+}
+function say(k, ...a) { document.getElementById("say").textContent = K.t(k, ...a); }
+function layout() {
+  const fl = document.getElementById("floor"), W = fl.clientWidth, H = fl.clientHeight, n = pals.length;
+  const size = Math.max(80, Math.min((W - 16) / n - 10, H * 0.55, 190));
+  pals.forEach((p, i) => { const cx = (i + 0.5) * W / n; p.el.style.width = size + "px"; p.el.style.height = size + "px"; p.el.style.left = (cx - size / 2) + "px"; p.el.style.top = (H * 0.66 - size) + "px"; fitHat(p); });
+}
+// where the toy's head is: the first row of the sticker that is not transparent (stickers are square, drawn bottom-aligned)
+const HEAD = {};
+function headTop(t) {
+  if (HEAD[t.slug] !== undefined) return HEAD[t.slug];
+  let top = 0.1;
+  try { const c = document.createElement("canvas"); c.width = c.height = 64; const g = c.getContext("2d"); g.drawImage(t.img, 0, 0, 64, 64);
+    const d = g.getImageData(0, 0, 64, 64).data; outer: for (let y = 0; y < 64; y++) for (let x = 0; x < 64; x++) if (d[(y * 64 + x) * 4 + 3] > 40) { top = y / 64; break outer; } } catch (e) {}
+  return (HEAD[t.slug] = top);
+}
+function fitHat(p) {
+  const S = p.el.clientHeight, ih = S * 0.84, y = S * 0.12 + ih * headTop(p.toy), hh = S * 0.42;
+  const on = p.el.querySelector(".on"); on.style.top = (y - hh * 0.8) + "px"; on.style.height = hh + "px";
+}
+function deal() {
+  const n = ROUNDS[round], set = pickToys(n), style = STYLES[round % STYLES.length]; wrongs = 0; sel = null; locked = false;
+  document.getElementById("round").innerHTML = ROUNDS.map((_, i) => `<i class="${i < round ? "on" : i === round ? "now" : ""}"></i>`).join("");
+  const fl = document.getElementById("floor"); fl.querySelectorAll(".pal").forEach(e => e.remove());
+  pals = set.map(t => {
+    const b = document.createElement("button"); b.type = "button"; b.className = "pal"; b.setAttribute("aria-label", K.toyName(t));
+    const disc = document.createElement("div"); disc.className = "disc"; disc.style.background = t.colour;
+    const toy = document.createElement("div"); toy.className = "toy"; const im = document.createElement("img"); im.src = t.img.src; im.alt = ""; im.draggable = false; toy.appendChild(im);
+    const on = document.createElement("div"); on.className = "on";
+    b.append(disc, toy, on); fl.appendChild(b); const p = { el: b, toy: t, done: false }; b.onclick = () => tapPal(p); return p;
+  });
+  const rack = document.getElementById("rack"); rack.innerHTML = "";
+  hats = shuffle(set).map(t => {
+    const h = document.createElement("button"); h.type = "button"; h.className = "hat"; h.innerHTML = hatSVG(style, t.colour); h.setAttribute("aria-label", K.t("pick"));
+    rack.appendChild(h); const o = { el: h, toy: t, style }; grab(o); return o;
+  });
+  layout(); say("go");
+}
+function select(h) { hats.forEach(o => o.el.classList.toggle("sel", o === h)); sel = h; if (h) { say("pick"); K.sfx.tick(); } }
+function grab(h) {
+  h.el.addEventListener("pointerdown", e => {
+    if (!running || locked || h.el.classList.contains("used")) return;
+    e.preventDefault(); drag = { h, x0: e.clientX, y0: e.clientY, moved: false, ghost: null, id: e.pointerId };
+    try { h.el.setPointerCapture(e.pointerId); } catch (_) {}
+  });
+  h.el.addEventListener("pointermove", e => {
+    if (!drag || drag.h !== h) return;
+    if (!drag.moved && Math.hypot(e.clientX - drag.x0, e.clientY - drag.y0) > 12) {
+      drag.moved = true; select(h); const g = document.createElement("div"); g.className = "ghost"; g.innerHTML = hatSVG(h.style, h.toy.colour); document.body.appendChild(g); drag.ghost = g; h.el.style.opacity = ".3";
+    }
+    if (drag.ghost) { drag.ghost.style.left = e.clientX + "px"; drag.ghost.style.top = e.clientY + "px"; const p = palAt(e.clientX, e.clientY); pals.forEach(o => o.el.classList.toggle("over", o === p)); }
+  });
+  const end = e => {
+    if (!drag || drag.h !== h) return;
+    const d = drag; drag = null; if (d.ghost) d.ghost.remove(); h.el.style.opacity = ""; pals.forEach(o => o.el.classList.remove("over"));
+    if (!d.moved) { select(sel === h ? null : h); if (!sel) say("go"); return; }
+    const p = palAt(e.clientX, e.clientY); if (p) tryHat(h, p); else { select(null); say("go"); }
+  };
+  h.el.addEventListener("pointerup", end); h.el.addEventListener("pointercancel", end);
+}
+function palAt(x, y) {
+  return pals.find(p => { if (p.done) return false; const r = p.el.getBoundingClientRect(), m = 18; return x > r.left - m && x < r.right + m && y > r.top - r.height * 0.3 && y < r.bottom + m; });
+}
+function tapPal(p) {
+  if (!running || locked || p.done) return;
+  if (!sel) { const h = hats.find(o => !o.el.classList.contains("used")); if (h) { h.el.classList.remove("back"); void h.el.offsetWidth; h.el.classList.add("back"); } say("go"); return; }
+  tryHat(sel, p);
+}
+async function tryHat(h, p) {
+  locked = true; hats.forEach(o => o.el.classList.remove("sel")); sel = null;
+  if (p.toy === h.toy) {
+    given++; document.getElementById("count").textContent = given; p.done = true; p.el.classList.remove("hint");
+    h.el.classList.add("used"); p.el.querySelector(".on").innerHTML = hatSVG(h.style, h.toy.colour); p.el.classList.add("drop"); K.sfx.pop();
+    say("yay", K.toyName(p.toy)); wrongs = 0;
+    await wait(350); p.el.classList.add("hop"); K.sfx.chime();
+    const r = p.el.getBoundingClientRect(); if (!K.CALM) K.confetti(r.left + r.width / 2, r.top + r.height * 0.2, 28);
+    await wait(800); p.el.classList.remove("hop", "drop"); if (!running) return;
+    if (pals.every(o => o.done)) {
+      say("party"); K.sfx.tada(); pals.forEach(o => o.el.classList.add("hop")); await wait(1500); if (!running) return;
+      if (round < ROUNDS.length - 1) { round++; deal(); } else finish();
+    } else { say("go"); locked = false; }
+  } else {
+    wrongs++; totalWrong++; K.sfx.boing(); p.el.classList.remove("no"); void p.el.offsetWidth; p.el.classList.add("no");
+    h.el.classList.remove("back"); void h.el.offsetWidth; h.el.classList.add("back"); say("no", K.toyName(p.toy));
+    await wait(900); if (!running) return;
+    if (wrongs >= 2) { const g = pals.find(o => o.toy === h.toy); if (g) g.el.classList.add("hint"); }
+    select(h); locked = false;
+  }
+}
+function finish() {
+  running = false; const stars = totalWrong <= 1 ? 3 : totalWrong <= 4 ? 2 : 1;
+  document.getElementById("stars").innerHTML = [0, 1, 2].map(i => K.starSVG(i < stars)).join("");
+  document.getElementById("overH").textContent = K.t("overH", stars); document.getElementById("overP").textContent = K.t("overP", given);
+  document.getElementById("over").hidden = false; K.sfx.tada(); K.confetti(); document.getElementById("againBtn").focus();
+}
+function start(list) {
+  toys = list.filter(t => t.img && t.colour); if (toys.length < 2) return;
+  timers.forEach(clearTimeout); timers = [];
+  round = 0; given = 0; totalWrong = 0; running = true; document.getElementById("count").textContent = "0";
+  document.getElementById("intro").hidden = true; document.getElementById("over").hidden = true; deal();
+}
+addEventListener("resize", () => { if (pals.length) layout(); });
+K.initBar(); K.onLang = () => { if (running && !locked) say(sel ? "pick" : "go"); pals.forEach(p => p.el.setAttribute("aria-label", K.toyName(p.toy))); }; K.applyWords();
+function introArt(list) {
+  const c = document.getElementById("introArt"), x = c.getContext("2d"); x.clearRect(0, 0, c.width, c.height);
+  x.fillStyle = "#9FD37A"; x.beginPath(); x.ellipse(200, 228, 180, 26, 0, 0, 7); x.fill();
+  const ts = (list || []).filter(t => t.img).slice(0, 3), cols = ts.length ? ts.map(t => t.colour) : ["#F28C3A", "#7CC56B", "#F7A9C4"];
+  const draw = (svg, X, Y, w, h) => { const im = new Image(); im.onload = () => x.drawImage(im, X, Y, w, h); im.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg.replace("<svg ", '<svg xmlns="http://www.w3.org/2000/svg" ')); };
+  [0, 1, 2].forEach(i => { const cx = 80 + i * 120;
+    if (ts[i]) x.drawImage(ts[i].img, cx - 50, 120, 100, 100); else { x.fillStyle = cols[i]; x.strokeStyle = K.INK; x.lineWidth = 5; x.beginPath(); x.arc(cx, 180, 42, 0, 7); x.fill(); x.stroke(); }
+    draw(hatSVG(STYLES[i], cols[i]), cx - 30, i === 1 ? 20 : 80, 60, 58); });
+}
+introArt();
+document.getElementById("homeBtn").href = window.SHOP_URL ? window.SHOP_URL + (window.SHOP_URL.includes("#") ? "" : "#play") : "/#play";
+K.library().then(list => introArt(list));
+document.getElementById("startBtn").onclick = () => { K.sfx.pop(); K.library().then(start); };
+document.getElementById("againBtn").onclick = () => { K.sfx.pop(); K.library().then(start); };
+</script>
+</body>
+</html>

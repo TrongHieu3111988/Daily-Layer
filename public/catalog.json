@@ -3,6 +3,67 @@
  "started": "2026-10-28",
  "products": [
   {
+   "slug": "wiggle-axolotl",
+   "title": "Wiggle Axolotl",
+   "title_vi": "K\u1ef3 Gi\u00f4ng U\u1ed1n \u00c9o",
+   "price": 1.49,
+   "blurb": "A 13 cm articulated axolotl with frilly gills and a little smile that prints in one piece and wiggles straight off the bed. No supports, no assembly.",
+   "tags": [
+    "flexi",
+    "print-in-place",
+    "fidget",
+    "axolotl",
+    "stocking-stuffer",
+    "kids"
+   ],
+   "line": "print-in-place",
+   "print_hint": "Prints in one piece, flat on the bed, no supports, no assembly: 7 segments on 6 captured pins, 45-degree overhangs only, 0.55 mm clearance. 0.2 mm layers, 2 walls, PLA. One STL for a single colour (pink or a silk/glow filament), plus a 3MF with the gills, eyes and spots pre-split for AMS colours. Flex each joint gently after printing. Contains small parts: not for children under 3.",
+   "parts": [
+    {
+     "name": "axolotl",
+     "triangles": 963340,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 7,
+     "volume_cm3": 13.8,
+     "size_mm": [
+      128.9,
+      44.6,
+      12.2
+     ],
+     "min_z": -0.0
+    }
+   ],
+   "watertight": true,
+   "web": [
+    {
+     "file": "products/wiggle-axolotl/web_axolotl.bin",
+     "color": "#F7A9C4",
+     "name": "axolotl"
+    },
+    {
+     "file": "products/wiggle-axolotl/web_axolotl_gill.bin",
+     "color": "#E0567E",
+     "name": "axolotl_gill"
+    },
+    {
+     "file": "products/wiggle-axolotl/web_axolotl_eye.bin",
+     "color": "#2B2E3A",
+     "name": "axolotl_eye"
+    },
+    {
+     "file": "products/wiggle-axolotl/web_axolotl_spot.bin",
+     "color": "#D9668F",
+     "name": "axolotl_spot"
+    }
+   ],
+   "download": "",
+   "cover": "products/wiggle-axolotl/cover.jpg",
+   "build_seconds": 215.0,
+   "download_bytes": 28723691,
+   "dropped": "2026-11-15"
+  },
+  {
    "slug": "sculpt-reindeer",
    "title": "Chibi Reindeer",
    "price": 2.49,
@@ -2766,6 +2827,6 @@
   "members": 0,
   "costs_usd": 0.0
  },
- "updated": "2026-11-14 08:49",
- "featured": "sculpt-reindeer"
+ "updated": "2026-11-15 09:00",
+ "featured": "wiggle-axolotl"
 }

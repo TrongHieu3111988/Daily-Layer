@@ -90,6 +90,11 @@
    "id": "peek",
    "artifact": "https://claude.ai/artifact/4Uew8RK7y4UKG6eRuKidPf",
    "library": "2d"
+  },
+  {
+   "id": "hats",
+   "artifact": "https://claude.ai/artifact/K17dRF3ktjvHQtzQq76N1J",
+   "library": "2d"
   }
  ]
 }

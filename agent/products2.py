@@ -731,3 +731,148 @@ def dragon_egg(step=0.8, egg_step=1.3):
 CATALOG2["dragon-egg-baby-dragon"] = (dragon_egg, dict(title="Dragon Egg with Baby Dragon Inside", title_vi="Trứng Rồng Có Rồng Con Bên Trong", price=2.99,
     blurb="A two-part dragon egg that clicks shut around a loose 4.7 cm baby dragon. Prints without supports. Great Christmas stocking surprise.",
     tags=["dragon", "dragon-egg", "surprise", "christmas", "stocking-stuffer", "fantasy", "figure", "gift"]))
+
+# ---------- Wiggle Axolotl (print-in-place, 2026-11-15) ----------
+# A 13 cm articulated axolotl on the same captured bicone pins as the Rainbow Wiggle Snake (45-degree overhangs,
+# 0.55 mm clearance): 7 segments on 6 pins, a wide smiling head with three flat gill fronds a side, four flat legs
+# and a tall narrow tail. Every add-on lies flat on the bed (no overhang); colours are pre-split for AMS.
+AX_J = [24.0 + 14.0 * k for k in range(6)]
+AX_TIP = AX_J[-1] + 30.0
+AX_H, AX_ZC, AX_W, AX_RH, AX_HX = 10.5, 4.5, 6.5, 11.0, 10.0
+AX_COL = "#F7A9C4"
+AX_ACC = {"gill": "#E0567E", "eye": "#2B2E3A", "spot": "#D9668F"}
+
+def _ax_w(x):
+    head = AX_RH * np.sqrt(np.clip(1 - ((x - AX_HX) / AX_RH) ** 2, 0, 1))
+    t = np.clip((x - AX_J[-1] - 4.0) / (AX_TIP - AX_J[-1] - 4.0), 0, 1)
+    tail = np.where(x > AX_J[-1] + 4.0, AX_W - (AX_W - 2.4) * t ** 1.2, AX_W)
+    return np.maximum(head, np.where(x > 14.0, tail, 0.0))
+
+def _ax_h(x):
+    t = np.clip((x - AX_J[-1] - 4.0) / (AX_TIP - AX_J[-1] - 4.0), 0, 1)
+    h = AX_H - 5.0 * t ** 2.0 + 1.5 * np.exp(-((x - AX_HX) / 7.0) ** 2)
+    return np.where(x < AX_HX, np.minimum(h, 3.0 + 1.0 * _ax_w(x)), h)   # round nose: no thin fin where the head narrows
+
+def _ax_body(p, x0, x1):
+    x, y, z = p[..., 0], p[..., 1], p[..., 2]
+    w = np.maximum(_ax_w(x), 1e-3); h = _ax_h(x); zc = np.minimum(AX_ZC, h * 0.45)
+    k = np.hypot(y / w, np.maximum(z - zc, 0) / np.maximum(h - zc, 1e-3))
+    d = np.where(z > zc, (k - 1.0) * np.minimum(w, h - zc), np.abs(y) - w)
+    return np.maximum(np.maximum(d, -z), np.maximum(x0 - x, x - x1))
+
+def _ax_top(x, y):
+    w = float(_ax_w(np.array(x))); h = float(_ax_h(np.array(x))); zc = min(AX_ZC, h * 0.45)
+    return zc + (h - zc) * np.sqrt(max(0.0, 1 - (y / w) ** 2))
+
+def _ax_features(p, i):
+    add, acc = [], {}
+    def put(name, s): acc[name] = s if name not in acc else np.minimum(acc[name], s)
+    if i == 0:
+        for sd in (1, -1):     # three gill fronds a side, flat on the bed, with darker tips
+            for (ax, ay), (bx, by), r in [((9.0, 8.5), (5.0, 18.5), 1.8), ((13.0, 9.0), (12.5, 20.5), 1.8), ((16.5, 8.0), (19.5, 17.0), 1.7)]:
+                fr = _wf_flat(cap2(p, (ax, sd * ay), (bx, sd * by), r), p, 3.2)
+                add.append(fr)
+                put("gill", np.maximum(fr, np.hypot(p[..., 0] - bx, p[..., 1] - sd * by) - 4.2))
+        for sd in (1, -1):     # little dark eyes (domes added in _ax_seg) and a smile of three dots
+            ex, ey = 8.0, sd * 5.4; zt = float(_ax_top(ex, abs(ey)))
+            put("eye", sphere(p, np.array([ex, ey, zt - 0.6]), 2.25))
+        for sx, sy in [(1.6, 0.0), (1.9, 1.5), (1.9, -1.5), (2.6, 2.9), (2.6, -2.9)]:
+            put("eye", sphere(p, np.array([sx, sy, float(_ax_top(sx, abs(sy))) - 0.15]), 0.7))
+    if i == 1 or i == 4:       # flat legs with a rounded paddle
+        lx = 33.0 if i == 1 else AX_J[3] + 8.0
+        for sd in (1, -1):
+            leg = _wf_flat(np.minimum(cap2(p, (lx, sd * 5.0), (lx - 3.0, sd * 12.5), 2.0), circ2(p, (lx - 3.2, sd * 12.8), 2.6)), p, 3.0)
+            add.append(leg)
+    if 2 <= i <= 5:            # two soft spots on the back of each middle segment
+        mx = (AX_J[i - 1] + AX_J[i]) / 2 + 2.0
+        for sy in (2.4, -2.4):
+            yy = sy if i % 2 else -sy * 0.4
+            put("spot", sphere(p, np.array([mx + (1.5 if sy > 0 else -1.5), yy, float(_ax_top(mx, abs(yy))) + 0.2]), 1.5))
+    return add, acc
+
+def _ax_seg(p, i):
+    n = len(AX_J)
+    x0 = AX_J[i - 1] if i > 0 else -4.0
+    x1 = AX_J[i] if i < n else AX_TIP + 1.0
+    s = _ax_body(p, x0, min(x1, AX_TIP + 1.0))
+    add, _ = _ax_features(p, i)
+    if add: s = np.minimum(s, np.minimum.reduce(add))
+    if i < n:
+        jx = x1
+        wrap = np.maximum(_ax_body(p, jx - SNK_WRAP, jx + SNK_WRAP), circ2(p, (jx, 0), SNK_WRAP))
+        s = np.minimum(s, wrap)
+        cav = np.minimum(_wf_pin(p, jx) - SNK_CLR, circ2(p, (jx, 0), 2.0 + SNK_CLR))
+        slot = np.abs(np.arctan2(p[..., 1], p[..., 0] - jx)) - np.radians(50)
+        s = diff(s, cav, slot)
+    if i > 0:
+        jx = x0
+        s = diff(s, circ2(p, (jx, 0), SNK_WRAP + SNK_CLR))
+        pin = np.maximum(_wf_pin(p, jx), _ax_body(p, jx - 5, jx + 5))
+        neck = np.maximum(extrude(rrect2(p, (jx + 3.8, 0), (3.8, 1.6), 0.5), p, 2.4, 6.6), _ax_body(p, jx, jx + 9))
+        s = union(s, pin, neck)
+    if i == 0:
+        for sd in (1, -1):
+            ex, ey = 8.0, sd * 5.4; zt = float(_ax_top(ex, abs(ey)))
+            s = union(s, sphere(p, np.array([ex, ey, zt - 1.1]), 2.4))
+    return s
+
+def _ax_range(i):
+    n = len(AX_J)
+    a = (AX_J[i - 1] - 7.0) if i > 0 else -6.0
+    b = (AX_J[i] + 7.5) if i < n else AX_TIP + 2.0
+    return a, b
+
+def _ax_sdf(segs, accent=None):
+    def f(P):
+        sh = P.shape[:-1]; Q = P.reshape(-1, 3); out = np.full(len(Q), 50.0)
+        for i in segs:
+            a, b = _ax_range(i); m = (Q[:, 0] > a - 0.5) & (Q[:, 0] < b + 0.5)
+            if not m.any(): continue
+            s = _ax_seg(Q[m], i)
+            if accent is not None:
+                _, acc = _ax_features(Q[m], i)
+                s = np.maximum(s, acc[accent]) if accent in acc else np.full(len(s), 50.0)
+            out[m] = np.minimum(out[m], s)
+        return out.reshape(sh)
+    return f
+
+def wiggle_axolotl(step=0.3):
+    n = len(AX_J) + 1
+    lo, hi = (-6.0, -24.0, 0.0), (AX_TIP + 1.0, 24.0, AX_H + 3.0)
+    v, f = mesh(_ax_sdf(range(n)), lo, hi, step)
+    names = list(AX_ACC)
+    accs = [_ax_sdf(range(n), a) for a in names]
+    base = _ax_sdf(range(n))
+    bv, bf = mesh(lambda P: diff(base(P), *[a(P) for a in accs]), lo, hi, step)
+    colour_parts = [("axolotl", bv, bf, AX_COL)]
+    for a, fn in zip(names, accs):
+        av, af = mesh(fn, lo, hi, step)
+        if len(af): colour_parts.append((f"axolotl_{a}", av, af, AX_ACC[a]))
+    # shop preview: the same segments posed in a gentle S after a wiggle (the print file stays straight)
+    ang = [0.0] + [np.radians(16) * np.sin(1.0 * k + 0.4) for k in range(1, n)]
+    T = [np.eye(3)]; posed = {}
+    for i in range(n):
+        if i > 0:
+            jx = AX_J[i - 1]; c, s_ = np.cos(ang[i]), np.sin(ang[i])
+            T.append(T[-1] @ np.array([[c, -s_, jx - c * jx], [s_, c, -s_ * jx], [0, 0, 1]]))
+        a, b = _ax_range(i); slo, shi = (a - 1, lo[1], lo[2]), (b + 1, hi[1], hi[2])
+        sacc = [_ax_sdf([i], an) for an in names]; sbase = _ax_sdf([i])
+        pieces = [("axolotl", mesh(lambda P: diff(sbase(P), *[q(P) for q in sacc]), slo, shi, step))]
+        for an, q in zip(names, sacc):
+            if an in _ax_features(np.zeros((1, 3)), i)[1]: pieces.append((f"axolotl_{an}", mesh(q, slo, shi, step)))
+        for nm, (sv, sf) in pieces:
+            if len(sf) == 0: continue
+            xy = np.c_[sv[:, :2], np.ones(len(sv))] @ T[i].T
+            sv = np.c_[xy[:, :2], sv[:, 2]].astype(np.float32)
+            pv, pf = posed.get(nm, (np.zeros((0, 3), np.float32), np.zeros((0, 3), np.int64)))
+            posed[nm] = (np.concatenate([pv, sv]), np.concatenate([pf, sf + len(pv)]))
+    allv = np.concatenate([pv for pv, _ in posed.values()]); ctr = (allv.max(0) + allv.min(0)) / 2
+    cols = {"axolotl": AX_COL, **{f"axolotl_{a}": AX_ACC[a] for a in names}}
+    preview = [(nm, pv - np.array([ctr[0], ctr[1], 0], np.float32), pf, cols[nm]) for nm, (pv, pf) in posed.items()]
+    return dict(parts=preview, print_parts=[("axolotl", v, f, AX_COL)], expect_shells=n, colour_3mf=colour_parts,
+                meta=dict(view=(55, -60), line="print-in-place",
+                          print_hint="Prints in one piece, flat on the bed, no supports, no assembly: 7 segments on 6 captured pins, 45-degree overhangs only, 0.55 mm clearance. 0.2 mm layers, 2 walls, PLA. One STL for a single colour (pink or a silk/glow filament), plus a 3MF with the gills, eyes and spots pre-split for AMS colours. Flex each joint gently after printing. Contains small parts: not for children under 3."))
+
+CATALOG2["wiggle-axolotl"] = (wiggle_axolotl, dict(title="Wiggle Axolotl", title_vi="Kỳ Giông Uốn Éo", price=1.49,
+    blurb="A 13 cm articulated axolotl with frilly gills and a little smile that prints in one piece and wiggles straight off the bed. No supports, no assembly.",
+    tags=["flexi", "print-in-place", "fidget", "axolotl", "stocking-stuffer", "kids"]))

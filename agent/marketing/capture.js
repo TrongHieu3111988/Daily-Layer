@@ -78,6 +78,35 @@ const DIRECTORS = {
     await hold(40);
   },
   // Peekaboo Cups: friends hide under cups (they swap in round 3); tap the cup with the named friend; round 2 lifts a wrong cup first
+  // Toy Dress-up Hats: drag a hat onto the friend of the same colour (one drag shown slowly), a wrong try in round 2, the hat party in round 3
+  async hats(s) {
+    const fr = async () => { await s.page.evaluate(dt => { for (const a of document.getAnimations()) { if (a.playState === "finished") continue; a.pause(); const end = a.effect.getComputedTiming().endTime; a.currentTime = Math.min((a.currentTime || 0) + dt, end); if (a.currentTime >= end) a.finish(); } }, DT); await s.frame(); };
+    const hold = async k => { for (let i = 0; i < k; i++) await fr(); };
+    const until = async (fn, max = 400) => { for (let i = 0; i < max; i++) { if (await s.page.evaluate(fn)) return; await fr(); } };
+    const idx = () => s.page.evaluate(() => { const h = hats.find(o => !o.el.classList.contains("used")); return { hi: hats.indexOf(h), pi: pals.findIndex(o => o.toy === h.toy), wi: pals.findIndex(o => o.toy !== h.toy && !o.done) }; });
+    const box = async (sel, i) => (await s.page.$$(sel))[i].boundingBox();
+    await hold(24); await s.tap("#startBtn"); await hold(30);
+    for (let r = 0; r < 3; r++) {
+      await until(() => running && !locked && document.querySelector(".hat:not(.used)"));
+      const n = await s.page.evaluate(() => pals.length);
+      for (let k = 0; k < n; k++) {
+        await until(() => !locked); await hold(k === 0 ? 14 : 8);
+        const { hi, pi, wi } = await idx();
+        if (r === 1 && k === 0 && wi >= 0) {
+          const h = await box(".hat", hi); await s.page.mouse.click(h.x + h.width / 2, h.y + h.height / 2); await hold(10);
+          const w = await box(".pal", wi); await s.page.mouse.click(w.x + w.width / 2, w.y + w.height / 2); s.mark("oops"); await hold(36);
+          await until(() => !locked); await s.page.evaluate(() => { if (sel) select(null); }); await hold(6);
+        }
+        const a = await box(".hat", hi), c = await box(".pal", pi), ax = a.x + a.width / 2, ay = a.y + a.height / 2, cx = c.x + c.width / 2, cy = c.y + c.height * 0.4;
+        await s.page.mouse.move(ax, ay); await s.page.mouse.down();
+        const steps = r === 0 && k === 0 ? 26 : 14;
+        for (let t = 1; t <= steps; t++) { const e = t / steps, q = e * e * (3 - 2 * e); await s.page.mouse.move(ax + (cx - ax) * q, ay + (cy - ay) * q); await fr(); }
+        await s.page.mouse.up(); s.mark("hat"); await hold(30);
+      }
+      s.mark("party"); await hold(r === 2 ? 70 : 50);
+    }
+    await hold(10);
+  },
   async peek(s) {
     const fr = async () => { await s.page.evaluate(dt => { for (const a of document.getAnimations()) { if (a.playState === "finished") continue; a.pause(); const end = a.effect.getComputedTiming().endTime; a.currentTime = Math.min((a.currentTime || 0) + dt, end); if (a.currentTime >= end) a.finish(); } }, DT); await s.frame(); };
     const hold = async k => { for (let i = 0; i < k; i++) await fr(); };
