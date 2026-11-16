@@ -7,7 +7,7 @@ const fs = require("fs"), path = require("path");
 const COL = { orange: "#F28C3A", white: "#FBFBF8", ink: "#24283A", pink: "#F7A1B5", cream: "#F4E9D4",
               green: "#7CC56B", lime: "#D9F0B5", rose: "#F7A9C4", magenta: "#E0609A", grey: "#A9AFBF", slate: "#7C8396", brown: "#7A4E33", ginger: "#C27C43", red: "#D9443F", pine: "#2F8A57" };
 const NAMES = Object.keys(COL), L = n => NAMES.indexOf(n);
-const BASE = { fox: "orange", frog: "green", axolotl: "rose", kitten: "grey", gingerbread: "ginger", reindeer: "ginger" };
+const BASE = { fox: "orange", frog: "green", axolotl: "rose", kitten: "grey", gingerbread: "ginger", reindeer: "ginger", snowman: "white" };
 
 function kit(s) {
   const k = {
@@ -39,6 +39,28 @@ function kit(s) {
 }
 
 const ANIMALS = {
+  snowman(s, k) {
+    // chibi snowman (our own design): big round head, red knitted beanie with a pompom, carrot nose, coal eyes and buttons, red scarf, mitten arms
+    k.blob([0, -0.38, 0], 0.36, "white");                                                       // bottom snowball
+    k.blob([0, 0.07, 0.02], 0.3, "white");                                                      // head
+    k.line([0, 0.27, -0.01], [0, 0.41, -0.03], 0.24, 0.15, "red", 12);                          // beanie
+    for (let a = 0; a < 28; a++) { const t = a / 28 * Math.PI * 2; k.blob([0.255 * Math.sin(t), 0.255, 0.01 + 0.255 * Math.cos(t)], 0.055, "white"); }   // cuff
+    k.blob([0, 0.53, -0.04], 0.075, "white");                                                    // pompom
+    for (let a = 0; a < 28; a++) { const t = a / 28 * Math.PI * 2; k.paint([0.27 * Math.sin(t), 0.255, 0.01 + 0.27 * Math.cos(t)], 0.065, "white"); }
+    k.paint([0, 0.55, -0.04], 0.1, "white");
+    for (let y = 0.315; y <= 0.57; y += 0.012) for (let a = 0; a < 48; a++) { const t = a / 48 * Math.PI * 2, h = s.raycast([2 * Math.sin(t), y, 2 * Math.cos(t)], [-Math.sin(t), 0, -Math.cos(t)]); if (h && h.p[1] > 0.31) k.paint(h.p, 0.035, "red"); }
+    k.line([0, 0.08, 0.29], [0, 0.065, 0.43], 0.055, 0.035, "orange", 10);                      // carrot nose
+    k.mirror(sx => k.eye(0.115 * sx, 0.16, 0.27, 0.045));
+    k.mirror(sx => k.paint([0.2 * sx, 0.02, 0.24], 0.05, "pink"));                              // rosy cheeks
+    k.smile(k.arc(0, 0.0, 0.075, 0.045, Math.PI * 1.15, Math.PI * 1.85, 10), 0.028);
+    // red scarf round the neck with a tail down the front
+    for (let a = 0; a < 26; a++) { const t = a / 26 * Math.PI * 2; k.blob([0.27 * Math.sin(t), -0.185 + 0.015 * Math.cos(2 * t), 0.01 + 0.27 * Math.cos(t)], 0.07, "red"); }
+    k.line([0.13, -0.2, 0.27], [0.17, -0.35, 0.32], 0.065, 0.055, "red", 10);
+    // coal buttons
+    for (const [y, z] of [[-0.31, 0.345], [-0.44, 0.355]]) k.blob([-0.06, y, z], 0.035, "ink");
+    // stubby arms hugging the body, red mittens
+    k.mirror(sx => { k.line([0.27 * sx, -0.24, 0.06], [0.33 * sx, -0.38, 0.14], 0.085, 0.075, "white", 8); k.blob([0.33 * sx, -0.41, 0.17], 0.075, "red"); });
+  },
   reindeer(s, k) {
     // chibi reindeer (our own design): round fawn body, cream muzzle and belly, branching antlers, red berry nose, green knitted scarf
     k.blob([0, -0.32, 0], 0.37, "ginger");                                                       // body

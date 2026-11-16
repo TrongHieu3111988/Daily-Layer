@@ -39,7 +39,8 @@
     boing: () => { tone(300, 120, 0.25, "square", 0.06); tone(150, 260, 0.2, "sine", 0.12, 0.05); },
     chime: () => { [660, 880, 1320].forEach((f, i) => tone(f, f * 1.01, 0.22, "triangle", 0.12, i * 0.07)); },
     tada: () => { [523, 659, 784, 1046].forEach((f, i) => tone(f, f, 0.3, "triangle", 0.14, i * 0.09)); },
-    tick: () => tone(1200, 900, 0.04, "square", 0.04)
+    tick: () => tone(1200, 900, 0.04, "square", 0.04),
+    note: f => { tone(f, f, 0.42, "triangle", 0.16); tone(f * 2, f * 2, 0.25, "sine", 0.04); }
   };
   K.setMuted = m => { K.muted = m; store.set("dl-muted", m); const b = document.getElementById("soundBtn"); if (b) b.innerHTML = m ? K.ICON.mute : K.ICON.sound; };
 

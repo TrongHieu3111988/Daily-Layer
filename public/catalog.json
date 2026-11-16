@@ -3,6 +3,148 @@
  "started": "2026-10-28",
  "products": [
   {
+   "slug": "sculpt-snowman",
+   "title": "Chibi Snowman",
+   "price": 2.49,
+   "blurb": "Chibi snowman with a red knitted beanie and pompom, a carrot nose, coal buttons, a red scarf and mitten arms. One solid piece, colour-split for AMS.",
+   "tags": [
+    "figure",
+    "cute",
+    "christmas",
+    "snowman",
+    "stocking-stuffer",
+    "kids",
+    "multicolor"
+   ],
+   "line": "figure",
+   "print_hint": "Sculpted in Sculpt Studio. Painted OBJ/3MF (Bambu Studio maps the colours to your filaments on import), colour-split 3MF and single-colour STL; 0.12-0.16 mm layers.",
+   "parts": [
+    {
+     "name": "body",
+     "triangles": 163188,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 58.19,
+     "size_mm": [
+      45.0,
+      45.2,
+      70.1
+     ],
+     "min_z": 0.0
+    }
+   ],
+   "colour_parts": [
+    {
+     "name": "white",
+     "triangles": 184264,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 4,
+     "volume_cm3": 40.28,
+     "size_mm": [
+      44.9,
+      39.6,
+      70.1
+     ],
+     "min_z": -0.02
+    },
+    {
+     "name": "red",
+     "triangles": 122752,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 5,
+     "volume_cm3": 17.16,
+     "size_mm": [
+      45.0,
+      38.9,
+      58.6
+     ],
+     "min_z": 10.11
+    },
+    {
+     "name": "pink",
+     "triangles": 976,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 2,
+     "volume_cm3": 0.02,
+     "size_mm": [
+      24.3,
+      2.9,
+      3.4
+     ],
+     "min_z": 36.4
+    },
+    {
+     "name": "ink",
+     "triangles": 7500,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 5,
+     "volume_cm3": 0.29,
+     "size_mm": [
+      18.6,
+      9.8,
+      37.8
+     ],
+     "min_z": 10.6
+    },
+    {
+     "name": "orange",
+     "triangles": 5144,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 0.35,
+     "size_mm": [
+      7.4,
+      13.1,
+      7.6
+     ],
+     "min_z": 37.41
+    }
+   ],
+   "watertight": true,
+   "smooth": true,
+   "web": [
+    {
+     "file": null,
+     "color": "#FBFBF8",
+     "name": "white"
+    },
+    {
+     "file": null,
+     "color": "#D9443F",
+     "name": "red"
+    },
+    {
+     "file": null,
+     "color": "#F7A1B5",
+     "name": "pink"
+    },
+    {
+     "file": null,
+     "color": "#24283A",
+     "name": "ink"
+    },
+    {
+     "file": null,
+     "color": "#F28C3A",
+     "name": "orange"
+    }
+   ],
+   "preview": "products/sculpt-snowman/preview_fc.bin",
+   "preview_face": true,
+   "download": "",
+   "cover": "products/sculpt-snowman/cover.jpg",
+   "build_seconds": 0,
+   "title_vi": "Ng\u01b0\u1eddi Tuy\u1ebft M\u0169m M\u0129m",
+   "download_bytes": 10858873,
+   "dropped": "2026-11-16"
+  },
+  {
    "slug": "wiggle-axolotl",
    "title": "Wiggle Axolotl",
    "title_vi": "K\u1ef3 Gi\u00f4ng U\u1ed1n \u00c9o",
@@ -2827,6 +2969,6 @@
   "members": 0,
   "costs_usd": 0.0
  },
- "updated": "2026-11-15 09:00",
- "featured": "wiggle-axolotl"
+ "updated": "2026-11-16 08:51",
+ "featured": "sculpt-snowman"
 }

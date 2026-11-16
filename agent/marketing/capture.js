@@ -107,6 +107,26 @@ const DIRECTORS = {
     }
     await hold(10);
   },
+  // Toy Echo Pattern: watch the toys sing in order, then tap them back (round 2 shows one wrong tap, which replays the song)
+  async echo(s) {
+    const fr = async () => { await s.page.evaluate(dt => { for (const a of document.getAnimations()) { if (a.playState === "finished") continue; a.pause(); const end = a.effect.getComputedTiming().endTime; a.currentTime = Math.min((a.currentTime || 0) + dt, end); if (a.currentTime >= end) a.finish(); } }, DT); await s.frame(); };
+    const hold = async k => { for (let i = 0; i < k; i++) await fr(); };
+    const until = async (fn, max = 400) => { for (let i = 0; i < max; i++) { if (await s.page.evaluate(fn)) return; await fr(); } };
+    await hold(24); await s.tap("#startBtn");
+    for (let r = 0; r < 4; r++) {
+      await until(`running && round === ${r} && document.getElementById("board").classList.contains("off")`);
+      s.mark("watch");
+      await until(() => !locked); s.mark("turn"); await hold(r === 0 ? 16 : 10);
+      if (r === 1) {
+        const bad = await s.page.evaluate(() => (song[0] + 1) % pads.length); await s.tap(`.pad:nth-child(${bad + 1})`); s.mark("oops");
+        await until(() => locked); await until(() => !locked); await hold(10);
+      }
+      const seq = await s.page.evaluate(() => song.slice());
+      for (let k = 0; k < seq.length; k++) { await s.tap(`.pad:nth-child(${seq[k] + 1})`); if (k === seq.length - 1) s.mark("echo"); await hold(14); }
+      await hold(r === 3 ? 70 : 30);
+    }
+    await hold(10);
+  },
   async peek(s) {
     const fr = async () => { await s.page.evaluate(dt => { for (const a of document.getAnimations()) { if (a.playState === "finished") continue; a.pause(); const end = a.effect.getComputedTiming().endTime; a.currentTime = Math.min((a.currentTime || 0) + dt, end); if (a.currentTime >= end) a.finish(); } }, DT); await s.frame(); };
     const hold = async k => { for (let i = 0; i < k; i++) await fr(); };

@@ -1,7 +1,21 @@
 {
- "updated": "2026-11-14 08:49",
- "featured": "sculpt-reindeer",
+ "updated": "2026-11-16 08:51",
+ "featured": "sculpt-snowman",
  "toys": [
+  {
+   "slug": "sculpt-snowman",
+   "title": "Chibi Snowman",
+   "title_vi": "Ng\u01b0\u1eddi Tuy\u1ebft M\u0169m M\u0129m",
+   "price": 2.49,
+   "dropped": "2026-11-16",
+   "height_mm": 70.1,
+   "game": "products/sculpt-snowman/game.bin",
+   "cover": "products/sculpt-snowman/cover.jpg",
+   "icon": "products/sculpt-snowman/icon.png",
+   "colour": "#FBFBF8",
+   "look": null,
+   "featured": true
+  },
   {
    "slug": "sculpt-reindeer",
    "title": "Chibi Reindeer",
@@ -14,7 +28,7 @@
    "icon": "products/sculpt-reindeer/icon.png",
    "colour": "#C27C43",
    "look": null,
-   "featured": true
+   "featured": false
   },
   {
    "slug": "sculpt-gingerbread",

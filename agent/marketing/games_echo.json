@@ -1,0 +1,26 @@
+{
+ "id": "echo",
+ "title": "Toy Echo Pattern",
+ "hook": "Can you remember\nthe toy song?",
+ "captions": {
+  "watch": [
+   "Watch and listen...",
+   "Here comes the song!",
+   "Three notes now!",
+   "Watch closely!"
+  ],
+  "oops": [
+   "Oops! Once more."
+  ],
+  "echo": [
+   "Perfect echo!",
+   "That's the song!",
+   "Super memory!",
+   "Toy concert!"
+  ]
+ },
+ "yt_title": "Can your kid remember the toy song? Memory game for kids #Shorts",
+ "yt_desc": "Cute toy friends light up and sing, one after another. Watch, listen, then tap them in the same order: two notes, then three, then four. A gentle memory and music game a 4-year-old can play, with no ads and no signing up, and the toys are real models you can 3D print at home.\n\nPlay free in your browser: {url}\nMore free kids' games and a new 3D-printable toy every day: {site}\n\n#Shorts #KidsGames #MemoryGame #3DPrinting #FreeGames",
+ "icons": "/home/user/Daily-Layer/public/products",
+ "toys": "/home/user/Daily-Layer/public/toys.json"
+}
