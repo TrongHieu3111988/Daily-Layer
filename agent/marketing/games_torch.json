@@ -1,0 +1,26 @@
+{
+ "id": "torch",
+ "title": "Flashlight Friends",
+ "hook": "Who is hiding\nin the dark?",
+ "captions": {
+  "search": [
+   "Shine the flashlight...",
+   "Where are you?",
+   "Look around...",
+   "Who's there?"
+  ],
+  "oops": [
+   "Oops! Not that one!"
+  ],
+  "found": [
+   "Peekaboo! Found you!",
+   "Lights on!",
+   "Yay, found it!",
+   "Hooray!"
+  ]
+ },
+ "yt_title": "Who is hiding in the dark? Free flashlight game for kids #Shorts",
+ "yt_desc": "The room is dark! Slide your finger to move the flashlight, find the toy friend shown at the top and tap it, and the lights come on. Easy enough for a 4-year-old, in English and Vietnamese, with no ads and no signing up, and the toys are real models you can 3D print at home.\n\nPlay free in your browser: {url}\nMore free kids' games and a new 3D-printable toy every day: {site}\n\n#Shorts #KidsGames #HideAndSeek #3DPrinting #FreeGames",
+ "icons": "/home/user/Daily-Layer/public/products",
+ "toys": "/home/user/Daily-Layer/public/toys.json"
+}

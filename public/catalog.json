@@ -3,6 +3,60 @@
  "started": "2026-10-28",
  "products": [
   {
+   "slug": "led-tealight-tree",
+   "title": "LED Tealight Christmas Tree",
+   "title_vi": "C\u00e2y Th\u00f4ng \u0110\u00e8n N\u1ebfn LED",
+   "price": 1.99,
+   "blurb": "A 12 cm three-tier Christmas tree with diamond light windows and a star that slips over any 38 mm LED tealight and glows. One piece, no supports.",
+   "tags": [
+    "christmas",
+    "decor",
+    "tealight",
+    "led",
+    "lamp",
+    "tree",
+    "holiday",
+    "gift",
+    "nightlight"
+   ],
+   "line": "decor",
+   "print_hint": "Prints upright in one piece, open side down, no supports, no brim: tier slopes 25-33 degrees, skirts and light windows 45 degrees. 0.2 mm layers, 2-3 walls, 10% infill; green, white or a translucent/silk PLA glows best. Optional filament swap to yellow at 103 mm for the star. Slip it over any standard 38 mm LED tealight (up to 40 mm wide, 40 mm tall with its flame). LED tealights only, never a real candle.",
+   "parts": [
+    {
+     "name": "tealight_tree",
+     "triangles": 780164,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 36.51,
+     "size_mm": [
+      76.7,
+      77.6,
+      129.9
+     ],
+     "min_z": -0.0
+    }
+   ],
+   "watertight": true,
+   "web": [
+    {
+     "file": "products/led-tealight-tree/web_tree.bin",
+     "color": "#2F8F5B",
+     "name": "tree"
+    },
+    {
+     "file": "products/led-tealight-tree/web_star.bin",
+     "color": "#F2C230",
+     "name": "star"
+    }
+   ],
+   "download": "",
+   "cover": "products/led-tealight-tree/cover.jpg",
+   "build_seconds": 35.4,
+   "download_bytes": 28636781,
+   "dropped": "2026-11-21"
+  },
+  {
    "slug": "sculpt-snowman",
    "title": "Chibi Snowman",
    "price": 2.49,
@@ -2969,6 +3023,6 @@
   "members": 0,
   "costs_usd": 0.0
  },
- "updated": "2026-11-16 08:51",
- "featured": "sculpt-snowman"
+ "updated": "2026-11-21 08:56",
+ "featured": "led-tealight-tree"
 }

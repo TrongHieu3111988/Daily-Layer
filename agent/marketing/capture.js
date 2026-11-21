@@ -144,6 +144,26 @@ const DIRECTORS = {
     }
     await hold(10);
   },
+  // Flashlight Friends: the room is dark; the flashlight sweeps around, finds the named friend and taps it (round 2 lights a wrong friend first), the lights come on
+  async torch(s) {
+    const fr = async () => { await s.page.evaluate(dt => { for (const a of document.getAnimations()) { if (a.playState === "finished") continue; a.pause(); const end = a.effect.getComputedTiming().endTime; a.currentTime = Math.min((a.currentTime || 0) + dt, end); if (a.currentTime >= end) a.finish(); } }, DT); await s.frame(); };
+    const hold = async k => { for (let i = 0; i < k; i++) await fr(); };
+    const centre = async sel => { const bb = await (await s.page.$(sel)).boundingBox(); return [bb.x + bb.width / 2, bb.y + bb.height / 2]; };
+    let cur = null;
+    const glide = async (to, k) => { const from = cur || to; for (let i = 1; i <= k; i++) { const t = i / k, e = t * t * (3 - 2 * t); await s.page.mouse.move(from[0] + (to[0] - from[0]) * e, from[1] + (to[1] - from[1]) * e); await fr(); } cur = to; };
+    await hold(24); await s.tap("#startBtn"); await hold(20);
+    for (let r = 0; r < 4; r++) {
+      const room = await s.page.$("#room").then(e => e.boundingBox());
+      cur = [room.x + room.width / 2, room.y + room.height / 2]; await s.page.mouse.move(...cur); await hold(8);
+      s.mark("search");
+      if (r === 0) { await glide([room.x + room.width * 0.2, room.y + room.height * 0.25], 22); await glide([room.x + room.width * 0.8, room.y + room.height * 0.45], 26); }
+      if (r === 1) { const bad = await s.page.evaluate(() => [...document.querySelectorAll("#toys .toy")].find(x => x.dataset.slug !== target.slug).dataset.slug);
+        const p = await centre(`#toys .toy[data-slug="${bad}"]`); await glide(p, 24); await hold(6); await s.page.mouse.click(...p); s.mark("oops"); await hold(40); }
+      const slug = await s.page.evaluate(() => target.slug), p = await centre(`#toys .toy[data-slug="${slug}"]`);
+      await glide(p, r === 0 ? 30 : 22); await hold(10); await s.page.mouse.click(...p); s.mark("found"); await hold(r === 3 ? 70 : 58);
+    }
+    await hold(10);
+  },
   // Bubble Pop: the sky names a toy friend; tap the bubble that holds it (round 2 shows one wrong bubble first), it pops and hops
   async bubbles(s) {
     const fr = async () => { await s.page.evaluate(dt => { for (const a of document.getAnimations()) { if (a.playState === "finished") continue; a.pause(); const end = a.effect.getComputedTiming().endTime; a.currentTime = Math.min((a.currentTime || 0) + dt, end); if (a.currentTime >= end) a.finish(); } }, DT); await s.frame(); };

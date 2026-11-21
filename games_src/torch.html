@@ -1,0 +1,159 @@
+<title>Flashlight Friends</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<!--HEAD-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@500;600;700;800&display=swap">
+<style>
+/*KITCSS*/
+/* Flashlight Friends: the room is dark; move the flashlight with a finger to find the named toy friend, then tap it. */
+.stage{background:#2A2F55;display:flex;flex-direction:column;align-items:center;overflow:hidden}
+.round{display:flex;justify-content:center;gap:8px;padding:10px 12px 0}
+.round i{width:14px;height:14px;border-radius:50%;border:2.5px solid var(--outline);background:var(--paper)}
+.round i.on{background:var(--grass)}.round i.now{background:var(--sun)}
+.find{display:flex;align-items:center;gap:12px;margin:10px 14px 0;padding:8px 16px 8px 10px;background:var(--paper);border:3px solid var(--outline);border-radius:26px;box-shadow:var(--pop-sm);position:relative;z-index:4}
+.find .pic{width:72px;height:72px;flex:none}.find .pic img{width:100%;height:100%;object-fit:contain;display:block}
+.find b{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:22px;line-height:1.15;color:var(--outline)}
+.room{position:relative;flex:1;min-height:0;width:calc(100% - 20px);margin:10px 10px 12px;border-radius:24px;border:3px solid #1B2547;overflow:hidden;touch-action:none;
+  background:linear-gradient(#FFE7B8 0 62%,#C98C55 62% 100%)}
+.room .wall{position:absolute;inset:0 0 38% 0;background-image:radial-gradient(circle,#FFD27A 0 3px,transparent 4px),radial-gradient(circle,#FFB9A0 0 3px,transparent 4px);background-size:46px 46px,46px 46px;background-position:0 0,23px 23px;opacity:.7}
+.room .rug{position:absolute;left:12%;right:12%;bottom:6%;height:16%;border-radius:50%;background:#8C6BF2;border:3px solid #1B2547;opacity:.85}
+.room .win{position:absolute;left:8%;top:8%;width:22%;height:22%;border:4px solid #1B2547;border-radius:10px;background:linear-gradient(#5DB8FF,#BDE6FF)}
+.room .win:after{content:"";position:absolute;left:50%;top:0;bottom:0;border-left:4px solid #1B2547}
+.room .shelf{position:absolute;right:7%;top:30%;width:30%;height:5px;background:#1B2547;border-radius:3px}
+.toy{position:absolute;padding:0;border:0;background:none;transform:translate(-50%,-50%);touch-action:none}
+.toy img{width:100%;height:100%;object-fit:contain;display:block;pointer-events:none;filter:drop-shadow(0 4px 0 rgba(27,37,71,.25))}
+.toy.no{animation:shk .4s ease}
+.toy.yay{animation:hop .9s ease;z-index:3}
+.toy.spark:after{content:"";position:absolute;inset:-12px;border-radius:50%;box-shadow:0 0 0 4px #FFC93C,0 0 26px 10px rgba(255,201,60,.9);animation:tw 1s ease-in-out infinite}
+@keyframes tw{50%{opacity:.25}}
+@keyframes shk{25%{transform:translate(calc(-50% - 8px),-50%)}75%{transform:translate(calc(-50% + 8px),-50%)}}
+@keyframes hop{0%{transform:translate(-50%,-50%) scale(1)}35%{transform:translate(-50%,-85%) scale(1.2)}70%{transform:translate(-50%,-50%) scale(1)}}
+.dark{position:absolute;inset:0;pointer-events:none;z-index:2;background:rgba(8,11,30,.95);transition:opacity .6s;
+  -webkit-mask:radial-gradient(circle var(--r,90px) at var(--x,50%) var(--y,50%),transparent 0 55%,#000 100%);mask:radial-gradient(circle var(--r,90px) at var(--x,50%) var(--y,50%),transparent 0 55%,#000 100%)}
+.dark.off{opacity:0}
+.beam{position:absolute;z-index:3;pointer-events:none;width:46px;height:46px;transform:translate(-50%,-50%);border-radius:50%;border:3px dashed rgba(255,233,150,.8)}
+.dark.off+.beam{opacity:0}
+.toast{z-index:5}
+@media (prefers-reduced-motion:reduce){.toy.no,.toy.yay,.toy.spark:after{animation:none}.dark{transition:none}}
+</style>
+<div class="app">
+  <header class="bar">
+    <a class="ibtn" id="back" href="/" data-t-label="back" aria-label="Back"></a>
+    <h1 data-t="title">Flashlight Friends</h1>
+    <span class="score" aria-live="polite"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.8-4.5 4.2 1.2 6L12 16.6 6.5 19.6l1.2-6L3.2 9.4l6.1-.8z" fill="#FFC93C" stroke="#1B2547" stroke-width="2" stroke-linejoin="round"/></svg><span id="count">0</span></span>
+    <button class="ibtn" id="soundBtn" type="button" data-t-label="sound" aria-label="Sound"></button>
+    <button class="ibtn" id="langBtn" type="button" aria-label="Language">VI</button>
+  </header>
+  <main class="stage" id="stage">
+    <div class="round" id="round" aria-hidden="true"></div>
+    <div class="find" id="find"><div class="pic" id="pic"></div><b id="ask" aria-live="polite"></b></div>
+    <div class="room" id="room">
+      <div class="wall"></div><div class="win"></div><div class="shelf"></div><div class="rug"></div>
+      <div id="toys"></div>
+      <div class="dark" id="dark"></div><div class="beam" id="beam"></div>
+    </div>
+    <div class="toast" id="toast" hidden></div>
+  </main>
+</div>
+
+<div class="overlay" id="intro">
+  <div class="card">
+    <canvas class="hero" id="introArt" width="400" height="280"></canvas>
+    <h2 data-t="introH">Who is hiding in the dark?</h2>
+    <p data-t="introP">Slide your finger to move the flashlight. When you find the toy friend from the top, tap it!</p>
+    <button class="btn coral" type="button" id="startBtn"><span data-t="start">Lights out!</span></button>
+  </div>
+</div>
+<div class="overlay" id="over" hidden>
+  <div class="card">
+    <div class="stars" id="stars"></div>
+    <h2 id="overH">You found everyone!</h2>
+    <p id="overP"></p>
+    <div class="row"><button class="btn coral" type="button" id="againBtn"><span data-t="again">Play again</span></button><a class="btn" id="homeBtn" href="/" data-t="home">More games</a></div>
+  </div>
+</div>
+
+<script>/*KITJS*/</script>
+<script>
+"use strict";
+K.words.en = { title: "Flashlight Friends", back: "Back", sound: "Sound on or off", introH: "Who is hiding in the dark?", introP: "Slide your finger to move the flashlight. When you find the toy friend from the top, tap it!", start: "Lights out!", again: "Play again", home: "More games",
+  find: n => "Find the " + n + "!", no: (a, b) => "That's the " + a + ". Where is the " + b + "?", yay: n => "Peekaboo, " + n + "!", overH: s => s >= 3 ? "Super seeker!" : s >= 2 ? "Well done!" : "You found everyone!", overP: n => "You found " + n + " friends in the dark." };
+K.words.vi = { title: "Đèn Pin Tìm Bạn", back: "Quay lại", sound: "Bật hoặc tắt âm thanh", introH: "Ai đang trốn trong bóng tối?", introP: "Kéo ngón tay để di chuyển đèn pin. Thấy bạn đồ chơi ở trên cùng thì chạm vào bạn ấy nhé!", start: "Tắt đèn nào!", again: "Chơi lại", home: "Trò khác",
+  find: n => "Tìm " + n + " nhé!", no: (a, b) => "Đây là " + a + ". " + b + " ở đâu nhỉ?", yay: n => "Ú òa, " + n + "!", overH: s => s >= 3 ? "Bé tìm giỏi quá!" : s >= 2 ? "Tuyệt vời!" : "Bé tìm được hết rồi!", overP: n => "Bé đã tìm thấy " + n + " bạn trong bóng tối." };
+
+const COUNTS = [3, 3, 4, 4, 5, 6];
+let toys = [], round = 0, target = null, wrongs = 0, totalWrong = 0, running = false, locked = false, found = 0, hintT = 0;
+const room = document.getElementById("room"), dark = document.getElementById("dark"), beam = document.getElementById("beam");
+function pick(a, n) { return a.slice().sort(() => Math.random() - .5).slice(0, n); }
+function imgOf(t) { const i = document.createElement("img"); i.src = t.img.src; i.alt = ""; i.draggable = false; return i; }
+function light(x, y) { dark.style.setProperty("--x", x + "px"); dark.style.setProperty("--y", y + "px"); beam.style.left = x + "px"; beam.style.top = y + "px"; }
+function size() { const W = room.clientWidth, H = room.clientHeight; return { W, H, s: Math.max(62, Math.min(104, Math.min(W, H) / 3.6)) }; }
+function place(n, W, H, s) {   // spread toys without overlap (best of many random tries)
+  let best = null, bestD = -1;
+  for (let k = 0; k < 300; k++) {
+    const pts = []; for (let i = 0; i < n; i++) pts.push([s * .6 + Math.random() * (W - s * 1.2), s * .6 + Math.random() * (H - s * 1.2)]);
+    let d = 1e9; for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++) d = Math.min(d, Math.hypot(pts[i][0] - pts[j][0], pts[i][1] - pts[j][1]));
+    if (d > bestD) { bestD = d; best = pts; } if (d > s * 1.35) break;
+  }
+  return best;
+}
+function deal() {
+  const n = Math.min(COUNTS[round], toys.length), set = pick(toys, n); target = set[0]; wrongs = 0; locked = false; clearTimeout(hintT);
+  document.getElementById("round").innerHTML = COUNTS.map((_, i) => `<i class="${i < round ? "on" : i === round ? "now" : ""}"></i>`).join("");
+  const pic = document.getElementById("pic"); pic.innerHTML = ""; pic.appendChild(imgOf(target));
+  document.getElementById("ask").textContent = K.t("find", K.toyName(target));
+  const box = document.getElementById("toys"); box.innerHTML = "";
+  const { W, H, s } = size(), pts = place(set.length, W, H, s), R = Math.max(70, Math.min(W, H) * 0.24);
+  dark.style.setProperty("--r", R + "px"); dark.classList.remove("off");
+  pick(set, set.length).forEach((t, i) => {
+    const b = document.createElement("button"); b.type = "button"; b.className = "toy"; b.dataset.slug = t.slug; b.setAttribute("aria-label", K.toyName(t));
+    b.style.cssText = `width:${s}px;height:${s}px;left:${pts[i][0]}px;top:${pts[i][1]}px`; b.appendChild(imgOf(t));
+    b.addEventListener("pointerdown", e => { e.stopPropagation(); light(pts[i][0], pts[i][1]); tap(t, b); });
+    box.appendChild(b);
+  });
+  light(W / 2, H / 2);
+  hintT = setTimeout(hint, 14000);
+}
+function hint() { if (!running || locked) return; const g = document.querySelector(`#toys .toy[data-slug="${target.slug}"]`); if (g) g.classList.add("spark"); }
+function tap(t, b) {
+  if (!running || locked) return;
+  if (t === target) {
+    locked = true; found++; clearTimeout(hintT); document.getElementById("count").textContent = found; K.sfx.chime();
+    b.classList.remove("spark"); b.classList.add("yay"); dark.classList.add("off");
+    document.getElementById("ask").textContent = K.t("yay", K.toyName(t));
+    const r = b.getBoundingClientRect(); if (!K.CALM) K.confetti(r.left + r.width / 2, r.top + r.height / 2, 40);
+    setTimeout(() => { if (round < COUNTS.length - 1) { round++; deal(); } else finish(); }, 2000);
+  } else {
+    wrongs++; totalWrong++; b.classList.remove("no"); void b.offsetWidth; b.classList.add("no"); K.sfx.boing();
+    document.getElementById("ask").textContent = K.t("no", K.toyName(t), K.toyName(target));
+    if (wrongs >= 2) hint();
+  }
+}
+function move(e) { if (!running || locked) return; const r = room.getBoundingClientRect(); light(e.clientX - r.left, e.clientY - r.top); }
+room.addEventListener("pointerdown", e => { move(e); if (e.target === room || !e.target.closest(".toy")) K.sfx.tick(); });
+room.addEventListener("pointermove", e => { if (e.pointerType === "mouse" || e.buttons || e.pressure > 0) move(e); });
+function finish() {
+  running = false; clearTimeout(hintT); const stars = totalWrong <= 2 ? 3 : totalWrong <= 6 ? 2 : 1;
+  document.getElementById("stars").innerHTML = [0, 1, 2].map(i => K.starSVG(i < stars)).join("");
+  document.getElementById("overH").textContent = K.t("overH", stars); document.getElementById("overP").textContent = K.t("overP", COUNTS.length);
+  document.getElementById("over").hidden = false; K.sfx.tada(); K.confetti(); document.getElementById("againBtn").focus();
+}
+function start(list) { toys = list.filter(t => t.img); if (toys.length < 3) return; round = 0; found = 0; totalWrong = 0; running = true; document.getElementById("count").textContent = "0"; document.getElementById("intro").hidden = true; document.getElementById("over").hidden = true; deal(); }
+
+K.initBar(); K.onLang = () => { if (running && target && !locked) document.getElementById("ask").textContent = K.t("find", K.toyName(target)); }; K.applyWords();
+function introArt(list) {
+  const c = document.getElementById("introArt"), x = c.getContext("2d"); x.clearRect(0, 0, c.width, c.height);
+  x.fillStyle = "#141936"; x.beginPath(); x.roundRect ? x.roundRect(10, 10, 380, 260, 26) : x.rect(10, 10, 380, 260); x.fill();
+  const ts = (list || []).filter(t => t.img).slice(0, 3);
+  ts.forEach((t, i) => { const cx = 90 + i * 110, cy = 150 + (i % 2 ? 25 : -15);
+    if (i === 1) { const g = x.createRadialGradient(cx, cy, 10, cx, cy, 90); g.addColorStop(0, "rgba(255,240,180,1)"); g.addColorStop(.6, "rgba(255,230,150,.75)"); g.addColorStop(1, "rgba(255,230,150,0)"); x.fillStyle = g; x.beginPath(); x.arc(cx, cy, 90, 0, 7); x.fill(); x.drawImage(t.img, cx - 45, cy - 45, 90, 90); }
+    else { x.globalAlpha = .22; x.drawImage(t.img, cx - 40, cy - 40, 80, 80); x.globalAlpha = 1; } });
+  x.fillStyle = "#FFC93C"; x.strokeStyle = K.INK; x.lineWidth = 4; x.beginPath(); x.moveTo(330, 250); x.lineTo(370, 210); x.lineTo(385, 225); x.lineTo(345, 265); x.closePath(); x.fill(); x.stroke();
+}
+introArt();
+document.getElementById("homeBtn").href = window.SHOP_URL ? window.SHOP_URL + (window.SHOP_URL.includes("#") ? "" : "#play") : "/#play";
+K.library().then(list => introArt(list));
+document.getElementById("startBtn").onclick = () => { K.sfx.pop(); K.library().then(start); };
+document.getElementById("againBtn").onclick = () => { K.sfx.pop(); K.library().then(start); };
+</script>
+<!--TAIL-->

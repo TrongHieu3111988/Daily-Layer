@@ -100,6 +100,11 @@
    "id": "echo",
    "artifact": "https://claude.ai/artifact/CkmqBqYt3c1u8pPfp8WPZ1",
    "library": "2d"
+  },
+  {
+   "id": "torch",
+   "artifact": "https://claude.ai/artifact/GjkvWzARE5WamvCWnAWbCX",
+   "library": "2d"
   }
  ]
 }

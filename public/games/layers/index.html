@@ -12,7 +12,7 @@
 <meta property="og:title" content="Magic Printer – free kids&#x27; game | Daily Layer">
 <meta property="og:description" content="A real 3D toy is cut into layers like a 3D printer makes it. Tap them from the bottom up and the little printer builds it! A free browser game for kids.">
 <meta property="og:url" content="https://dailylayer.funny3dprint.workers.dev/games/layers/">
-<meta property="og:image" content="https://dailylayer.funny3dprint.workers.dev/products/sculpt-snowman/cover.jpg">
+<meta property="og:image" content="https://dailylayer.funny3dprint.workers.dev/products/led-tealight-tree/cover.jpg">
 <meta name="twitter:card" content="summary_large_image">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "VideoGame", "name": "Magic Printer", "description": "A real 3D toy is cut into layers like a 3D printer makes it. Tap them from the bottom up and the little printer builds it! A free browser game for kids.", "url": "https://dailylayer.funny3dprint.workers.dev/games/layers/", "genre": "Educational", "gamePlatform": "Web browser", "applicationCategory": "Game", "audience": {"@type": "PeopleAudience", "suggestedMinAge": 3}, "isAccessibleForFree": true, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}}</script>
 <!--/seo-->
@@ -20,8 +20,7 @@
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="icon" href="/icons/icon-192.png" type="image/png">
 <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@500;600;700;800&display=swap">
+<link rel="stylesheet" href="/vendor/fonts/fonts.css">
 <style>
 /* Daily Layer game kit: the same chunky toy-block look as the shop. One-screen apps: bar on top, stage fills the rest. */
 :root{
@@ -379,7 +378,7 @@ K.initBar(); K.applyWords();
 let toastT = 0;
 function toast(m) { const e = document.getElementById("toast"); e.textContent = m; e.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => (e.hidden = true), 1700); }
 </script>
-<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/","cannon-es":"https://cdn.jsdelivr.net/npm/cannon-es@0.20.0/dist/cannon-es.js"}}</script>
+<script type="importmap">{"imports":{"three":"/vendor/three/build/three.module.js","three/addons/":"/vendor/three/examples/jsm/","cannon-es":"/vendor/cannon-es/cannon-es.js"}}</script>
 <script type="module">
 import * as THREE from "three";
 /* ---------- Daily Layer 3D kit: loads the shop's real figures as light game toys (inlined into module scripts) ---------- */

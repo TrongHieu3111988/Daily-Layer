@@ -876,3 +876,65 @@ def wiggle_axolotl(step=0.3):
 CATALOG2["wiggle-axolotl"] = (wiggle_axolotl, dict(title="Wiggle Axolotl", title_vi="Kỳ Giông Uốn Éo", price=1.49,
     blurb="A 13 cm articulated axolotl with frilly gills and a little smile that prints in one piece and wiggles straight off the bed. No supports, no assembly.",
     tags=["flexi", "print-in-place", "fidget", "axolotl", "stocking-stuffer", "kids"]))
+
+# ---------- LED Tealight Christmas Tree (decor, 2026-11-21) ----------
+# A hollow three-tier tree that slips over a standard 38 mm LED tealight. Prints upright, open bottom, no supports:
+# tier slopes lean 25-33 degrees from vertical, the scalloped tier skirts flare out at 45 degrees, the diamond
+# light windows have 45-degree tops and the star's side arms stay under 50 degrees. LED tealights only, never a flame.
+TL_WALL = 2.0
+TL_PROF = np.array([(0, 0), (37, 0), (37, 6), (23, 36), (31, 44), (17, 70), (24.5, 77.5), (6.5, 103),
+                    (2.6, 110), (0, 117)], float)           # outer (r, z), material on the axis side
+TL_TIERS = [(6.0, 36.0, 37.0, 23.0), (44.0, 70.0, 31.0, 17.0), (77.5, 103.0, 24.5, 6.5)]
+TL_STAR_Z, TL_STAR_R, TL_STAR_RI = 117.0, 13.0, 6.0
+
+def _tl_rz(P):
+    x, y, z = P[..., 0], P[..., 1], P[..., 2]
+    r = np.hypot(x, y); th = np.arctan2(y, x)
+    # gentle scallops (9 lobes) that grow toward each tier skirt
+    amp = np.zeros_like(z)
+    for z0, z1, r0, r1 in TL_TIERS:
+        t = np.clip((z1 - z) / (z1 - z0), 0, 1)
+        amp = np.where((z >= z0 - 8) & (z <= z1), 0.06 * t ** 2, amp)
+    r = r / (1.0 + amp * np.cos(9 * th + 0.35 * z / 10))
+    return r, th, z
+
+def _tl_tree(P):
+    r, th, z = _tl_rz(P)
+    d = poly2(np.stack([r, z, np.zeros_like(z)], -1), TL_PROF)
+    cav = np.maximum(d + TL_WALL, z - 96.0)           # hollow up to 96 mm, solid tip above
+    cav = np.minimum(cav, np.maximum(r - 34.6, z - 5.0))   # open foot: the tealight slides in from below
+    shell = np.maximum(d, -cav)
+    # diamond light windows: two staggered rows per tier
+    holes = []
+    for k, (z0, z1, r0, r1) in enumerate(TL_TIERS):
+        for row, (fz, n) in enumerate(((0.35, 9), (0.68, 9 if k < 2 else 6))):
+            zc = z0 + fz * (z1 - z0); rc = r0 + fz * (r1 - r0)
+            off = (row * 0.5 + k * 0.25) * 2 * np.pi / n
+            ph = np.mod(th - off + np.pi / n, 2 * np.pi / n) - np.pi / n
+            t = rc * ph; s = z - zc
+            hs = 3.4 if k < 2 else 2.6
+            holes.append(np.maximum((np.abs(t) + np.abs(s)) / np.sqrt(2) - hs / np.sqrt(2), rc - 8 - r))
+    return np.maximum(shell, -np.minimum.reduce(holes))
+
+def _tl_star(P):
+    x, y, z = P[..., 0], P[..., 1], P[..., 2]
+    q = np.stack([x, z - TL_STAR_Z, np.zeros_like(z)], -1)
+    d2 = star2(q, TL_STAR_R, TL_STAR_RI)
+    rr = np.hypot(x, z - TL_STAR_Z)
+    half = 3.4 - 1.6 * np.clip(rr / TL_STAR_R, 0, 1)       # thicker in the middle, like a faceted star
+    return np.maximum(d2, np.abs(y) - half)
+
+def tealight_tree(step=0.66):
+    lo, hi = (-39, -39, 0), (39, 39, TL_STAR_Z + TL_STAR_R + 1)
+    body = lambda P: np.minimum(_tl_tree(P), _tl_star(P))
+    v, f = mesh(lambda P: np.maximum(body(P), -P[..., 2]), lo, hi, step)
+    tv, tf = mesh(lambda P: np.maximum(np.maximum(_tl_tree(P), -_tl_star(P)), -P[..., 2]), lo, hi, step)
+    sv, sf = mesh(lambda P: np.maximum(_tl_star(P), -P[..., 2]), (-12, -4, TL_STAR_Z - 12), (12, 4, TL_STAR_Z + 12), step)
+    preview = [("tree", tv, tf, "#2F8F5B"), ("star", sv, sf, "#F2C230")]
+    return dict(parts=preview, print_parts=[("tealight_tree", v, f, "#2F8F5B")], expect_shells=1,
+                meta=dict(view=(18, -60), line="decor",
+                          print_hint="Prints upright in one piece, open side down, no supports, no brim: tier slopes 25-33 degrees, skirts and light windows 45 degrees. 0.2 mm layers, 2-3 walls, 10% infill; green, white or a translucent/silk PLA glows best. Optional filament swap to yellow at 103 mm for the star. Slip it over any standard 38 mm LED tealight (up to 40 mm wide, 40 mm tall with its flame). LED tealights only, never a real candle."))
+
+CATALOG2["led-tealight-tree"] = (tealight_tree, dict(title="LED Tealight Christmas Tree", title_vi="Cây Thông Đèn Nến LED", price=1.99,
+    blurb="A 12 cm three-tier Christmas tree with diamond light windows and a star that slips over any 38 mm LED tealight and glows. One piece, no supports.",
+    tags=["christmas", "decor", "tealight", "led", "lamp", "tree", "holiday", "gift", "nightlight"]))
