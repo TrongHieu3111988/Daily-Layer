@@ -144,6 +144,26 @@ const DIRECTORS = {
     }
     await hold(10);
   },
+  // Gift Box Surprise: swipe across the lid (first present) or tap it (second), twist by twist, until it pops and a toy friend jumps out onto the shelf
+  async gift(s) {
+    const fr = async () => { await s.page.evaluate(dt => { for (const a of document.getAnimations()) { if (a.playState === "finished") continue; a.pause(); const end = a.effect.getComputedTiming().endTime; a.currentTime = Math.min((a.currentTime || 0) + dt, end); if (a.currentTime >= end) a.finish(); } }, DT); await s.frame(); };
+    const hold = async k => { for (let i = 0; i < k; i++) await fr(); };
+    await hold(24); await s.tap("#startBtn"); await hold(20);
+    for (let r = 0; r < 4; r++) {
+      const bb = await (await s.page.$("#lid")).boundingBox(), y = bb.y + bb.height / 2, xl = bb.x + bb.width * 0.15, xr = bb.x + bb.width * 0.85;
+      s.mark("twist");
+      if (r % 2 === 0) {          // swipe back and forth across the lid
+        await s.page.mouse.move(xl, y); await s.page.mouse.down();
+        for (let k = 0; k < 8 && !(await s.page.evaluate(() => locked)); k++) { const a = k % 2 ? xr : xl, b2 = k % 2 ? xl : xr;
+          for (let i = 1; i <= 9; i++) { await s.page.mouse.move(a + (b2 - a) * i / 9, y); await fr(); } }
+        await s.page.mouse.up();
+      } else {                    // tap, tap, tap
+        for (let k = 0; k < 6 && !(await s.page.evaluate(() => locked)); k++) { await s.page.mouse.click(bb.x + bb.width / 2, y); await hold(12); }
+      }
+      s.mark("pop"); await hold(r === 3 ? 80 : 76);
+    }
+    await hold(10);
+  },
   // Flashlight Friends: the room is dark; the flashlight sweeps around, finds the named friend and taps it (round 2 lights a wrong friend first), the lights come on
   async torch(s) {
     const fr = async () => { await s.page.evaluate(dt => { for (const a of document.getAnimations()) { if (a.playState === "finished") continue; a.pause(); const end = a.effect.getComputedTiming().endTime; a.currentTime = Math.min((a.currentTime || 0) + dt, end); if (a.currentTime >= end) a.finish(); } }, DT); await s.frame(); };

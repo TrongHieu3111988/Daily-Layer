@@ -105,6 +105,11 @@
    "id": "torch",
    "artifact": "https://claude.ai/artifact/GjkvWzARE5WamvCWnAWbCX",
    "library": "2d"
+  },
+  {
+   "id": "gift",
+   "artifact": "https://claude.ai/artifact/WLQZQM6fBRqzUJwunqzW5g",
+   "library": "2d"
   }
  ]
 }

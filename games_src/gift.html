@@ -1,0 +1,187 @@
+<title>Gift Box Surprise</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<!--HEAD-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@500;600;700;800&display=swap">
+<style>
+/*KITCSS*/
+/* Gift Box Surprise: twist the screw lid of a round present (swipe across the lid, or tap it) until it pops off
+   and a toy friend from the library jumps out and joins the shelf. One present per round, more turns later on. */
+.stage{display:flex;flex-direction:column;align-items:center;overflow:hidden;background:linear-gradient(#E9F6FF 0 70%,#F6D9A8 70% 100%)}
+.round{display:flex;justify-content:center;gap:8px;padding:10px 12px 0}
+.round i{width:14px;height:14px;border-radius:50%;border:2.5px solid var(--outline);background:var(--paper)}
+.round i.on{background:var(--grass)}.round i.now{background:var(--sun)}
+.ask{margin:10px 14px 0;padding:8px 16px;background:var(--paper);border:3px solid var(--outline);border-radius:22px;box-shadow:var(--pop-sm);
+  font-family:'Baloo 2',sans-serif;font-weight:800;font-size:21px;line-height:1.15;color:var(--outline);text-align:center;max-width:calc(100% - 28px);position:relative;z-index:4}
+.play{position:relative;flex:1;min-height:0;width:100%;display:grid;place-items:center;touch-action:none}
+.snow{position:absolute;inset:0;pointer-events:none;background-image:radial-gradient(circle,#fff 0 3px,transparent 4px),radial-gradient(circle,#fff 0 2px,transparent 3px);background-size:60px 60px,38px 38px;background-position:0 0,19px 25px;opacity:.9}
+.gift{position:relative;width:var(--w,210px);height:calc(var(--w,210px) * 1.12);touch-action:none;cursor:grab}
+.gift.wig{animation:wig .35s ease}
+@keyframes wig{25%{transform:rotate(-4deg)}75%{transform:rotate(4deg)}}
+.body{position:absolute;left:4%;right:4%;bottom:0;height:62%;border:4px solid var(--outline);border-radius:12px 12px 22px 22px / 12px 12px 30px 30px;overflow:hidden;background:var(--c1);z-index:2}
+.body:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,.16),transparent 22%,transparent 70%,rgba(0,0,0,.2))}
+.body .band{position:absolute;top:0;bottom:0;width:15%;background:var(--c3);border-left:3px solid var(--outline);border-right:3px solid var(--outline)}
+.neck{position:absolute;left:12%;right:12%;bottom:58%;height:10%;background:var(--c1);border:4px solid var(--outline);border-bottom:0;z-index:1;
+  background-image:repeating-linear-gradient(-18deg,transparent 0 9px,rgba(0,0,0,.28) 9px 13px)}
+.lid{position:absolute;left:0;right:0;bottom:58%;height:24%;z-index:3;transition:transform .25s ease}
+.lid .rim{position:absolute;inset:0;border:4px solid var(--outline);border-radius:14px;background-color:var(--c2);
+  background-image:repeating-linear-gradient(90deg,rgba(255,255,255,.22) 0 7px,rgba(0,0,0,.14) 7px 14px);background-position:var(--spin,0px) 0}
+.lid .rim:before{content:"";position:absolute;inset:0;border-radius:10px;background:linear-gradient(90deg,rgba(0,0,0,.22),transparent 25%,transparent 70%,rgba(0,0,0,.25))}
+.bow{position:absolute;left:50%;bottom:88%;width:58%;transform:translateX(-50%);pointer-events:none}
+.lid.off{transform:translate(48%,-120%) rotate(24deg)!important;transition:transform .55s cubic-bezier(.3,1.4,.6,1)}
+.arrows{position:absolute;left:50%;bottom:62%;transform:translateX(-50%);z-index:4;pointer-events:none;width:72%;opacity:.95;animation:sw 1.4s ease-in-out infinite}
+@keyframes sw{50%{transform:translateX(-38%)}}
+.dots{position:absolute;left:0;right:0;bottom:-34px;display:flex;justify-content:center;gap:8px}
+.dots i{width:16px;height:16px;border-radius:50%;border:2.5px solid var(--outline);background:var(--paper)}.dots i.on{background:var(--sun)}
+.pal{position:absolute;left:50%;bottom:40%;width:78%;aspect-ratio:1;transform:translate(-50%,40%) scale(.3);opacity:0;z-index:1;pointer-events:none;transition:transform .6s cubic-bezier(.3,1.6,.5,1),opacity .2s}
+.pal img{width:100%;height:100%;object-fit:contain;display:block;filter:drop-shadow(0 5px 0 rgba(27,37,71,.25))}
+.pal.out{transform:translate(-50%,-58%) scale(1);opacity:1;z-index:5}
+.pal.out.hop{animation:hop .8s ease .6s 2}
+@keyframes hop{50%{margin-bottom:28px}}
+.shelf{position:relative;width:calc(100% - 24px);height:86px;margin:0 12px 12px;border:3px solid var(--outline);border-radius:18px;background:var(--wood);box-shadow:inset 0 -12px 0 var(--wood2);display:flex;align-items:flex-end;justify-content:center;gap:4px;padding:0 6px 14px}
+.shelf .slot{width:52px;height:52px;border-radius:50%;border:3px dashed rgba(27,37,71,.35);flex:none;display:grid;place-items:center}
+.shelf .slot img{width:62px;height:62px;object-fit:contain;margin-bottom:8px;animation:land .5s cubic-bezier(.3,1.6,.5,1)}
+@keyframes land{0%{transform:translateY(-60px) scale(.5)}}
+.shelf .slot.full{border-color:transparent}
+.hand{position:absolute;z-index:6;width:54px;pointer-events:none;left:50%;top:44%;animation:hand 1.6s ease-in-out infinite}
+@keyframes hand{0%,100%{transform:translateX(-80%)}50%{transform:translateX(10%)}}
+@media (prefers-reduced-motion:reduce){.gift.wig,.arrows,.pal.out.hop,.hand,.shelf .slot img{animation:none}.lid,.lid.off,.pal{transition:none}}
+</style>
+<div class="app">
+  <header class="bar">
+    <a class="ibtn" id="back" href="/" data-t-label="back" aria-label="Back"></a>
+    <h1 data-t="title">Gift Box Surprise</h1>
+    <span class="score" aria-live="polite"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.8-4.5 4.2 1.2 6L12 16.6 6.5 19.6l1.2-6L3.2 9.4l6.1-.8z" fill="#FFC93C" stroke="#1B2547" stroke-width="2" stroke-linejoin="round"/></svg><span id="count">0</span></span>
+    <button class="ibtn" id="soundBtn" type="button" data-t-label="sound" aria-label="Sound"></button>
+    <button class="ibtn" id="langBtn" type="button" aria-label="Language">VI</button>
+  </header>
+  <main class="stage" id="stage">
+    <div class="round" id="round" aria-hidden="true"></div>
+    <div class="ask" id="ask" aria-live="polite" data-t="title">Gift Box Surprise</div>
+    <div class="play" id="play"><div class="snow"></div><div id="spot"></div></div>
+    <div class="shelf" id="shelf" aria-hidden="true"></div>
+    <div class="toast" id="toast" hidden></div>
+  </main>
+</div>
+
+<div class="overlay" id="intro">
+  <div class="card">
+    <canvas class="hero" id="introArt" width="400" height="280"></canvas>
+    <h2 data-t="introH">Who is in the present?</h2>
+    <p data-t="introP">Swipe across the lid to twist it, or tap the lid. When it pops off, a toy friend jumps out!</p>
+    <button class="btn coral" type="button" id="startBtn"><span data-t="start">Open presents!</span></button>
+  </div>
+</div>
+<div class="overlay" id="over" hidden>
+  <div class="card">
+    <div class="stars" id="stars"></div>
+    <h2 id="overH">Surprise!</h2>
+    <p id="overP"></p>
+    <div class="row"><button class="btn coral" type="button" id="againBtn"><span data-t="again">Play again</span></button><a class="btn" id="homeBtn" href="/" data-t="home">More games</a></div>
+  </div>
+</div>
+
+<script>/*KITJS*/</script>
+<script>
+"use strict";
+K.words.en = { title: "Gift Box Surprise", back: "Back", sound: "Sound on or off", introH: "Who is in the present?", introP: "Swipe across the lid to twist it, or tap the lid. When it pops off, a toy friend jumps out!", start: "Open presents!", again: "Play again", home: "More games",
+  twist: n => n === 1 ? "One more twist!" : "Twist the lid " + n + " times!", yay: n => "Surprise! It's the " + n + "!", overH: "Merry surprise!", overP: n => "You opened " + n + " presents and filled the shelf with friends." };
+K.words.vi = { title: "Hộp Quà Bất Ngờ", back: "Quay lại", sound: "Bật hoặc tắt âm thanh", introH: "Ai ở trong hộp quà?", introP: "Vuốt ngang nắp để vặn, hoặc chạm vào nắp. Khi nắp bật ra, một bạn đồ chơi sẽ nhảy ra!", start: "Mở quà nào!", again: "Chơi lại", home: "Trò khác",
+  twist: n => n === 1 ? "Vặn thêm một lần nữa!" : "Vặn nắp " + n + " lần nhé!", yay: n => "Bất ngờ chưa! Là " + n + "!", overH: "Quà vui quá!", overP: n => "Bé đã mở " + n + " hộp quà và xếp đầy kệ bạn bè." };
+
+const TURNS = [2, 3, 3, 4, 4, 4];
+const LOOKS = [["#E23B3B", "#2F9E5B", "#FFD24A"], ["#2F9E5B", "#E23B3B", "#FFFFFF"], ["#4A8DF0", "#FFD24A", "#FFFFFF"], ["#8C6BF2", "#FF8FB8", "#FFD24A"], ["#FF9B3D", "#4A8DF0", "#FFFFFF"], ["#FF8FB8", "#8C6BF2", "#FFFFFF"]];
+let toys = [], order = [], round = 0, left = 0, running = false, locked = false, opened = 0, idleT = 0, acc = 0, lastX = null, spin = 0;
+const play = document.getElementById("play"), spot = document.getElementById("spot");
+function shuffle(a) { return a.slice().sort(() => Math.random() - .5); }
+function bowSVG(c) { return `<svg viewBox="0 0 120 60"><g fill="${c}" stroke="#1B2547" stroke-width="4" stroke-linejoin="round"><path d="M60 34 C40 4 6 6 10 28 C13 46 44 44 60 34Z"/><path d="M60 34 C80 4 114 6 110 28 C107 46 76 44 60 34Z"/><path d="M54 36 L38 58 L48 58 L60 42 L72 58 L82 58 L66 36Z"/><circle cx="60" cy="34" r="10"/></g><path d="M26 22 C32 18 42 20 48 28 M94 22 C88 18 78 20 72 28" stroke="#1B2547" stroke-width="3" fill="none" stroke-linecap="round" opacity=".55"/></svg>`; }
+const ARROWS = `<svg viewBox="0 0 160 40"><path d="M20 20 H140 M20 20 l14 -12 M20 20 l14 12 M140 20 l-14 -12 M140 20 l-14 12" stroke="#fff" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M20 20 H140 M20 20 l14 -12 M20 20 l14 12 M140 20 l-14 -12 M140 20 l-14 12" stroke="#1B2547" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>`;
+const HAND = `<svg viewBox="0 0 60 70"><path d="M22 8c0-4 7-4 7 0v26l3-14c1-4 7-3 7 1l-1 15 3-10c1-4 7-3 6 1l-2 14 3-6c2-3 7-1 6 2l-6 18c-3 8-9 12-17 12h-4c-8 0-13-6-15-12l-5-14c-1-4 4-6 6-2l5 9V8z" fill="#fff" stroke="#1B2547" stroke-width="3.5" stroke-linejoin="round"/></svg>`;
+function size() { const r = play.getBoundingClientRect(); return Math.max(150, Math.min(250, r.width * 0.62, (r.height - 70) * 0.66)); }
+function setAsk() { document.getElementById("ask").textContent = locked && order[round] ? K.t("yay", K.toyName(order[round])) : K.t("twist", left); }
+function shelf() {
+  const s = document.getElementById("shelf"); s.innerHTML = "";
+  for (let i = 0; i < TURNS.length; i++) { const d = document.createElement("div"); d.className = "slot"; s.appendChild(d); }
+  const W = s.clientWidth - 12, n = TURNS.length, w = Math.min(52, Math.floor(W / n) - 6); s.querySelectorAll(".slot").forEach(d => { d.style.width = d.style.height = w + "px"; });
+}
+function deal() {
+  const t = order[round], look = LOOKS[round % LOOKS.length]; left = TURNS[round]; locked = false; acc = 0; lastX = null; spin = 0;
+  document.getElementById("round").innerHTML = TURNS.map((_, i) => `<i class="${i < round ? "on" : i === round ? "now" : ""}"></i>`).join("");
+  const w = size();
+  spot.innerHTML = `<div class="gift" id="gift" role="button" tabindex="0" style="--w:${w}px;--c1:${look[0]};--c2:${look[1]};--c3:${look[2]}">
+    <div class="pal" id="pal"></div><div class="neck"></div>
+    <div class="body"><div class="band" style="left:18%"></div><div class="band" style="right:18%"></div></div>
+    <div class="lid" id="lid"><div class="rim"></div><div class="bow">${bowSVG(look[2] === "#FFFFFF" ? "#FFD24A" : look[2])}</div></div>
+    <div class="arrows" id="arrows">${ARROWS}</div>
+    <div class="dots" id="dots">${Array.from({ length: left }, () => "<i></i>").join("")}</div></div>`;
+  const img = document.createElement("img"); img.src = t.img.src; img.alt = ""; img.draggable = false; document.getElementById("pal").appendChild(img);
+  const g = document.getElementById("gift"); g.setAttribute("aria-label", K.t("twist", left));
+  g.addEventListener("pointerdown", down); g.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); turn(); } });
+  setAsk(); idle();
+}
+function idle() { clearTimeout(idleT); const h = document.querySelector(".hand"); if (h) h.remove(); idleT = setTimeout(() => { if (!running || locked) return; const d = document.createElement("div"); d.className = "hand"; d.innerHTML = HAND; play.appendChild(d); }, 6000); }
+let downX = 0, moved = 0;
+function down(e) { if (!running || locked) return; e.preventDefault(); downX = lastX = e.clientX; moved = 0; try { e.currentTarget.setPointerCapture(e.pointerId); } catch (_) {} idle(); }
+play.addEventListener("pointermove", e => {
+  if (lastX === null || !running || locked) return;
+  const dx = e.clientX - lastX; lastX = e.clientX; moved += Math.abs(dx); acc += Math.abs(dx); spin += dx;
+  document.querySelector("#lid .rim").style.setProperty("--spin", spin + "px");
+  if (Math.abs(dx) > 1 && Math.random() < .25) K.sfx.tick();
+  if (acc >= 70) { acc = 0; turn(); }
+});
+function up() { if (lastX === null) return; lastX = null; if (moved < 12 && running && !locked) turn(); }
+play.addEventListener("pointerup", up); play.addEventListener("pointercancel", () => { lastX = null; });
+function turn() {
+  if (!running || locked || left <= 0) return;
+  left--; const done = TURNS[round] - left; idle();
+  const lid = document.getElementById("lid"), g = document.getElementById("gift");
+  spin += 28; lid.querySelector(".rim").style.setProperty("--spin", spin + "px");
+  lid.style.transform = `translateY(${-done * 4}px)`;
+  document.querySelectorAll("#dots i").forEach((d, i) => d.classList.toggle("on", i < done));
+  g.classList.remove("wig"); void g.offsetWidth; g.classList.add("wig");
+  K.sfx.note(392 * Math.pow(2, done / 6));
+  if (left === 0) pop(); else setAsk();
+}
+function pop() {
+  locked = true; clearTimeout(idleT); const h = document.querySelector(".hand"); if (h) h.remove();
+  const t = order[round]; opened++; document.getElementById("count").textContent = opened;
+  document.getElementById("arrows").remove(); document.getElementById("lid").classList.add("off"); K.sfx.pop();
+  setTimeout(() => { const p = document.getElementById("pal"); p.classList.add("out", "hop"); K.sfx.chime(); setAsk();
+    const r = p.getBoundingClientRect(); if (!K.CALM) K.confetti(r.left + r.width / 2, r.top + r.height / 2, 50); }, 250);
+  setTimeout(() => {
+    const slot = document.querySelectorAll("#shelf .slot")[round]; if (slot) { const im = document.createElement("img"); im.src = t.img.src; im.alt = ""; slot.appendChild(im); slot.classList.add("full"); K.sfx.thud(); }
+    if (round < TURNS.length - 1) { round++; deal(); } else finish();
+  }, 2600);
+}
+function finish() {
+  running = false; clearTimeout(idleT);
+  document.getElementById("stars").innerHTML = [0, 1, 2].map(() => K.starSVG(true)).join("");
+  document.getElementById("overH").textContent = K.t("overH"); document.getElementById("overP").textContent = K.t("overP", TURNS.length);
+  document.getElementById("over").hidden = false; K.sfx.tada(); K.confetti(); document.getElementById("againBtn").focus();
+}
+function start(list) {
+  toys = list.filter(t => t.img); if (toys.length < 2) return;
+  order = []; while (order.length < TURNS.length) order = order.concat(shuffle(toys)); order = order.slice(0, TURNS.length);
+  round = 0; opened = 0; running = true; document.getElementById("count").textContent = "0";
+  document.getElementById("intro").hidden = true; document.getElementById("over").hidden = true; shelf(); deal();
+}
+
+K.initBar(); K.onLang = () => { if (running) setAsk(); }; K.applyWords();
+function introArt(list) {
+  const c = document.getElementById("introArt"), x = c.getContext("2d"); x.clearRect(0, 0, c.width, c.height);
+  x.fillStyle = "#E9F6FF"; x.beginPath(); x.roundRect ? x.roundRect(10, 10, 380, 260, 26) : x.rect(10, 10, 380, 260); x.fill();
+  x.lineWidth = 5; x.strokeStyle = K.INK; x.lineJoin = "round";
+  x.fillStyle = "#E23B3B"; x.beginPath(); x.roundRect ? x.roundRect(60, 150, 140, 105, 14) : x.rect(60, 150, 140, 105); x.fill(); x.stroke();
+  x.fillStyle = "#FFD24A"; x.fillRect(110, 152, 22, 101); x.strokeRect(110, 152, 22, 101);
+  x.save(); x.translate(205, 95); x.rotate(.35); x.fillStyle = "#2F9E5B"; x.beginPath(); x.roundRect ? x.roundRect(-82, -20, 164, 42, 12) : x.rect(-82, -20, 164, 42); x.fill(); x.stroke(); x.restore();
+  const t = (list || []).find(t => t.img); if (t) x.drawImage(t.img, 80, 40, 120, 120);
+  K.star(x, 300, 70, 18); K.star(x, 340, 150, 12); K.star(x, 290, 210, 14);
+}
+introArt();
+document.getElementById("homeBtn").href = window.SHOP_URL ? window.SHOP_URL + (window.SHOP_URL.includes("#") ? "" : "#play") : "/#play";
+K.library().then(list => introArt(list));
+document.getElementById("startBtn").onclick = () => { K.sfx.pop(); K.library().then(start); };
+document.getElementById("againBtn").onclick = () => { K.sfx.pop(); K.library().then(start); };
+addEventListener("resize", () => { if (running && !locked) { const g = document.getElementById("gift"); if (g) g.style.setProperty("--w", size() + "px"); shelf(); document.querySelectorAll("#shelf .slot").forEach((s, i) => { if (i < round) { const t = order[i]; const im = document.createElement("img"); im.src = t.img.src; im.alt = ""; s.appendChild(im); s.classList.add("full"); } }); } });
+</script>
+<!--TAIL-->

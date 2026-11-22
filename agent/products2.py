@@ -938,3 +938,103 @@ def tealight_tree(step=0.66):
 CATALOG2["led-tealight-tree"] = (tealight_tree, dict(title="LED Tealight Christmas Tree", title_vi="Cây Thông Đèn Nến LED", price=1.99,
     blurb="A 12 cm three-tier Christmas tree with diamond light windows and a star that slips over any 38 mm LED tealight and glows. One piece, no supports.",
     tags=["christmas", "decor", "tealight", "led", "lamp", "tree", "holiday", "gift", "nightlight"]))
+
+# ---------- Screw-Lid Gift Box (functional, 2026-11-22) ----------
+# A round 72 mm present box with a screw-on lid and a slot-in bow. Box prints upright, lid prints top-down, bow prints
+# flat: no supports anywhere. Right-hand single-start thread, 3.6 mm pitch, 1.4 mm deep, 45-degree flanks and 0.4 mm
+# radial (about 0.28 mm normal) clearance. Four raised ribbon bands on the box, 24 grip ribs on the lid.
+# Box and lid are exact lathe meshes (lathe_loop: one closed section per angle), so the thread stays sharp and the zip small.
+GB_R, GB_BAND, GB_H = 36.0, 1.6, 52.0          # box radius, ribbon band height, shoulder height
+GB_R0, GB_TH, GB_P, GB_NECK = 32.0, 1.4, 3.6, 64.0   # thread core radius, depth, pitch, top of the neck
+GB_CLR = 0.4
+GB_LID0, GB_CEIL, GB_TOP = 52.6, 65.0, 68.2    # lid skirt bottom, inner ceiling, lid top (assembled coordinates)
+
+def _gb_thread(th, z):
+    u = np.mod(z - GB_P * th / (2 * np.pi), GB_P)
+    return np.clip(GB_TH + 0.2 - np.abs(u - GB_P / 2), 0, GB_TH)
+
+def lathe_loop(thetas, loop):
+    """Closed solid from a closed (r, z) section loop for every angle: loop(th) -> (N, M, 2) with matching point order.
+    Points on the axis (r = 0) are welded, so floors and lids close. Watertight by construction."""
+    L = loop(thetas); N, M = L.shape[:2]
+    r, z = L[..., 0], L[..., 1]
+    V = np.stack([r * np.cos(thetas)[:, None], r * np.sin(thetas)[:, None], z], -1).reshape(-1, 3)
+    idx = np.arange(N * M).reshape(N, M)
+    on_axis = (r.reshape(-1) <= 1e-9)
+    key = np.where(on_axis, -1 - np.round(z.reshape(-1) * 1e4).astype(np.int64), np.arange(N * M))
+    _, first, inv = np.unique(key, return_index=True, return_inverse=True)
+    V = V[first]; idx = inv.reshape(N, M)
+    a = idx; b = np.roll(idx, -1, 0); c = np.roll(np.roll(idx, -1, 0), -1, 1); d = np.roll(idx, -1, 1)
+    F = np.concatenate([np.stack([a, b, c], -1).reshape(-1, 3), np.stack([a, c, d], -1).reshape(-1, 3)])
+    F = F[(F[:, 0] != F[:, 1]) & (F[:, 1] != F[:, 2]) & (F[:, 0] != F[:, 2])]
+    V = V.astype(np.float32)
+    if signed_volume(V, F) < 0: F = F[:, ::-1]
+    return V, F.astype(np.int64)
+
+def _gb_bandr(th):
+    ph = np.mod(th + np.pi / 4, np.pi / 2) - np.pi / 4
+    return GB_R + GB_BAND * (np.abs(GB_R * ph) < 6.0)
+
+def gift_box_loop(th, dz):
+    th = th[:, None]; R = _gb_bandr(th)
+    zs = np.arange(GB_H, GB_NECK - 1.4 + 1e-6, dz)[None, :] * np.ones_like(th)
+    zt = np.linspace(GB_NECK - 1.4, GB_NECK, 8)[None, :] * np.ones_like(th)
+    zn = np.concatenate([zs[:, :-1], zt], 1)
+    rn = np.minimum(GB_R0 + _gb_thread(th, zn), GB_R0 + GB_TH - (zn - (GB_NECK - 1.4)))
+    one = np.ones_like(th); ri = GB_R0 - 2.4
+    pts = [np.stack([0 * one, 0 * one], -1), np.stack([R - 0.8, 0 * one], -1), np.stack([R, 0.8 * one], -1),
+           np.stack([R, GB_H * one], -1), np.stack(np.broadcast_arrays(rn, zn), -1),
+           np.stack([ri * one, GB_NECK * one], -1), np.stack([ri * one, 52.0 * one], -1),
+           np.stack([33.6 * one, 48.0 * one], -1), np.stack([33.6 * one, 2.0 * one], -1), np.stack([0 * one, 2.0 * one], -1)]
+    return np.concatenate([p if p.ndim == 3 else p[:, None, :] for p in pts], 1)
+
+def gift_lid_loop(th, dz):
+    th = th[:, None]; one = np.ones_like(th)
+    Ro = GB_R + 0.8 * np.clip(np.cos(24 * th) * 1.6, 0, 1)
+    zf = np.arange(GB_LID0, GB_CEIL + 1e-6, dz)[None, :] * one
+    rf = GB_R0 + GB_CLR + _gb_thread(th, zf)
+    hole = 3.2                                            # bow peg hole (0.2 mm press fit on a 3.0 mm peg)
+    pts = [np.stack(np.broadcast_arrays(rf, zf), -1)[:, ::-1][:, ::-1],
+           np.stack([hole * one, GB_CEIL * one], -1), np.stack([hole * one, GB_TOP * one], -1),
+           np.stack([Ro - 1.0, GB_TOP * one], -1), np.stack([Ro, (GB_TOP - 1.0) * one], -1),
+           np.stack([Ro, GB_LID0 * one], -1)]
+    out = np.concatenate([p if p.ndim == 3 else p[:, None, :] for p in pts], 1)
+    return out
+
+def _gb_bow2(q):                 # bow outline in (x, z): z = 0 sits on the lid, the tab goes below
+    d = circ2(q, (0, 11.0), 6.0)
+    for s in (1, -1):
+        loop = ell2(q, (s * 12.5, 15.0), 12.5, 8.5, s * 0.30)
+        tail = poly2(q, np.array([(s * 1.0, 9.0), (s * 15.0, 0.0), (s * 8.5, 0.0), (s * -1.0, 5.0)], float)[::s])
+        d = np.minimum.reduce([d, loop, tail])
+    wrap = np.maximum(np.abs(q[..., 0]) - 4.0, np.abs(q[..., 1] - 5.5) - 5.5)
+    return np.minimum(d, wrap)
+
+def _gb_bow3(P):                 # printed flat (z = thickness); the peg (3.0 mm radius, 3.2 mm long) points along -y
+    q = P / 1.3
+    body = np.maximum(_gb_bow2(q) * 1.3, np.abs(P[..., 2] - 2.5) - 2.5)
+    folds = np.minimum.reduce([np.abs(ell2(q, (s * 13.0, 15.2), 7.0, 3.2, s * 0.30)) * 1.3 - 0.7 for s in (1, -1)])
+    body = np.maximum(body, -np.maximum(folds, 4.0 - P[..., 2]))          # 1 mm fold lines pressed into the top face
+    peg = np.maximum.reduce([np.hypot(P[..., 0], P[..., 2] - 2.5) - 3.0, np.abs(P[..., 2] - 2.5) - 2.5, -P[..., 1] - 3.2, P[..., 1] - 1.0])
+    return np.minimum(body, peg)
+
+def gift_box(step=0.4):
+    nth = int(round(288 / step)); th = np.linspace(0, 2 * np.pi, nth, endpoint=False)
+    v, f = lathe_loop(th, lambda t: gift_box_loop(t, step * 0.3))
+    lv, lf = lathe_loop(th, lambda t: gift_lid_loop(t, step * 0.3))
+    bv, bf = mesh(_gb_bow3, (-34, -4, 0), (34, 32, 5), step * 1.25)
+    # assembled preview: lid screwed on, bow standing on it with its peg in the hole (x->x, y->-(z-2.5), z->y)
+    pb = np.stack([bv[:, 0], -(bv[:, 2] - 2.5), bv[:, 1] + GB_TOP], -1)
+    ca, sa = np.cos(np.radians(40)), np.sin(np.radians(40))                        # turned toward the camera (the peg is round)
+    pb = np.stack([ca * pb[:, 0] - sa * pb[:, 1], sa * pb[:, 0] + ca * pb[:, 1], pb[:, 2]], -1).astype(np.float32)
+    preview = [("box", v, f, "#D63A3A"), ("lid", lv, lf, "#2F8F5B"), ("bow", pb, bf, "#F2C230")]
+    plv = lv * np.array([1, -1, -1], np.float32)                                   # lid flipped top-down (a rotation)
+    prints = [("box", v, f, "#D63A3A"), ("lid", drop_to_bed(plv + np.array([80, 0, 0], np.float32)), lf, "#2F8F5B"),
+              ("bow", drop_to_bed(bv + np.array([0, -70, 0], np.float32)), bf, "#F2C230")]
+    return dict(parts=preview, print_parts=prints, expect_shells=3,
+                meta=dict(view=(22, -58), line="functional",
+                          print_hint="No supports, three parts: box upright, lid top-down (as laid out), bow flat. 0.2 mm layers, 3 walls, 15% infill. Right-hand thread, 3.6 mm pitch, 0.4 mm clearance: screw the lid on gently the first time. Push the bow's peg into the hole on top of the lid (a dab of glue makes it permanent). Inside: 67 mm wide, about 60 mm deep, for small gifts, rolled-up gift cards or treasures. Keep the bow away from children under 3."))
+
+CATALOG2["screw-gift-box"] = (gift_box, dict(title="Screw-Lid Gift Box", title_vi="Hộp Quà Nắp Vặn", price=1.99,
+    blurb="A round 72 mm present box with a real screw-on lid, ribbon bands and a slot-in bow. Prints without supports; reusable gift wrap for small presents.",
+    tags=["christmas", "gift-box", "gift", "box", "screw-lid", "threaded", "storage", "functional", "holiday"]))

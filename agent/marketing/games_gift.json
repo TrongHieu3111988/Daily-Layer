@@ -1,0 +1,23 @@
+{
+ "id": "gift",
+ "title": "Gift Box Surprise",
+ "hook": "Who is inside\nthe present?",
+ "captions": {
+  "twist": [
+   "Twist, twist the lid...",
+   "Tap, tap, tap!",
+   "Twist it open!",
+   "One more twist..."
+  ],
+  "pop": [
+   "Surprise!",
+   "It's a toy friend!",
+   "Pop! Hello!",
+   "Onto the shelf!"
+  ]
+ },
+ "yt_title": "Who is inside the present? Free gift box game for kids #Shorts",
+ "yt_desc": "Twist the lid of each present until it pops off and a toy friend jumps out! Swipe across the lid or just tap it, six presents to fill the shelf. Easy enough for a 4-year-old, in English and Vietnamese, with no ads and no signing up, and the toys and the screw-lid gift box are real models you can 3D print at home.\n\nPlay free in your browser: {url}\nMore free kids' games and a new 3D-printable toy every day: {site}\n\n#Shorts #KidsGames #Christmas #3DPrinting #FreeGames",
+ "icons": "/home/user/Daily-Layer/public/products",
+ "toys": "/home/user/Daily-Layer/public/toys.json"
+}

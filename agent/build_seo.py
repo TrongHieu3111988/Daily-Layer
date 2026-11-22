@@ -15,6 +15,7 @@ E = lambda s: html.escape(str(s), quote=True)
 
 LINES = {"figure": "Cute figures", "print-in-place": "Moving toys", "functional": "Handy things", "decor": "Decor"}
 GAMES = {  # path: (name, description) - keep in step with the `games` words in site_src/shop.html
+    "games/gift": ("Gift Box Surprise", "Twist the lid of each present until it pops off and a toy friend jumps out! A free twist-and-open game for small kids, from our 3D-printable toy shop."),
     "games/torch": ("Flashlight Friends", "The room is dark! Slide your finger to move the flashlight, find the named toy friend and tap it. A free seek-and-find game for small kids, from our 3D-printable toy shop."),
     "games/echo": ("Toy Echo Pattern", "Toy friends light up and sing, one after another. Watch, listen, then tap them in the same order! A free memory and music game for small kids, from our 3D-printable toy shop."),
     "games/hats": ("Toy Dress-up Hats", "Every hat has the colour of one toy friend: drag each hat onto the friend of the same colour. A free colour-matching game for small kids, from our 3D-printable toy shop."),

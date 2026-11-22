@@ -3,6 +3,93 @@
  "started": "2026-10-28",
  "products": [
   {
+   "slug": "screw-gift-box",
+   "title": "Screw-Lid Gift Box",
+   "title_vi": "H\u1ed9p Qu\u00e0 N\u1eafp V\u1eb7n",
+   "price": 1.99,
+   "blurb": "A round 72 mm present box with a real screw-on lid, ribbon bands and a slot-in bow. Prints without supports; reusable gift wrap for small presents.",
+   "tags": [
+    "christmas",
+    "gift-box",
+    "gift",
+    "box",
+    "screw-lid",
+    "threaded",
+    "storage",
+    "functional",
+    "holiday"
+   ],
+   "line": "functional",
+   "print_hint": "No supports, three parts: box upright, lid top-down (as laid out), bow flat. 0.2 mm layers, 3 walls, 15% infill. Right-hand thread, 3.6 mm pitch, 0.4 mm clearance: screw the lid on gently the first time. Push the bow's peg into the hole on top of the lid (a dab of glue makes it permanent). Inside: 67 mm wide, about 60 mm deep, for small gifts, rolled-up gift cards or treasures. Keep the bow away from children under 3.",
+   "parts": [
+    {
+     "name": "box",
+     "triangles": 148320,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 47.31,
+     "size_mm": [
+      75.2,
+      75.2,
+      64.0
+     ],
+     "min_z": 0.0
+    },
+    {
+     "name": "lid",
+     "triangles": 156960,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 21.83,
+     "size_mm": [
+      73.6,
+      73.6,
+      15.6
+     ],
+     "min_z": 0.0
+    },
+    {
+     "name": "bow",
+     "triangles": 136360,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 6.79,
+     "size_mm": [
+      64.2,
+      34.3,
+      5.0
+     ],
+     "min_z": 0.0
+    }
+   ],
+   "watertight": true,
+   "web": [
+    {
+     "file": "products/screw-gift-box/web_box.bin",
+     "color": "#D63A3A",
+     "name": "box"
+    },
+    {
+     "file": "products/screw-gift-box/web_lid.bin",
+     "color": "#2F8F5B",
+     "name": "lid"
+    },
+    {
+     "file": "products/screw-gift-box/web_bow.bin",
+     "color": "#F2C230",
+     "name": "bow"
+    }
+   ],
+   "download": "",
+   "cover": "products/screw-gift-box/cover.jpg",
+   "build_seconds": 13.4,
+   "download_bytes": 6403987,
+   "dropped": "2026-11-22"
+  },
+  {
    "slug": "led-tealight-tree",
    "title": "LED Tealight Christmas Tree",
    "title_vi": "C\u00e2y Th\u00f4ng \u0110\u00e8n N\u1ebfn LED",
@@ -3023,6 +3110,6 @@
   "members": 0,
   "costs_usd": 0.0
  },
- "updated": "2026-11-21 08:56",
- "featured": "led-tealight-tree"
+ "updated": "2026-11-22 08:53",
+ "featured": "screw-gift-box"
 }
