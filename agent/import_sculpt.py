@@ -40,6 +40,7 @@ BLURB = {
     "gingerbread": "Chubby gingerbread buddy with white icing trim, gumdrop buttons and a knitted scarf. One solid piece, colour-split for AMS.",
     "reindeer": "Chibi reindeer with branching antlers, a red berry nose, a cream muzzle and a green knitted scarf. One solid piece, colour-split for AMS.",
     "snowman": "Chibi snowman with a red knitted beanie and pompom, a carrot nose, coal buttons, a red scarf and mitten arms. One solid piece, colour-split for AMS.",
+    "santa": "Chibi Santa with a fluffy white beard, a red hat with a white cuff and pompom, a black belt with a gold buckle, mittens and boots. One solid piece, colour-split for AMS.",
     "kitten": "Tabby kitten with pink ears, a white muzzle and its tail wrapped round its paws. Colour-split for AMS.",
 }
 

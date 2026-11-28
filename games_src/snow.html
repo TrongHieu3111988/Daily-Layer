@@ -1,0 +1,226 @@
+<title>Toy Snowball Toss</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<!--HEAD-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@500;600;700;800&display=swap">
+<style>
+/*KITCSS*/
+/* Toy Snowball Toss: toy friends peek out from behind snow forts; tap a friend to toss a soft snowball and make it giggle. */
+.stage{background:linear-gradient(#9FD3FF,#D9EEFF 55%,#F4FAFF);display:flex;flex-direction:column;align-items:center;overflow:hidden}
+:root[data-theme="dark"] .stage{background:linear-gradient(#17254F,#2A3D72 60%,#3B4E86)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .stage{background:linear-gradient(#17254F,#2A3D72 60%,#3B4E86)}}
+.round{display:flex;justify-content:center;gap:8px;padding:10px 12px 0;position:relative;z-index:4}
+.round i{width:14px;height:14px;border-radius:50%;border:2.5px solid var(--outline);background:var(--paper)}
+.round i.on{background:var(--grass)}.round i.now{background:var(--sun)}
+.goal{display:flex;align-items:center;gap:10px;margin:10px 14px 0;padding:8px 16px;background:var(--paper);border:3px solid var(--outline);border-radius:26px;box-shadow:var(--pop-sm);position:relative;z-index:4;min-height:56px}
+.goal b{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:21px;line-height:1.15;color:var(--outline)}
+.balls{display:flex;gap:4px;flex:none}
+.balls i{width:16px;height:16px;border-radius:50%;border:2.5px solid var(--outline);background:rgba(127,140,180,.25)}
+.balls i.on{background:#5DB8FF}
+.field{position:relative;flex:1;min-height:0;width:100%;touch-action:manipulation}
+.flake{position:absolute;top:-10px;width:8px;height:8px;border-radius:50%;background:#fff;opacity:.85;animation:fall linear infinite;pointer-events:none}
+@keyframes fall{to{transform:translate(18px,110vh)}}
+.hill{position:absolute;left:-10%;right:-10%;bottom:-8%;height:40%;border-radius:50% 50% 0 0;background:#fff;border-top:3px solid #1B2547}
+.fort{position:absolute;transform:translate(-50%,0);overflow:hidden}
+.fort .peek{position:absolute;left:50%;bottom:12%;width:80%;height:62%;transform:translate(-50%,72%);transition:transform .35s cubic-bezier(.3,1.5,.6,1);padding:0;border:0;background:none;z-index:1}
+.fort .peek img{width:100%;height:100%;object-fit:contain;object-position:bottom;display:block;pointer-events:none;filter:drop-shadow(0 3px 0 rgba(27,37,71,.25))}
+.fort.up .peek{transform:translate(-50%,-16%)}
+.fort.hit .peek{animation:giggle .7s ease}
+@keyframes giggle{0%,100%{transform:translate(-50%,-16%) rotate(0)}20%{transform:translate(-50%,-22%) rotate(-10deg)}45%{transform:translate(-50%,-28%) rotate(9deg)}70%{transform:translate(-50%,-16%) rotate(-5deg)}}
+.fort .wall{position:absolute;left:7%;right:7%;bottom:0;height:36%;z-index:2;border:3px solid #1B2547;border-radius:46% 46% 14px 14px;background:radial-gradient(circle at 30% 30%,#fff,#E3F1FF 70%);pointer-events:none}
+.fort .wall:before,.fort .wall:after{content:"";position:absolute;bottom:-3px;width:34%;height:46%;border:3px solid #1B2547;border-radius:50% 50% 8px 8px;background:#F2F9FF}
+.fort .wall:before{left:-6%}.fort .wall:after{right:-6%}
+.fort{pointer-events:none}.fort .tap{pointer-events:auto;position:absolute;inset:14% 0 0;z-index:3;padding:0;border:0;background:none;border-radius:20px;touch-action:manipulation}
+.fort.hint{overflow:visible}.fort.hint .wall{box-shadow:0 0 0 5px #FFC93C,0 0 22px 8px rgba(255,201,60,.85)}
+.ball{position:absolute;z-index:6;width:34px;height:34px;margin:-17px 0 0 -17px;border-radius:50%;border:3px solid #1B2547;background:radial-gradient(circle at 35% 30%,#fff 0 40%,#DDEBFA);pointer-events:none}
+.puff{position:absolute;z-index:6;width:90px;height:90px;margin:-45px 0 0 -45px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,#fff 0 30%,rgba(255,255,255,.7) 45%,transparent 70%);animation:puff .5s ease-out forwards}
+@keyframes puff{from{transform:scale(.3);opacity:1}to{transform:scale(1.4);opacity:0}}
+.hand{position:absolute;z-index:7;width:54px;height:54px;pointer-events:none;animation:tapme 1s ease-in-out infinite}
+@keyframes tapme{50%{transform:translateY(12px) scale(.9)}}
+.pile{position:absolute;left:50%;bottom:8px;transform:translateX(-50%);width:86px;height:46px;z-index:5;pointer-events:none}
+.toast{z-index:8}
+@media (prefers-reduced-motion:reduce){.flake{display:none}.fort .peek{transition:none}.fort.hit .peek,.puff,.hand{animation:none}}
+</style>
+<div class="app">
+  <header class="bar">
+    <a class="ibtn" id="back" href="/" data-t-label="back" aria-label="Back"></a>
+    <h1 data-t="title">Toy Snowball Toss</h1>
+    <span class="score" aria-live="polite"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.8-4.5 4.2 1.2 6L12 16.6 6.5 19.6l1.2-6L3.2 9.4l6.1-.8z" fill="#FFC93C" stroke="#1B2547" stroke-width="2" stroke-linejoin="round"/></svg><span id="count">0</span></span>
+    <button class="ibtn" id="soundBtn" type="button" data-t-label="sound" aria-label="Sound"></button>
+    <button class="ibtn" id="langBtn" type="button" aria-label="Language">VI</button>
+  </header>
+  <main class="stage" id="stage">
+    <div class="round" id="round" aria-hidden="true"></div>
+    <div class="goal"><div class="balls" id="balls" aria-hidden="true"></div><b id="say" aria-live="polite"></b></div>
+    <div class="field" id="field">
+      <div id="flakes"></div>
+      <div class="hill"></div>
+      <div id="forts"></div>
+    </div>
+    <div class="toast" id="toast" hidden></div>
+  </main>
+</div>
+
+<div class="overlay" id="intro">
+  <div class="card">
+    <canvas class="hero" id="introArt" width="400" height="280" style="position:static;animation:none;transform:none;pointer-events:auto"></canvas>
+    <h2 data-t="introH">Snowball time!</h2>
+    <p data-t="introP">Toy friends peek out from the snow forts. Tap a friend to toss a soft snowball and make it giggle!</p>
+    <button class="btn coral" type="button" id="startBtn"><span data-t="start">Let's toss!</span></button>
+  </div>
+</div>
+<div class="overlay" id="over" hidden>
+  <div class="card">
+    <div class="stars" id="stars"></div>
+    <h2 id="overH">Snow much fun!</h2>
+    <p id="overP"></p>
+    <div class="row"><button class="btn coral" type="button" id="againBtn"><span data-t="again">Play again</span></button><a class="btn" id="homeBtn" href="/" data-t="home">More games</a></div>
+  </div>
+</div>
+
+<script>/*KITJS*/</script>
+<script>
+"use strict";
+K.words.en = { title: "Toy Snowball Toss", back: "Back", sound: "Sound on or off", introH: "Snowball time!", introP: "Toy friends peek out from the snow forts. Tap a friend to toss a soft snowball and make it giggle!", start: "Let's toss!", again: "Play again", home: "More games",
+  go: "Tap a friend when it peeks out!", hit: n => "Poof! " + n + " giggles!", miss: "Oops, a snow pile! Wait for a friend.", next: "More friends are coming!",
+  overH: s => s >= 3 ? "Snow much fun!" : s >= 2 ? "Great tossing!" : "What a snowy game!", overP: n => "You tossed " + n + " snowballs and made every friend giggle." };
+K.words.vi = { title: "Ném Bóng Tuyết", back: "Quay lại", sound: "Bật hoặc tắt âm thanh", introH: "Ném bóng tuyết nào!", introP: "Các bạn đồ chơi ló ra sau những pháo đài tuyết. Chạm vào một bạn để ném quả bóng tuyết mềm cho bạn ấy cười khúc khích!", start: "Ném thôi!", again: "Chơi lại", home: "Trò khác",
+  go: "Chạm vào bạn khi bạn ấy ló ra!", hit: n => "Bụp! " + n + " cười khúc khích!", miss: "Ối, trúng đống tuyết! Đợi bạn ló ra nhé.", next: "Thêm các bạn sắp tới!",
+  overH: s => s >= 3 ? "Vui quá đi!" : s >= 2 ? "Ném giỏi lắm!" : "Trò chơi tuyết thật vui!", overP: n => "Bé đã ném " + n + " quả bóng tuyết và làm mọi bạn cười khúc khích." };
+
+// rounds: forts on the field, hits needed, how long a friend stays up (ms; 0 = until tapped), and how many friends can be up at once
+const ROUNDS = [{ forts: 3, need: 4, stay: 0, up: 1 }, { forts: 4, need: 5, stay: 3600, up: 1 }, { forts: 6, need: 6, stay: 3000, up: 2 }];
+let toys = [], round = 0, hits = 0, total = 0, misses = 0, running = false, forts = [], timers = [], idleT = null, busy = 0;
+const $ = id => document.getElementById(id);
+function pick(a, n) { return a.slice().sort(() => Math.random() - .5).slice(0, n); }
+function later(fn, ms) { const t = setTimeout(fn, ms); timers.push(t); return t; }
+function clearAll() { timers.forEach(clearTimeout); timers = []; clearTimeout(idleT); const h = document.querySelector(".hand"); if (h) h.remove(); }
+function say(k, ...a) { $("say").textContent = K.t(k, ...a); }
+function flakes() {
+  const f = $("flakes"); f.innerHTML = ""; if (K.CALM) return;
+  for (let i = 0; i < 18; i++) { const d = document.createElement("i"); d.className = "flake"; const s = 4 + Math.random() * 7;
+    d.style.cssText = `left:${Math.random() * 100}%;width:${s}px;height:${s}px;animation-duration:${(6 + Math.random() * 6).toFixed(1)}s;animation-delay:-${(Math.random() * 10).toFixed(1)}s`; f.appendChild(d); }
+}
+function layout() {
+  const R = ROUNDS[round], fld = $("field"), W = fld.clientWidth, H = fld.clientHeight, box = $("forts"); box.innerHTML = ""; forts = [];
+  const rows = R.forts === 3 ? [1, 2] : R.forts === 4 ? [2, 2] : [3, 3];
+  const fw = Math.min(W / Math.max(...rows) - 10, 170, H * 0.34), fh = fw * 1.5;
+  rows.forEach((n, r) => {
+    const scale = r === 0 ? 0.88 : 1, w = fw * scale, h = fh * scale;
+    const bottom = r === 0 ? H * 0.05 + fh * 0.87 : H * 0.05;
+    for (let i = 0; i < n; i++) {
+      const x = (i + 0.5) * W / n + (rows.length > 1 && r === 0 ? 0 : 0), el = document.createElement("div");
+      el.className = "fort"; el.style.cssText = `left:${x}px;bottom:${bottom}px;width:${w}px;height:${h}px;z-index:${r + 1}`;
+      el.innerHTML = '<button class="peek" type="button" tabindex="-1"></button><div class="wall"></div><button class="tap" type="button"></button>';
+      const f = { el, toy: null, up: false, hideT: null }; forts.push(f);
+      el.querySelector(".tap").onclick = e => tap(f, e);
+      box.appendChild(el);
+    }
+  });
+}
+function dealRound() {
+  const R = ROUNDS[round]; hits = 0; busy = 0;
+  $("round").innerHTML = ROUNDS.map((_, i) => `<i class="${i < round ? "on" : i === round ? "now" : ""}"></i>`).join("");
+  $("balls").innerHTML = Array.from({ length: R.need }, () => "<i></i>").join("");
+  layout(); say("go");
+  later(spawn, 700);
+}
+function spawn() {
+  if (!running) return;
+  const R = ROUNDS[round], upNow = forts.filter(f => f.up).length;
+  if (upNow < R.up) {
+    const free = forts.filter(f => !f.up && !f.cool); if (free.length) {
+      const f = free[Math.floor(Math.random() * free.length)], others = forts.filter(o => o.up).map(o => o.toy);
+      const choices = toys.filter(t => !others.includes(t)); f.toy = choices[Math.floor(Math.random() * choices.length)] || toys[0];
+      const p = f.el.querySelector(".peek"); p.innerHTML = ""; const im = document.createElement("img"); im.src = f.toy.img.src; im.alt = ""; im.draggable = false; p.appendChild(im);
+      f.el.querySelector(".tap").setAttribute("aria-label", K.toyName(f.toy));
+      f.up = true; f.el.classList.add("up"); K.sfx.tick();
+      if (R.stay) f.hideT = later(() => duck(f), R.stay);
+      idle();
+    }
+  }
+  later(spawn, R.up > 1 ? 900 : 1100);
+}
+function duck(f) { if (!f.up) return; f.up = false; f.el.classList.remove("up"); f.cool = true; later(() => { f.cool = false; }, 700); }
+function idle() {
+  clearTimeout(idleT); const old = document.querySelector(".hand"); if (old) old.remove();
+  idleT = setTimeout(() => {
+    if (!running) return; const f = forts.find(o => o.up); if (!f) return;
+    f.el.classList.add("hint");
+    const h = document.createElement("div"); h.className = "hand"; h.innerHTML = '<svg viewBox="0 0 54 54"><path d="M20 50c-6-6-12-14-10-18s7 0 9 3V10a4 4 0 018 0v14a4 4 0 018 0v3a4 4 0 018 1v14c0 5-4 9-9 9z" fill="#FFE0C2" stroke="#1B2547" stroke-width="3" stroke-linejoin="round"/></svg>';
+    const r = f.el.getBoundingClientRect(), s = $("field").getBoundingClientRect();
+    h.style.left = (r.left - s.left + r.width / 2 - 10) + "px"; h.style.top = (r.top - s.top + r.height * 0.15) + "px"; $("field").appendChild(h);
+  }, 6000);
+}
+function toss(x, y, done) {
+  const fld = $("field"), W = fld.clientWidth, H = fld.clientHeight, b = document.createElement("div"); b.className = "ball"; fld.appendChild(b);
+  const x0 = W / 2, y0 = H - 40, dur = K.CALM ? 1 : 420, t0 = performance.now();
+  K.sfx.pop();
+  function step(now) {
+    const t = Math.min(1, (now - t0) / dur), px = x0 + (x - x0) * t, py = y0 + (y - y0) * t - Math.sin(Math.PI * t) * Math.min(160, H * 0.3);
+    b.style.left = px + "px"; b.style.top = py + "px"; b.style.transform = `scale(${1 - 0.35 * t})`;
+    if (t < 1) requestAnimationFrame(step); else { b.remove(); const p = document.createElement("div"); p.className = "puff"; p.style.left = x + "px"; p.style.top = y + "px"; fld.appendChild(p); setTimeout(() => p.remove(), 520); done(); }
+  }
+  requestAnimationFrame(step);
+}
+function tap(f, e) {
+  if (!running) return;
+  const s = $("field").getBoundingClientRect(), r = f.el.getBoundingClientRect();
+  document.querySelectorAll(".fort.hint").forEach(o => o.classList.remove("hint"));
+  if (f.up && !f.hitNow) {
+    f.hitNow = true; clearTimeout(f.hideT);
+    toss(r.left - s.left + r.width / 2, r.top - s.top + r.height * 0.3, () => {
+      K.sfx.thud(); setTimeout(K.sfx.chime, 120);
+      f.el.classList.remove("hit"); void f.el.offsetWidth; f.el.classList.add("hit");
+      hits++; total++; $("count").textContent = total;
+      const bi = $("balls").children[hits - 1]; if (bi) bi.classList.add("on");
+      say("hit", K.toyName(f.toy));
+      if (!K.CALM) K.confetti(r.left + r.width / 2, r.top + r.height * 0.3, 18);
+      later(() => { f.hitNow = false; duck(f); }, 800);
+      if (hits >= ROUNDS[round].need) roundDone();
+    });
+  } else if (!f.up) {
+    misses++;
+    toss(r.left - s.left + r.width / 2, r.top - s.top + r.height * 0.62, () => { K.sfx.thud(); say("miss"); });
+  }
+  idle();
+}
+function roundDone() {
+  running = false; clearAll(); K.sfx.tada();
+  later(() => {
+    if (round < ROUNDS.length - 1) { round++; running = true; say("next"); later(dealRound, 900); }
+    else finish();
+  }, 1300);
+}
+function finish() {
+  running = false; clearAll(); const stars = misses <= 3 ? 3 : misses <= 8 ? 2 : 1;
+  $("stars").innerHTML = [0, 1, 2].map(i => K.starSVG(i < stars)).join("");
+  $("overH").textContent = K.t("overH", stars); $("overP").textContent = K.t("overP", total);
+  $("over").hidden = false; K.sfx.tada(); K.confetti(); $("againBtn").focus();
+}
+function start(list) {
+  toys = list.filter(t => t.img); if (!toys.length) return; clearAll();
+  round = 0; total = 0; misses = 0; running = true; $("count").textContent = "0"; $("intro").hidden = true; $("over").hidden = true;
+  flakes(); dealRound();
+}
+
+K.initBar(); K.onLang = () => { if (running) say("go"); }; K.applyWords();
+function introArt(list) {
+  const c = $("introArt"), x = c.getContext("2d"); x.clearRect(0, 0, c.width, c.height);
+  x.fillStyle = "#D9EEFF"; x.fillRect(0, 0, 400, 280);
+  x.fillStyle = "#fff"; x.strokeStyle = K.INK; x.lineWidth = 4; x.beginPath(); x.ellipse(200, 300, 260, 90, 0, Math.PI, 0); x.fill(); x.stroke();
+  const ts = (list || []).filter(t => t.img).slice(0, 2);
+  [[110, 150], [290, 150]].forEach(([cx, cy], i) => {
+    if (ts[i]) x.drawImage(ts[i].img, cx - 50, cy - 95, 100, 100);
+    x.fillStyle = "#F2F9FF"; x.beginPath(); x.moveTo(cx - 70, cy + 50); x.lineTo(cx - 70, cy); x.quadraticCurveTo(cx, cy - 40, cx + 70, cy); x.lineTo(cx + 70, cy + 50); x.closePath(); x.fill(); x.stroke();
+  });
+  x.fillStyle = "#fff"; x.beginPath(); x.arc(200, 90, 18, 0, 7); x.fill(); x.stroke();
+  x.setLineDash([6, 8]); x.beginPath(); x.moveTo(200, 250); x.quadraticCurveTo(205, 120, 200, 110); x.stroke(); x.setLineDash([]);
+}
+introArt();
+$("homeBtn").href = window.SHOP_URL ? window.SHOP_URL + (window.SHOP_URL.includes("#") ? "" : "#play") : "/#play";
+K.library().then(list => introArt(list));
+$("startBtn").onclick = () => { K.sfx.pop(); K.library().then(start); };
+$("againBtn").onclick = () => { K.sfx.pop(); K.library().then(start); };
+</script>
+<!--TAIL-->

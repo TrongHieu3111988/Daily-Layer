@@ -144,6 +144,26 @@ const DIRECTORS = {
     }
     await hold(10);
   },
+  // Toy Snowball Toss: toy friends peek out of snow forts; tap each one a moment after it peeks (one throw at an empty fort in round 2), snowball flies, friend giggles
+  async snow(s) {
+    const fr = async () => { await s.page.evaluate(dt => { for (const a of document.getAnimations()) { if (a.playState === "finished") continue; a.pause(); const end = a.effect.getComputedTiming().endTime; a.currentTime = Math.min((a.currentTime || 0) + dt, end); if (a.currentTime >= end) a.finish(); } }, DT); await s.frame(); };
+    const hold = async k => { for (let i = 0; i < k; i++) await fr(); };
+    await hold(24); await s.tap("#startBtn"); await hold(16);
+    let seen = -1, upFor = 0, missed = false, lastRound = 0;
+    for (let i = 0; i < 1100; i++) {
+      const st = await s.page.evaluate(() => ({ over: !document.getElementById("over").hidden, round, hits, total, up: forts.findIndex(f => f.up && !f.hitNow), empty: forts.findIndex(f => !f.up) }));
+      if (st.over || st.round >= 2) break;
+      if (st.round !== lastRound) { lastRound = st.round; s.mark("next"); }
+      if (st.up >= 0) {
+        if (st.up !== seen) { seen = st.up; upFor = 0; if (st.total === 0) s.mark("peek"); }
+        upFor++;
+        if (st.round === 1 && !missed && st.hits === 1 && st.empty >= 0 && upFor === 4) { missed = true; await s.tap(`.fort:nth-child(${st.empty + 1}) .tap`); s.mark("oops"); await hold(20); continue; }
+        if (upFor >= (st.round === 0 ? 16 : 10)) { await s.tap(`.fort:nth-child(${st.up + 1}) .tap`); s.mark("hit"); seen = -1; await hold(st.round === 0 ? 30 : 22); continue; }
+      }
+      await fr();
+    }
+    s.mark("done"); await hold(40);
+  },
   // Gift Box Surprise: swipe across the lid (first present) or tap it (second), twist by twist, until it pops and a toy friend jumps out onto the shelf
   async gift(s) {
     const fr = async () => { await s.page.evaluate(dt => { for (const a of document.getAnimations()) { if (a.playState === "finished") continue; a.pause(); const end = a.effect.getComputedTiming().endTime; a.currentTime = Math.min((a.currentTime || 0) + dt, end); if (a.currentTime >= end) a.finish(); } }, DT); await s.frame(); };

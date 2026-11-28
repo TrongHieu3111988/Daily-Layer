@@ -110,6 +110,11 @@
    "id": "gift",
    "artifact": "https://claude.ai/artifact/WLQZQM6fBRqzUJwunqzW5g",
    "library": "2d"
+  },
+  {
+   "id": "snow",
+   "artifact": "https://claude.ai/artifact/9bWQ7RzQGqQi44id5P8Y22",
+   "library": "2d"
   }
  ]
 }

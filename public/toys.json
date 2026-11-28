@@ -1,7 +1,21 @@
 {
- "updated": "2026-11-16 08:51",
- "featured": "sculpt-snowman",
+ "updated": "2026-11-28 08:49",
+ "featured": "sculpt-santa",
  "toys": [
+  {
+   "slug": "sculpt-santa",
+   "title": "Chibi Santa",
+   "title_vi": "\u00d4ng Gi\u00e0 Noel M\u0169m M\u0129m",
+   "price": 2.49,
+   "dropped": "2026-11-28",
+   "height_mm": 70.2,
+   "game": "products/sculpt-santa/game.bin",
+   "cover": "products/sculpt-santa/cover.jpg",
+   "icon": "products/sculpt-santa/icon.png",
+   "colour": "#D9443F",
+   "look": null,
+   "featured": true
+  },
   {
    "slug": "sculpt-snowman",
    "title": "Chibi Snowman",
@@ -14,7 +28,7 @@
    "icon": "products/sculpt-snowman/icon.png",
    "colour": "#FBFBF8",
    "look": null,
-   "featured": true
+   "featured": false
   },
   {
    "slug": "sculpt-reindeer",

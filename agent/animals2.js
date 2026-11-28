@@ -5,9 +5,9 @@ const S2 = require("./core2.js");
 const fs = require("fs"), path = require("path");
 
 const COL = { orange: "#F28C3A", white: "#FBFBF8", ink: "#24283A", pink: "#F7A1B5", cream: "#F4E9D4",
-              green: "#7CC56B", lime: "#D9F0B5", rose: "#F7A9C4", magenta: "#E0609A", grey: "#A9AFBF", slate: "#7C8396", brown: "#7A4E33", ginger: "#C27C43", red: "#D9443F", pine: "#2F8A57" };
+              green: "#7CC56B", lime: "#D9F0B5", rose: "#F7A9C4", magenta: "#E0609A", grey: "#A9AFBF", slate: "#7C8396", brown: "#7A4E33", ginger: "#C27C43", red: "#D9443F", pine: "#2F8A57", skin: "#F6CBAA", gold: "#E8B93C" };
 const NAMES = Object.keys(COL), L = n => NAMES.indexOf(n);
-const BASE = { fox: "orange", frog: "green", axolotl: "rose", kitten: "grey", gingerbread: "ginger", reindeer: "ginger", snowman: "white" };
+const BASE = { fox: "orange", frog: "green", axolotl: "rose", kitten: "grey", gingerbread: "ginger", reindeer: "ginger", snowman: "white", santa: "red" };
 
 function kit(s) {
   const k = {
@@ -39,6 +39,37 @@ function kit(s) {
 }
 
 const ANIMALS = {
+  santa(s, k) {
+    // chibi Santa (our own design): round red suit, peach face with a fluffy white beard and moustache, red hat with a white cuff
+    // bending back to a pompom, black belt with a gold buckle, white fur trim down the front, mittens and black boots
+    k.blob([0, -0.34, 0], 0.37, "red");                                                          // body
+    k.blob([0, 0.08, 0.03], 0.3, "skin");                                                        // head
+    // beard: soft clumps hugging the lower face and chin, falling onto the chest
+    for (const [x, y, z, r] of [[0, -0.1, 0.24, 0.17], [0.13, -0.05, 0.2, 0.14], [-0.13, -0.05, 0.2, 0.14], [0.2, 0.03, 0.14, 0.11], [-0.2, 0.03, 0.14, 0.11],
+                                [0, -0.2, 0.26, 0.14], [0.08, -0.17, 0.25, 0.12], [-0.08, -0.17, 0.25, 0.12]]) k.blob([x, y, z], r, "white");
+    k.smoothAll(1, [[0, -0.1, 0.22], 0.3]);
+    k.mirror(sx => k.line([0.015 * sx, 0.04, 0.33], [0.13 * sx, 0.025, 0.28], 0.055, 0.04, "white", 8));   // moustache
+    k.blob([0, 0.075, 0.33], 0.05, "skin");                                                       // button nose
+    k.paint([0, 0.08, 0.37], 0.045, "pink");
+    k.mirror(sx => k.eye(0.105 * sx, 0.155, 0.29, 0.047));
+    k.mirror(sx => k.paint([0.19 * sx, 0.09, 0.23], 0.045, "pink"));                              // rosy cheeks
+    // hat: a red cone that bends back, a white fur cuff and a pompom resting on the back of the hat
+    k.line([0, 0.27, -0.01], [0, 0.42, -0.06], 0.25, 0.15, "red", 12);
+    k.line([0, 0.42, -0.06], [0, 0.5, -0.17], 0.15, 0.09, "red", 10);
+    for (let a = 0; a < 30; a++) { const t = a / 30 * Math.PI * 2; k.blob([0.26 * Math.sin(t), 0.26, 0.01 + 0.26 * Math.cos(t)], 0.06, "white"); }
+    k.blob([0, 0.5, -0.26], 0.075, "white");
+    for (let y = 0.33; y <= 0.6; y += 0.012) for (let a = 0; a < 48; a++) { const t = a / 48 * Math.PI * 2, h = s.raycast([2 * Math.sin(t), y, 2 * Math.cos(t)], [-Math.sin(t), 0, -Math.cos(t)]); if (h && h.p[1] > 0.325 && Math.hypot(h.p[1] - 0.5, h.p[2] + 0.26) > 0.09) k.paint(h.p, 0.03, "red"); }
+    // black belt with a gold buckle
+    for (let a = 0; a < 40; a++) { const t = a / 40 * Math.PI * 2, h = s.raycast([2 * Math.sin(t), -0.4, 2 * Math.cos(t)], [-Math.sin(t), 0, -Math.cos(t)]); if (h) { k.paint(h.p, 0.05, "ink"); k.paint([h.p[0], h.p[1] + 0.03, h.p[2]], 0.04, "ink"); } }
+    { const h = k.hit(0, -0.39); if (h) k.blob([h.p[0], h.p[1], h.p[2] - 0.01], 0.06, "gold"); }
+    { const h = k.hit(0, -0.39); if (h) k.paint(h.p, 0.03, "ink"); }
+    // white fur trim down the front of the coat, under the beard and below the belt
+    for (const y of [-0.27, -0.31, -0.49, -0.53, -0.57, -0.61]) { const h = k.hit(0, y); if (h) k.paint(h.p, 0.065, "white"); }
+    // stubby arms with white cuffs and dark mittens, hugging the tummy
+    k.mirror(sx => { k.line([0.27 * sx, -0.2, 0.04], [0.33 * sx, -0.36, 0.14], 0.09, 0.08, "red", 8); k.blob([0.33 * sx, -0.39, 0.16], 0.075, "white"); k.blob([0.32 * sx, -0.45, 0.2], 0.07, "pine"); });
+    // boots
+    k.mirror(sx => { k.line([0.15 * sx, -0.63, 0.14], [0.17 * sx, -0.65, 0.3], 0.09, 0.08, "ink", 6); });
+  },
   snowman(s, k) {
     // chibi snowman (our own design): big round head, red knitted beanie with a pompom, carrot nose, coal eyes and buttons, red scarf, mitten arms
     k.blob([0, -0.38, 0], 0.36, "white");                                                       // bottom snowball

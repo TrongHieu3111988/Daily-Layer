@@ -1,0 +1,29 @@
+{
+ "id": "snow",
+ "title": "Toy Snowball Toss",
+ "hook": "Snowball fight\nwith toy friends!",
+ "captions": {
+  "peek": [
+   "Who's peeking out?",
+   "Peekaboo!",
+   "Quick, there!",
+   "Another friend!"
+  ],
+  "hit": [
+   "Poof! Giggle giggle!",
+   "Snowball!",
+   "Got you!",
+   "Hee hee!"
+  ],
+  "oops": [
+   "Oops, just snow!"
+  ],
+  "next": [
+   "More snow forts!"
+  ]
+ },
+ "yt_title": "Snowball fight with toy friends! Free winter game for kids #Shorts",
+ "yt_desc": "Toy friends peek out from behind snow forts. Tap one to toss a soft snowball and make it giggle! Easy enough for a 4-year-old, in English and Vietnamese, with no ads and no signing up, and every toy (even the new Chibi Santa) is a real model you can 3D print at home.\n\nPlay free in your browser: {url}\nMore free kids' games and a new 3D-printable toy every day: {site}\n\n#Shorts #KidsGames #Christmas #Snow #3DPrinting #FreeGames",
+ "icons": "/home/user/Daily-Layer/public/products",
+ "toys": "/home/user/Daily-Layer/public/toys.json"
+}

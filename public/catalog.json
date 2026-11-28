@@ -3,6 +3,186 @@
  "started": "2026-10-28",
  "products": [
   {
+   "slug": "sculpt-santa",
+   "title": "Chibi Santa",
+   "price": 2.49,
+   "blurb": "Chibi Santa with a fluffy white beard, a red hat with a white cuff and pompom, a black belt with a gold buckle, mittens and boots. One solid piece, colour-split for AMS.",
+   "tags": [
+    "figure",
+    "cute",
+    "christmas",
+    "santa",
+    "kids",
+    "multicolor",
+    "stocking stuffer"
+   ],
+   "line": "figure",
+   "print_hint": "Sculpted in Sculpt Studio. Painted OBJ/3MF (Bambu Studio maps the colours to your filaments on import), colour-split 3MF and single-colour STL; 0.12-0.16 mm layers.",
+   "parts": [
+    {
+     "name": "body",
+     "triangles": 178272,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 63.5,
+     "size_mm": [
+      45.5,
+      43.2,
+      70.2
+     ],
+     "min_z": 0.0
+    }
+   ],
+   "colour_parts": [
+    {
+     "name": "ink",
+     "triangles": 47088,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 7,
+     "volume_cm3": 3.01,
+     "size_mm": [
+      40.6,
+      41.1,
+      48.0
+     ],
+     "min_z": -0.04
+    },
+    {
+     "name": "red",
+     "triangles": 182936,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 4,
+     "volume_cm3": 39.24,
+     "size_mm": [
+      45.4,
+      40.5,
+      70.2
+     ],
+     "min_z": -0.04
+    },
+    {
+     "name": "white",
+     "triangles": 104316,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 8,
+     "volume_cm3": 13.22,
+     "size_mm": [
+      45.5,
+      41.0,
+      66.3
+     ],
+     "min_z": 2.27
+    },
+    {
+     "name": "skin",
+     "triangles": 65152,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 6.94,
+     "size_mm": [
+      33.1,
+      36.2,
+      23.0
+     ],
+     "min_z": 24.68
+    },
+    {
+     "name": "pine",
+     "triangles": 9096,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 2,
+     "volume_cm3": 0.66,
+     "size_mm": [
+      43.4,
+      8.8,
+      8.5
+     ],
+     "min_z": 8.52
+    },
+    {
+     "name": "pink",
+     "triangles": 2008,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 3,
+     "volume_cm3": 0.05,
+     "size_mm": [
+      24.4,
+      9.8,
+      4.0
+     ],
+     "min_z": 39.49
+    },
+    {
+     "name": "gold",
+     "triangles": 3376,
+     "watertight": true,
+     "bad_edges": 0,
+     "shells": 1,
+     "volume_cm3": 0.2,
+     "size_mm": [
+      8.1,
+      7.0,
+      6.5
+     ],
+     "min_z": 12.3
+    }
+   ],
+   "watertight": true,
+   "smooth": true,
+   "web": [
+    {
+     "file": null,
+     "color": "#24283A",
+     "name": "ink"
+    },
+    {
+     "file": null,
+     "color": "#D9443F",
+     "name": "red"
+    },
+    {
+     "file": null,
+     "color": "#FBFBF8",
+     "name": "white"
+    },
+    {
+     "file": null,
+     "color": "#F6CBAA",
+     "name": "skin"
+    },
+    {
+     "file": null,
+     "color": "#2F8A57",
+     "name": "pine"
+    },
+    {
+     "file": null,
+     "color": "#F7A1B5",
+     "name": "pink"
+    },
+    {
+     "file": null,
+     "color": "#E8B93C",
+     "name": "gold"
+    }
+   ],
+   "preview": "products/sculpt-santa/preview_fc.bin",
+   "preview_face": true,
+   "download": "",
+   "cover": "products/sculpt-santa/cover.jpg",
+   "build_seconds": 0,
+   "title_vi": "\u00d4ng Gi\u00e0 Noel M\u0169m M\u0129m",
+   "download_bytes": 12706082,
+   "dropped": "2026-11-28"
+  },
+  {
    "slug": "screw-gift-box",
    "title": "Screw-Lid Gift Box",
    "title_vi": "H\u1ed9p Qu\u00e0 N\u1eafp V\u1eb7n",
@@ -3110,6 +3290,6 @@
   "members": 0,
   "costs_usd": 0.0
  },
- "updated": "2026-11-22 08:53",
- "featured": "screw-gift-box"
+ "updated": "2026-11-28 08:49",
+ "featured": "sculpt-santa"
 }
